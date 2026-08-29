@@ -67,23 +67,19 @@
     /* Seção do Vídeo */
     .player-section { flex: 2; padding: 1.5rem; background: #111; display: flex; flex-direction: column; align-items: center; }
     
-    .iframe-wrapper {
+    .video-wrapper {
       position: relative;
       width: 100%;
-      padding-bottom: 56.25%; /* Proporção 16:9 */
-      height: 0;
       background: #000;
       border-radius: 4px;
       overflow: hidden;
     }
 
-    .iframe-wrapper iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
+    .video-wrapper video {
       width: 100%;
-      height: 100%;
-      border: 0;
+      height: auto;
+      display: block;
+      max-height: 500px;
     }
 
     .controls-extra {
@@ -133,8 +129,8 @@
 
     <div class="main-content">
       <div class="player-section">
-        <div class="iframe-wrapper">
-          <iframe id="onedrive-frame" src="" allowfullscreen></iframe>
+        <div class="video-wrapper">
+          <video id="main-player" controls preload="metadata"></video>
         </div>
         <div class="controls-extra">
           <span id="current-title">Selecione um vídeo</span>
@@ -165,19 +161,19 @@
       }
     }
 
-    // Lista contendo o link de Embed do vídeo do OneDrive que você enviou
+    // URL convertida para o endpoint direto de download do OneDrive (download.aspx)
     let videos = [
       { 
         id: 1, 
         title: "Palavra 2020-06-14-18h Salmos 91", 
-        url: "https://onedrive.live.com/embed?resid=26427E9CFAA3AA79%211218&authkey=%21IQTFiLgQDaMfR5gwzAGde9oa" 
+        url: "https://onedrive.live.com/download.aspx?resid=26427E9CFAA3AA79%211218&authkey=%21IQTFiLgQDaMfR5gwzAGde9oa" 
       }
     ];
 
     let currentVideoIndex = 0;
     let isShuffle = false;
 
-    const iframe = document.getElementById('onedrive-frame');
+    const videoPlayer = document.getElementById('main-player');
     const playlistElement = document.getElementById('playlist');
     const titleElement = document.getElementById('current-title');
 
@@ -186,6 +182,17 @@
       if (videos.length > 0) {
         tocarVideo(0);
       }
+      
+      // Quando o vídeo atual terminar
+      videoPlayer.onended = () => {
+        if (isShuffle) {
+          let randomIndex = Math.floor(Math.random() * videos.length);
+          tocarVideo(randomIndex);
+        } else {
+          let nextIndex = (currentVideoIndex + 1) % videos.length;
+          tocarVideo(nextIndex);
+        }
+      };
     }
 
     function renderizarLista(lista) {
@@ -203,7 +210,8 @@
       currentVideoIndex = index;
       const vid = videos[index];
       titleElement.innerText = vid.title;
-      iframe.src = vid.url;
+      videoPlayer.src = vid.url;
+      videoPlayer.play().catch(() => {}); // Tenta reproduzir automaticamente
       renderizarLista(videos);
     }
 
