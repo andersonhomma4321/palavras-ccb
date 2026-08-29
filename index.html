@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palavras CCB</title>
+  
+  <!-- CSS Plyr Player -->
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+
   <style>
     :root {
       --ccb-blue: #0b2545;
@@ -65,7 +69,12 @@
 
     /* Seção do Vídeo */
     .player-section { flex: 2; padding: 1.5rem; background: #111; display: flex; flex-direction: column; align-items: center; }
-    video { width: 100%; max-height: 450px; background: #000; border-radius: 4px; outline: none; }
+    
+    .plyr-wrapper {
+      width: 100%;
+      border-radius: 4px;
+      overflow: hidden;
+    }
 
     .controls-extra {
       display: flex; justify-content: space-between; width: 100%;
@@ -114,9 +123,9 @@
 
     <div class="main-content">
       <div class="player-section">
-        <video id="main-player" controls preload="metadata" controlsList="nodownload">
-          Seu navegador não suporta a execução de vídeos.
-        </video>
+        <div class="plyr-wrapper">
+          <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="dQw4w9WgXcQ"></div>
+        </div>
         <div class="controls-extra">
           <span id="current-title">Selecione um vídeo</span>
           <button class="btn-shuffle" id="btn-shuffle" onclick="toggleShuffle()">🔀 Aleatório: OFF</button>
@@ -132,6 +141,9 @@
     </div>
   </div>
 
+  <!-- JS Plyr Player -->
+  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
   <script>
     const SENHA_MESTRA = "ccb123"; 
 
@@ -146,28 +158,43 @@
       }
     }
 
-    // LISTA DE VÍDEOS COM A URL DIRETA DE MEDIA STREAM DO ONEDRIVE
+    // Cole aqui os IDs reais dos seus vídeos do YouTube
     let videos = [
       { 
         id: 1, 
         title: "Palavra 2020-06-14-18h Salmos 91", 
-        url: "https://storage.live.com/items/26427E9CFAA3AA79!105?authkey=!IQQrp9JzNC_ASY-Dk_LmwcKGAfTcgDrUFLy0L6lm8gnN1Wg" 
+        youtubeId: "dQw4w9WgXcQ" // Substitua pelo ID do seu vídeo no YouTube
       }
     ];
 
     let currentVideoIndex = 0;
     let isShuffle = false;
-
-    const player = document.getElementById('main-player');
-    const playlistElement = document.getElementById('playlist');
-    const titleElement = document.getElementById('current-title');
+    let plyrPlayer;
 
     function carregarPlaylist() {
       renderizarLista(videos);
-      if (videos.length > 0) tocarVideo(0);
+      
+      plyrPlayer = new Plyr('#player', {
+        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
+      });
+
+      plyrPlayer.on('ended', () => {
+        if (isShuffle) {
+          let randomIndex = Math.floor(Math.random() * videos.length);
+          tocarVideo(randomIndex);
+        } else {
+          let nextIndex = (currentVideoIndex + 1) % videos.length;
+          tocarVideo(nextIndex);
+        }
+      });
+
+      if (videos.length > 0) {
+        tocarVideo(0);
+      }
     }
 
     function renderizarLista(lista) {
+      const playlistElement = document.getElementById('playlist');
       playlistElement.innerHTML = '';
       lista.forEach((vid, index) => {
         const li = document.createElement('li');
@@ -180,22 +207,22 @@
 
     function tocarVideo(index) {
       currentVideoIndex = index;
-      player.src = videos[index].url;
-      titleElement.innerText = videos[index].title;
-      player.load();
-      player.play().catch(err => console.log("Aguardando ação para dar play:", err));
+      const vid = videos[index];
+      document.getElementById('current-title').innerText = vid.title;
+      
+      if (plyrPlayer) {
+        plyrPlayer.source = {
+          type: 'video',
+          sources: [
+            {
+              src: vid.youtubeId,
+              provider: 'youtube',
+            },
+          ],
+        };
+      }
       renderizarLista(videos);
     }
-
-    player.onended = () => {
-      if (isShuffle) {
-        let randomIndex = Math.floor(Math.random() * videos.length);
-        tocarVideo(randomIndex);
-      } else {
-        let nextIndex = (currentVideoIndex + 1) % videos.length;
-        tocarVideo(nextIndex);
-      }
-    };
 
     function toggleShuffle() {
       isShuffle = !isShuffle;
