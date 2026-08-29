@@ -18,43 +18,64 @@
 
     body { background-color: var(--ccb-dark-blue); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
 
-    /* Tela de Login */
-    #login-overlay {
+    /* Overlay dos Modais */
+    #login-overlay, .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(6, 23, 46, 0.95); display: flex;
-      justify-content: center; align-items: center; z-index: 1000;
-    }
-
-    /* Modal Admin / Engrenagem */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(6, 23, 46, 0.95); display: none;
       justify-content: center; align-items: center; z-index: 2000;
     }
 
+    .modal-overlay { display: none; }
+
     .login-card, .admin-card {
-      background: #fff; padding: 2.5rem; border-radius: 8px;
+      background: #fff; padding: 2.5rem 2rem 2rem 2rem; border-radius: 8px;
       border-top: 5px solid var(--ccb-gold); text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-width: 400px; width: 90%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-width: 450px; width: 90%;
       position: relative;
     }
 
-    .login-card h2, .admin-card h2 { color: var(--ccb-blue); margin-bottom: 0.5rem; }
-    .login-card p, .admin-card p { font-size: 0.9rem; color: #666; margin-bottom: 1.5rem; }
+    .login-card h2, .admin-card h2 { color: var(--ccb-blue); margin-bottom: 0.5rem; font-size: 1.5rem; }
+    .login-card p, .admin-card p { font-size: 0.9rem; color: #666; margin-bottom: 1rem; }
+    
     .login-card input, .admin-card input {
       width: 100%; padding: 0.75rem; border: 1px solid #ccc;
-      border-radius: 4px; margin-bottom: 1rem; font-size: 1rem; text-align: center; outline: none;
+      border-radius: 4px; margin-bottom: 0.75rem; font-size: 0.95rem; outline: none;
     }
-    .login-card button, .admin-card button {
+
+    /* Estilo aplicado apenas aos botões principais de ação */
+    .login-card button:not(.btn-close), 
+    .admin-card button:not(.btn-close) {
       width: 100%; padding: 0.75rem; background: var(--ccb-blue);
       color: #fff; border: none; border-radius: 4px; font-size: 1rem;
       cursor: pointer; font-weight: bold; transition: 0.2s;
     }
-    .login-card button:hover, .admin-card button:hover { background: var(--ccb-gold); color: var(--ccb-dark-blue); }
+    
+    .login-card button:not(.btn-close):hover, 
+    .admin-card button:not(.btn-close):hover { 
+      background: var(--ccb-gold); color: var(--ccb-dark-blue); 
+    }
 
+    /* CORREÇÃO DO BOTÃO FECHAR (x) */
     .btn-close {
-      position: absolute; top: 10px; right: 15px; background: none;
-      border: none; font-size: 1.5rem; color: #666; cursor: pointer; width: auto;
+      position: absolute !important;
+      top: 12px !important;
+      right: 15px !important;
+      width: auto !important;
+      height: auto !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      background: transparent !important;
+      border: none !important;
+      font-size: 1.5rem !important;
+      font-weight: bold !important;
+      color: #888 !important;
+      cursor: pointer !important;
+      line-height: 1 !important;
+      box-shadow: none !important;
+    }
+    
+    .btn-close:hover { 
+      color: var(--ccb-blue) !important; 
     }
 
     /* Estrutura do Player */
@@ -71,7 +92,6 @@
     }
     header h1 { font-weight: 600; letter-spacing: 1px; font-size: 1.8rem; }
 
-    /* Botão Engrenagem no topo direito */
     .btn-gear {
       position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
       background: transparent; border: none; color: var(--ccb-gold);
@@ -139,15 +159,23 @@
     </div>
   </div>
 
-  <!-- MODAL PARA ADICIONAR VÍDEO -->
+  <!-- MODAL PARA ADICIONAR VÍDEO NO GITHUB -->
   <div id="admin-form-overlay" class="modal-overlay">
     <div class="admin-card">
       <button class="btn-close" onclick="fecharModais()">&times;</button>
-      <h2>Adicionar Vídeo</h2>
-      <p>Insira o título e a URL ou ID do YouTube</p>
+      <h2>Adicionar Vídeo no GitHub</h2>
+      <p>Preencha os dados abaixo para salvar no repositório</p>
+      
+      <input type="text" id="gh-owner" placeholder="Usuário do GitHub (ex: andersonhomma4321)">
+      <input type="text" id="gh-repo" placeholder="Nome do Repositório (ex: palavras-ccb)">
+      <input type="password" id="gh-token" placeholder="Personal Access Token (PAT) do GitHub">
+      <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ddd;">
+      
       <input type="text" id="new-video-title" placeholder="Título do Vídeo">
       <input type="text" id="new-video-url" placeholder="ID ou URL do YouTube">
-      <button onclick="adicionarVideoNaLista()">Adicionar na Playlist</button>
+      
+      <button id="btn-save-gh" onclick="adicionarVideoNoGitHub()">Salvar no GitHub</button>
+      <p id="admin-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
     </div>
   </div>
 
@@ -183,7 +211,7 @@
     // LISTA DE VÍDEOS DO YOUTUBE
     const listaVideos = [
       { title: "Palavra 2026-04-22 Proverbios 27 IrLuiz", youtubeId: "cjp_4UM7ed8" },
-      { title: "Palavra 2026 04 19 Salmos 23 IrHelio", youtubeId: "Rl2uD4dUyY8" }
+      { title: "Palavra 2026 04 19 Salmos 23 IrHelio", youtubeId: "R12uD4dUyY8" }
     ];
 
     let currentVideoIndex = 0;
@@ -261,6 +289,7 @@
       if (input === SENHA_MESTRA) {
         document.getElementById('admin-auth-overlay').style.display = 'none';
         document.getElementById('admin-form-overlay').style.display = 'flex';
+        carregarCredenciaisGitHub();
       } else {
         document.getElementById('admin-auth-error').style.display = 'block';
       }
@@ -272,25 +301,103 @@
       return match ? match[1] : entrada.trim();
     }
 
-    function adicionarVideoNaLista() {
+    function carregarCredenciaisGitHub() {
+      if (localStorage.getItem('gh_owner')) document.getElementById('gh-owner').value = localStorage.getItem('gh_owner');
+      if (localStorage.getItem('gh_repo')) document.getElementById('gh-repo').value = localStorage.getItem('gh_repo');
+      if (localStorage.getItem('gh_token')) document.getElementById('gh-token').value = localStorage.getItem('gh_token');
+    }
+
+    /* INTEGRAÇÃO COM A API DO GITHUB */
+    async function adicionarVideoNoGitHub() {
+      const owner = document.getElementById('gh-owner').value.trim();
+      const repo = document.getElementById('gh-repo').value.trim();
+      const token = document.getElementById('gh-token').value.trim().replace(/\s+/g, '');
       const title = document.getElementById('new-video-title').value.trim();
       const rawUrl = document.getElementById('new-video-url').value.trim();
+      const msg = document.getElementById('admin-msg');
+      const btn = document.getElementById('btn-save-gh');
 
-      if (!title || !rawUrl) {
-        alert("Preencha o título e o ID/Link do vídeo!");
+      if (!owner || !repo || !token || !title || !rawUrl) {
+        msg.style.color = 'red';
+        msg.innerText = 'Preencha todos os campos!';
         return;
       }
 
+      localStorage.setItem('gh_owner', owner);
+      localStorage.setItem('gh_repo', repo);
+      localStorage.setItem('gh_token', token);
+
       const youtubeId = extrairYoutubeId(rawUrl);
-      listaVideos.push({ title: title, youtubeId: youtubeId });
+      btn.disabled = true;
+      msg.style.color = '#0b2545';
+      msg.innerText = 'Enviando alterações para o GitHub...';
 
-      renderizarLista(listaVideos);
-      fecharModais();
+      try {
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/index.html`;
+        const resGet = await fetch(apiUrl, {
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
 
-      document.getElementById('new-video-title').value = '';
-      document.getElementById('new-video-url').value = '';
+        if (!resGet.ok) {
+          if (resGet.status === 401) throw new Error('Token inválido ou revogado. Gere um novo token no GitHub.');
+          if (resGet.status === 404) throw new Error('Repositório ou arquivo index.html não encontrado.');
+          throw new Error(`Erro na busca (${resGet.status})`);
+        }
+        
+        const fileData = await resGet.json();
+        const contentDecoded = decodeURIComponent(escape(atob(fileData.content)));
 
-      alert("Vídeo adicionado com sucesso na sessão atual!");
+        const novoItem = `{ title: "${title}", youtubeId: "${youtubeId}" }`;
+        const regexLista = /(const listaVideos = \[\s*)([\s\S]*?)(\s*\];)/;
+
+        if (!regexLista.test(contentDecoded)) {
+          throw new Error('A lista de vídeos (listaVideos) não foi encontrada no arquivo.');
+        }
+
+        const conteudoAtualizado = contentDecoded.replace(regexLista, (match, p1, p2, p3) => {
+          const virgula = p2.trim().length > 0 ? ',\n      ' : '\n      ';
+          return `${p1}${p2.trim()}${virgula}${novoItem}${p3}`;
+        });
+
+        const contentEncoded = btoa(unescape(encodeURIComponent(conteudoAtualizado)));
+
+        const resPut = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `Adicionado novo vídeo: ${title}`,
+            content: contentEncoded,
+            sha: fileData.sha
+          })
+        });
+
+        if (resPut.ok) {
+          msg.style.color = 'green';
+          msg.innerText = 'Vídeo salvo com sucesso! O GitHub Pages atualizará o site em 1-2 minutos.';
+          
+          listaVideos.push({ title: title, youtubeId: youtubeId });
+          renderizarLista(listaVideos);
+
+          document.getElementById('new-video-title').value = '';
+          document.getElementById('new-video-url').value = '';
+        } else {
+          const errData = await resPut.json();
+          throw new Error(errData.message || 'Erro ao salvar no GitHub.');
+        }
+
+      } catch (err) {
+        msg.style.color = 'red';
+        msg.innerText = 'Erro: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
     }
   </script>
 </body>
