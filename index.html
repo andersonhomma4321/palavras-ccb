@@ -95,15 +95,13 @@
 </head>
 <body>
 
-  <!-- Tela de Login -->
-  <div id="login-overlay">
-    <div class="login-card">
-      <h2>Palavras CCB</h2>
-      <p>Acesso Restrito</p>
-      <input type="password" id="password-input" placeholder="Digite a senha de acesso">
-      <button onclick="autenticar()">Entrar</button>
-      <p id="login-error" style="color: red; font-size: 0.8rem; margin-top: 0.5rem; display: none;">Senha incorreta!</p>
-    </div>
+  <!-- TELA DE LOGIN -->
+  <div id="loginContainer">
+    <h2>Área Restrita - Palavras CCB</h2>
+    <p>Insira a senha de acesso:</p>
+    <input type="password" id="passInput" placeholder="Digite a senha de acesso" onkeyup="if(event.key === 'Enter') verificarSenha()">
+    <button onclick="verificarSenha()">Entrar</button>
+    <p id="errorMsg" style="color: red; display: none;">Senha incorreta!</p>
   </div>
 
   <!-- Aplicação do Player -->
