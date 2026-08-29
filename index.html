@@ -95,7 +95,6 @@
 </head>
 <body>
 
-  <!-- TELA DE LOGIN -->
   <div id="login-overlay">
     <div class="login-card">
       <h2>Palavras CCB</h2>
@@ -106,14 +105,12 @@
     </div>
   </div>
 
-  <!-- APLICAÇÃO DO PLAYER -->
   <div id="app-container">
     <header>
       <h1>Palavras CCB</h1>
     </header>
 
     <div class="main-content">
-      <!-- Player de Vídeo -->
       <div class="player-section">
         <video id="main-player" controls autoplay controlsList="nodownload">
           <source src="" type="video/mp4">
@@ -125,20 +122,17 @@
         </div>
       </div>
 
-      <!-- Playlist e Busca -->
       <div class="playlist-section">
         <div class="search-box">
           <input type="text" id="search-input" placeholder="🔍 Localizar vídeo..." onkeyup="filtrarVideos()">
         </div>
         <ul class="video-list" id="playlist">
-          <!-- Vídeos inseridos via JS -->
-        </ul>
+          </ul>
       </div>
     </div>
   </div>
 
   <script>
-    // 1. SENHA DE ACESSO
     const SENHA_MESTRA = "ccb123"; 
 
     function autenticar() {
@@ -152,7 +146,6 @@
       }
     }
 
-    // 2. LISTA DE VÍDEOS
     let videos = [
       { 
         id: 1, 
@@ -192,7 +185,6 @@
       renderizarLista(videos);
     }
 
-    // Reprodução Automática e Aleatória (Shuffle)
     player.onended = () => {
       if (isShuffle) {
         let randomIndex = Math.floor(Math.random() * videos.length);
@@ -215,7 +207,6 @@
       }
     }
 
-    // Busca e Filtro de Vídeos
     function filtrarVideos() {
       const termo = document.getElementById('search-input').value.toLowerCase();
       const itens = document.querySelectorAll('.video-item');
