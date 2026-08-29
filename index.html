@@ -42,26 +42,36 @@
       border-radius: 4px; margin-bottom: 0.75rem; font-size: 0.95rem; outline: none;
     }
 
-    /* Estilo aplicado apenas aos botões principais de ação */
+    /* Estilo aplicado APENAS aos botões principais de ação */
     .login-card button:not(.btn-close), 
     .admin-card button:not(.btn-close) {
-      width: 100%; padding: 0.75rem; background: var(--ccb-blue);
-      color: #fff; border: none; border-radius: 4px; font-size: 1rem;
-      cursor: pointer; font-weight: bold; transition: 0.2s;
+      width: 100% !important;
+      padding: 0.75rem !important;
+      background: var(--ccb-blue) !important;
+      color: #fff !important;
+      border: none !important;
+      border-radius: 4px !important;
+      font-size: 1rem !important;
+      cursor: pointer !important;
+      font-weight: bold !important;
+      transition: 0.2s !important;
+      margin-top: 0 !important;
     }
     
     .login-card button:not(.btn-close):hover, 
     .admin-card button:not(.btn-close):hover { 
-      background: var(--ccb-gold); color: var(--ccb-dark-blue); 
+      background: var(--ccb-gold) !important; 
+      color: var(--ccb-dark-blue) !important; 
     }
 
-    /* CORREÇÃO DO BOTÃO FECHAR (x) */
-    .btn-close {
+    /* CORREÇÃO DEFINITIVA DO BOTÃO FECHAR (x) */
+    button.btn-close {
       position: absolute !important;
-      top: 12px !important;
-      right: 15px !important;
-      width: auto !important;
-      height: auto !important;
+      top: 10px !important;
+      right: 12px !important;
+      width: 30px !important;
+      height: 30px !important;
+      min-width: unset !important;
       padding: 0 !important;
       margin: 0 !important;
       background: transparent !important;
@@ -72,10 +82,15 @@
       cursor: pointer !important;
       line-height: 1 !important;
       box-shadow: none !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      z-index: 10 !important;
     }
     
-    .btn-close:hover { 
+    button.btn-close:hover { 
       color: var(--ccb-blue) !important; 
+      background: transparent !important;
     }
 
     /* Estrutura do Player */
