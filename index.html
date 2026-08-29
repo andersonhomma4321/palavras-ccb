@@ -67,40 +67,25 @@
     .video-container {
       position: relative;
       width: 100%;
-      padding-bottom: 56.25%; /* Proporção 16:9 */
+      padding-bottom: 56.25%; /* 16:9 */
       height: 0;
       background: #000;
       border-radius: 4px;
       overflow: hidden;
     }
 
-    .video-container iframe {
+    .video-container video {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      border: 0;
+      outline: none;
     }
 
     .controls-extra {
       display: flex; justify-content: space-between; width: 100%;
-      margin-top: 1rem; color: #fff; align-items: center; flex-wrap: wrap; gap: 10px;
-    }
-
-    .hd-button {
-      color: var(--ccb-gold);
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: bold;
-      border: 1px solid var(--ccb-gold);
-      padding: 6px 12px;
-      border-radius: 4px;
-      transition: 0.2s;
-    }
-    .hd-button:hover {
-      background: var(--ccb-gold);
-      color: var(--ccb-dark-blue);
+      margin-top: 1rem; color: #fff; align-items: center;
     }
 
     .playlist-section { flex: 1; background: var(--ccb-white); padding: 1.5rem; border-left: 1px solid var(--ccb-gray); }
@@ -139,13 +124,10 @@
     <div class="main-content">
       <div class="player-section">
         <div class="video-container">
-          <iframe id="main-iframe" allow="autoplay" allowfullscreen></iframe>
+          <video id="main-video" controls controlsList="nodownload"></video>
         </div>
         <div class="controls-extra">
           <span id="current-title">Selecione um vídeo</span>
-          <a id="hd-link" href="#" target="_blank" class="hd-button">
-            ↗️ Assistir em HD no Drive
-          </a>
         </div>
       </div>
 
@@ -161,17 +143,16 @@
   <script>
     const SENHA_MESTRA = "ccb123"; 
 
-    // LISTA DE VÍDEOS
+    // LISTA DE VÍDEOS DO GOOGLE DRIVE
     const listaVideos = [
       { title: "Palavra 2026-04-22 Proverbios 27 IrLuiz", driveId: "1UFlUK7KwyYz3Y0sGzjhhihmb0iZ2uYna" }
     ];
 
     let currentVideoIndex = 0;
 
-    const iframePlayer = document.getElementById('main-iframe');
+    const videoPlayer = document.getElementById('main-video');
     const playlistElement = document.getElementById('playlist');
     const titleElement = document.getElementById('current-title');
-    const hdLinkElement = document.getElementById('hd-link');
 
     function autenticar() {
       const input = document.getElementById('password-input').value;
@@ -209,11 +190,11 @@
       if (!vid) return;
       
       titleElement.innerText = vid.title;
-      iframePlayer.src = `https://drive.google.com/file/d/${vid.driveId}/preview`;
       
-      // Atualiza o link direto para visualizar em alta qualidade no Drive
-      hdLinkElement.href = `https://drive.google.com/file/d/${vid.driveId}/view`;
-      
+      // Carrega a fonte direta do arquivo sem a limitação do iframe
+      videoPlayer.src = `https://drive.google.com/uc?export=download&id=${vid.driveId}`;
+      videoPlayer.load();
+
       const termo = document.getElementById('search-input').value.toLowerCase();
       if (termo) {
         filtrarVideos();
