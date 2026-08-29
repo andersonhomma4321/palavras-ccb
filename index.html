@@ -4,9 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Palavras CCB</title>
-  
-  <!-- CSS Plyr Player -->
-  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
   <style>
     :root {
@@ -70,10 +67,23 @@
     /* Seção do Vídeo */
     .player-section { flex: 2; padding: 1.5rem; background: #111; display: flex; flex-direction: column; align-items: center; }
     
-    .plyr-wrapper {
+    .iframe-wrapper {
+      position: relative;
       width: 100%;
+      padding-bottom: 56.25%; /* Proporção 16:9 */
+      height: 0;
+      background: #000;
       border-radius: 4px;
       overflow: hidden;
+    }
+
+    .iframe-wrapper iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
     }
 
     .controls-extra {
@@ -123,8 +133,8 @@
 
     <div class="main-content">
       <div class="player-section">
-        <div class="plyr-wrapper">
-          <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="dQw4w9WgXcQ"></div>
+        <div class="iframe-wrapper">
+          <iframe id="onedrive-frame" src="" allowfullscreen></iframe>
         </div>
         <div class="controls-extra">
           <span id="current-title">Selecione um vídeo</span>
@@ -141,9 +151,6 @@
     </div>
   </div>
 
-  <!-- JS Plyr Player -->
-  <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-
   <script>
     const SENHA_MESTRA = "ccb123"; 
 
@@ -158,43 +165,30 @@
       }
     }
 
-    // Cole aqui os IDs reais dos seus vídeos do YouTube
+    // Lista com o seu link do OneDrive formatado para Embed
     let videos = [
       { 
         id: 1, 
-        title: "Palavra 2020-06-14-18h Salmos 91", 
-        youtubeId: "dQw4w9WgXcQ" // Substitua pelo ID do seu vídeo no YouTube
+        title: "Palavra CCB - Vídeo Selecionado", 
+        url: "https://onedrive.live.com/embed?resid=26427E9CFAA3AA79%211218&authkey=%21IQTFiLgQDaMfR5gwzAGde9oa" 
       }
     ];
 
     let currentVideoIndex = 0;
     let isShuffle = false;
-    let plyrPlayer;
+
+    const iframe = document.getElementById('onedrive-frame');
+    const playlistElement = document.getElementById('playlist');
+    const titleElement = document.getElementById('current-title');
 
     function carregarPlaylist() {
       renderizarLista(videos);
-      
-      plyrPlayer = new Plyr('#player', {
-        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen']
-      });
-
-      plyrPlayer.on('ended', () => {
-        if (isShuffle) {
-          let randomIndex = Math.floor(Math.random() * videos.length);
-          tocarVideo(randomIndex);
-        } else {
-          let nextIndex = (currentVideoIndex + 1) % videos.length;
-          tocarVideo(nextIndex);
-        }
-      });
-
       if (videos.length > 0) {
         tocarVideo(0);
       }
     }
 
     function renderizarLista(lista) {
-      const playlistElement = document.getElementById('playlist');
       playlistElement.innerHTML = '';
       lista.forEach((vid, index) => {
         const li = document.createElement('li');
@@ -208,19 +202,8 @@
     function tocarVideo(index) {
       currentVideoIndex = index;
       const vid = videos[index];
-      document.getElementById('current-title').innerText = vid.title;
-      
-      if (plyrPlayer) {
-        plyrPlayer.source = {
-          type: 'video',
-          sources: [
-            {
-              src: vid.youtubeId,
-              provider: 'youtube',
-            },
-          ],
-        };
-      }
+      titleElement.innerText = vid.title;
+      iframe.src = vid.url;
       renderizarLista(videos);
     }
 
