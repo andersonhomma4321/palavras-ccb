@@ -85,7 +85,22 @@
 
     .controls-extra {
       display: flex; justify-content: space-between; width: 100%;
-      margin-top: 1rem; color: #fff; align-items: center;
+      margin-top: 1rem; color: #fff; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
+
+    .hd-button {
+      color: var(--ccb-gold);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border: 1px solid var(--ccb-gold);
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: 0.2s;
+    }
+    .hd-button:hover {
+      background: var(--ccb-gold);
+      color: var(--ccb-dark-blue);
     }
 
     .playlist-section { flex: 1; background: var(--ccb-white); padding: 1.5rem; border-left: 1px solid var(--ccb-gray); }
@@ -128,6 +143,9 @@
         </div>
         <div class="controls-extra">
           <span id="current-title">Selecione um vídeo</span>
+          <a id="hd-link" href="#" target="_blank" class="hd-button">
+            ↗️ Assistir em HD no Drive
+          </a>
         </div>
       </div>
 
@@ -145,14 +163,6 @@
 
     // LISTA DE VÍDEOS
     const listaVideos = [
-      // Deixe comentado ou remova os que ainda não têm o ID correto:
-      // { title: "Palavra 2026-03-15 Mateus 7 IrSalvador", driveId: "ID_REAL_AQUI" },
-      // { title: "Palavra 2026-03-18 Marcos 11 IrLuiz", driveId: "ID_REAL_AQUI" },
-      // { title: "Palavra 2026-03-22 Hebreus 3 IrLuiz", driveId: "ID_REAL_AQUI" },
-      // { title: "Palavra 2026-03-29 Isaías 54 IrHélio", driveId: "ID_REAL_AQUI" },
-      // { title: "Palavra 2026-04-08 Romanos 5 IrLuiz", driveId: "ID_REAL_AQUI" },
-      // { title: "Palavra 2026-04-12 Tiago 4 IrSalvador", driveId: "ID_REAL_AQUI" },
-      // { title: "Palavra 2026-04-19 Salmos 23 IrHelio", driveId: "ID_REAL_AQUI" },
       { title: "Palavra 2026-04-22 Proverbios 27 IrLuiz", driveId: "1UFlUK7KwyYz3Y0sGzjhhihmb0iZ2uYna" }
     ];
 
@@ -161,6 +171,7 @@
     const iframePlayer = document.getElementById('main-iframe');
     const playlistElement = document.getElementById('playlist');
     const titleElement = document.getElementById('current-title');
+    const hdLinkElement = document.getElementById('hd-link');
 
     function autenticar() {
       const input = document.getElementById('password-input').value;
@@ -182,11 +193,12 @@
 
     function renderizarLista(lista) {
       playlistElement.innerHTML = '';
-      lista.forEach((vid, index) => {
+      lista.forEach((vid) => {
+        const indexNaListaOriginal = listaVideos.findIndex(v => v.driveId === vid.driveId);
         const li = document.createElement('li');
-        li.className = `video-item ${index === currentVideoIndex ? 'active' : ''}`;
+        li.className = `video-item ${indexNaListaOriginal === currentVideoIndex ? 'active' : ''}`;
         li.innerText = vid.title;
-        li.onclick = () => tocarVideo(index);
+        li.onclick = () => tocarVideo(indexNaListaOriginal);
         playlistElement.appendChild(li);
       });
     }
@@ -194,22 +206,26 @@
     function tocarVideo(index) {
       currentVideoIndex = index;
       const vid = listaVideos[index];
+      if (!vid) return;
+      
       titleElement.innerText = vid.title;
       iframePlayer.src = `https://drive.google.com/file/d/${vid.driveId}/preview`;
-      renderizarLista(listaVideos);
+      
+      // Atualiza o link direto para visualizar em alta qualidade no Drive
+      hdLinkElement.href = `https://drive.google.com/file/d/${vid.driveId}/view`;
+      
+      const termo = document.getElementById('search-input').value.toLowerCase();
+      if (termo) {
+        filtrarVideos();
+      } else {
+        renderizarLista(listaVideos);
+      }
     }
 
     function filtrarVideos() {
       const termo = document.getElementById('search-input').value.toLowerCase();
-      const itens = document.querySelectorAll('.video-item');
-      
-      listaVideos.forEach((vid, i) => {
-        if (vid.title.toLowerCase().includes(termo)) {
-          itens[i].style.display = 'block';
-        } else {
-          itens[i].style.display = 'none';
-        }
-      });
+      const filtrados = listaVideos.filter(vid => vid.title.toLowerCase().includes(termo));
+      renderizarLista(filtrados);
     }
   </script>
 </body>
