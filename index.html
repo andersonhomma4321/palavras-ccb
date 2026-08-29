@@ -17,7 +17,7 @@
 
     body { background-color: var(--ccb-dark-blue); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
 
-    /* Tela de Login */
+    /* Overlay e Cartão de Login */
     #login-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(6, 23, 46, 0.95); display: flex;
@@ -34,7 +34,7 @@
     .login-card p { font-size: 0.9rem; color: #666; margin-bottom: 1.5rem; }
     .login-card input {
       width: 100%; padding: 0.75rem; border: 1px solid #ccc;
-      border-radius: 4px; margin-bottom: 1rem; font-size: 1rem; text-align: center;
+      border-radius: 4px; margin-bottom: 1rem; font-size: 1rem; text-align: center; outline: none;
     }
     .login-card button {
       width: 100%; padding: 0.75rem; background: var(--ccb-blue);
@@ -96,15 +96,17 @@
 <body>
 
   <!-- TELA DE LOGIN -->
-  <div id="loginContainer">
-    <h2>Área Restrita - Palavras CCB</h2>
-    <p>Insira a senha de acesso:</p>
-    <input type="password" id="passInput" placeholder="Digite a senha de acesso" onkeyup="if(event.key === 'Enter') verificarSenha()">
-    <button onclick="verificarSenha()">Entrar</button>
-    <p id="errorMsg" style="color: red; display: none;">Senha incorreta!</p>
+  <div id="login-overlay">
+    <div class="login-card">
+      <h2>Palavras CCB</h2>
+      <p>Acesso Restrito</p>
+      <input type="password" id="password-input" placeholder="Digite a senha de acesso" onkeyup="if(event.key === 'Enter') autenticar()">
+      <button onclick="autenticar()">Entrar</button>
+      <p id="login-error" style="color: red; margin-top: 10px; display: none;">Senha incorreta!</p>
+    </div>
   </div>
 
-  <!-- Aplicação do Player -->
+  <!-- APLICAÇÃO DO PLAYER -->
   <div id="app-container">
     <header>
       <h1>Palavras CCB</h1>
@@ -136,9 +138,7 @@
   </div>
 
   <script>
-    // -------------------------------------------------------------
-    // 1. AQUI VOCÊ ALTERA A SUA SENHA DE ACESSO:
-    // -------------------------------------------------------------
+    // 1. SENHA DE ACESSO
     const SENHA_MESTRA = "ccb123"; 
 
     function autenticar() {
@@ -152,15 +152,12 @@
       }
     }
 
-    // -------------------------------------------------------------
-    // 2. AQUI VOCÊ ADICIONA SEUS VÍDEOS DO ONEDRIVE:
-    // Cole a URL trocando 'embed' por 'download=1' no final
-    // -------------------------------------------------------------
+    // 2. LISTA DE VÍDEOS
     let videos = [
       { 
-      id: 1, 
-      title: "Palavra 2020-06-14-18h Salmos 91", 
-      url: "https://1drv.ms/download/c/26427e9cfaa3aa79/IQQrp9JzNC_ASY-Dk_LmwcKGAfTcgDrUFLy0L6lm8gnN1Wg" 
+        id: 1, 
+        title: "Palavra 2020-06-14-18h Salmos 91", 
+        url: "https://1drv.ms/download/c/26427e9cfaa3aa79/IQQrp9JzNC_ASY-Dk_LmwcKGAfTcgDrUFLy0L6lm8gnN1Wg" 
       }
     ];
 
