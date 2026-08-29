@@ -19,42 +19,45 @@
     body { background-color: var(--ccb-dark-blue); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
 
     /* Tela de Login */
-    #login-overlay, .modal-overlay {
+    #login-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(6, 23, 46, 0.95); display: flex;
       justify-content: center; align-items: center; z-index: 1000;
     }
 
-    .modal-overlay { display: none; }
+    /* Modal Admin / Engrenagem */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(6, 23, 46, 0.95); display: none;
+      justify-content: center; align-items: center; z-index: 2000;
+    }
 
     .login-card, .admin-card {
       background: #fff; padding: 2.5rem; border-radius: 8px;
       border-top: 5px solid var(--ccb-gold); text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-width: 450px; width: 90%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-width: 400px; width: 90%;
       position: relative;
     }
 
     .login-card h2, .admin-card h2 { color: var(--ccb-blue); margin-bottom: 0.5rem; }
-    .login-card p, .admin-card p { font-size: 0.9rem; color: #666; margin-bottom: 1.2rem; }
-    
-    input[type="text"], input[type="password"] {
+    .login-card p, .admin-card p { font-size: 0.9rem; color: #666; margin-bottom: 1.5rem; }
+    .login-card input, .admin-card input {
       width: 100%; padding: 0.75rem; border: 1px solid #ccc;
-      border-radius: 4px; margin-bottom: 1rem; font-size: 0.95rem; outline: none;
+      border-radius: 4px; margin-bottom: 1rem; font-size: 1rem; text-align: center; outline: none;
     }
-
-    button {
+    .login-card button, .admin-card button {
       width: 100%; padding: 0.75rem; background: var(--ccb-blue);
       color: #fff; border: none; border-radius: 4px; font-size: 1rem;
       cursor: pointer; font-weight: bold; transition: 0.2s;
     }
-    button:hover { background: var(--ccb-gold); color: var(--ccb-dark-blue); }
+    .login-card button:hover, .admin-card button:hover { background: var(--ccb-gold); color: var(--ccb-dark-blue); }
 
     .btn-close {
       position: absolute; top: 10px; right: 15px; background: none;
       border: none; font-size: 1.5rem; color: #666; cursor: pointer; width: auto;
     }
 
-    /* Header e Estrutura Principal */
+    /* Estrutura do Player */
     #app-container {
       display: none; width: 95%; max-width: 1650px; background: #fff;
       border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
@@ -68,12 +71,13 @@
     }
     header h1 { font-weight: 600; letter-spacing: 1px; font-size: 1.8rem; }
 
+    /* Botão Engrenagem no topo direito */
     .btn-gear {
       position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
       background: transparent; border: none; color: var(--ccb-gold);
-      font-size: 1.6rem; cursor: pointer; width: auto; padding: 0;
+      font-size: 1.5rem; cursor: pointer; padding: 5px;
     }
-    .btn-gear:hover { color: #fff; background: transparent; }
+    .btn-gear:hover { color: #fff; }
 
     .main-content { display: flex; flex-direction: column; }
     @media(min-width: 900px) {
@@ -98,6 +102,9 @@
 
     .playlist-section { flex: 1; background: var(--ccb-white); padding: 1.5rem; border-left: 1px solid var(--ccb-gray); min-width: 300px; }
     .search-box { margin-bottom: 1rem; }
+    .search-box input {
+      width: 100%; padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; outline: none;
+    }
     .video-list { list-style: none; max-height: 500px; overflow-y: auto; }
     .video-item {
       padding: 0.75rem; border-bottom: 1px solid var(--ccb-gray);
@@ -109,6 +116,7 @@
 </head>
 <body>
 
+  <!-- TELA DE LOGIN -->
   <div id="login-overlay">
     <div class="login-card">
       <h2>Palavras CCB</h2>
@@ -119,36 +127,31 @@
     </div>
   </div>
 
+  <!-- MODAL DE AUTENTICAÇÃO DA ENGRENAGEM -->
   <div id="admin-auth-overlay" class="modal-overlay">
     <div class="admin-card">
       <button class="btn-close" onclick="fecharModais()">&times;</button>
-      <h2>Painel de Gerenciamento</h2>
-      <p>Confirme a senha para adicionar novos vídeos</p>
+      <h2>Painel do Administrador</h2>
+      <p>Digite a senha para gerenciar vídeos</p>
       <input type="password" id="admin-password-input" placeholder="Digite a senha mestra" onkeyup="if(event.key === 'Enter') verificarSenhaAdmin()">
       <button onclick="verificarSenhaAdmin()">Acessar</button>
       <p id="admin-auth-error" style="color: red; margin-top: 10px; display: none;">Senha incorreta!</p>
     </div>
   </div>
 
+  <!-- MODAL PARA ADICIONAR VÍDEO -->
   <div id="admin-form-overlay" class="modal-overlay">
     <div class="admin-card">
       <button class="btn-close" onclick="fecharModais()">&times;</button>
-      <h2>Cadastrar Novo Vídeo</h2>
-      <p>Preencha os dados e salve direto no GitHub</p>
-      
-      <input type="text" id="gh-owner" placeholder="Usuário GitHub (ex: seu-usuario)">
-      <input type="text" id="gh-repo" placeholder="Nome do Repositório (ex: palavras-ccb)">
-      <input type="password" id="gh-token" placeholder="GitHub Personal Access Token (PAT)">
-      <hr style="margin-bottom: 1rem; border: 0; border-top: 1px solid #ccc;">
-      
-      <input type="text" id="new-video-title" placeholder="Título do Vídeo (ex: Palavra 2026-05-10)">
-      <input type="text" id="new-video-url" placeholder="ID ou URL do YouTube (ex: cjp_4UM7ed8)">
-      
-      <button id="btn-save-video" onclick="salvarVideoGitHub()">Adicionar Vídeo</button>
-      <p id="admin-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
+      <h2>Adicionar Vídeo</h2>
+      <p>Insira o título e a URL ou ID do YouTube</p>
+      <input type="text" id="new-video-title" placeholder="Título do Vídeo">
+      <input type="text" id="new-video-url" placeholder="ID ou URL do YouTube">
+      <button onclick="adicionarVideoNaLista()">Adicionar na Playlist</button>
     </div>
   </div>
 
+  <!-- APLICAÇÃO DO PLAYER -->
   <div id="app-container">
     <header>
       <h1>Palavras CCB</h1>
@@ -240,7 +243,7 @@
       renderizarLista(filtrados);
     }
 
-    /* AÇÕES DA ENGRENAGEM E ADMIN */
+    /* FUNÇÕES DA ENGRENAGEM E MODAL */
     function abrirAuthAdmin() {
       document.getElementById('admin-password-input').value = '';
       document.getElementById('admin-auth-error').style.display = 'none';
@@ -257,7 +260,6 @@
       if (input === SENHA_MESTRA) {
         document.getElementById('admin-auth-overlay').style.display = 'none';
         document.getElementById('admin-form-overlay').style.display = 'flex';
-        carregarCredenciaisSalvas();
       } else {
         document.getElementById('admin-auth-error').style.display = 'block';
       }
@@ -269,96 +271,25 @@
       return match ? match[1] : entrada.trim();
     }
 
-    function carregarCredenciaisSalvas() {
-      if (localStorage.getItem('gh_owner')) document.getElementById('gh-owner').value = localStorage.getItem('gh_owner');
-      if (localStorage.getItem('gh_repo')) document.getElementById('gh-repo').value = localStorage.getItem('gh_repo');
-      if (localStorage.getItem('gh_token')) document.getElementById('gh-token').value = localStorage.getItem('gh_token');
-    }
-
-    async function salvarVideoGitHub() {
-      const owner = document.getElementById('gh-owner').value.trim();
-      const repo = document.getElementById('gh-repo').value.trim();
-      const token = document.getElementById('gh-token').value.trim();
+    function adicionarVideoNaLista() {
       const title = document.getElementById('new-video-title').value.trim();
       const rawUrl = document.getElementById('new-video-url').value.trim();
-      const msg = document.getElementById('admin-msg');
-      const btn = document.getElementById('btn-save-video');
 
-      if (!owner || !repo || !token || !title || !rawUrl) {
-        msg.style.color = 'red';
-        msg.innerText = 'Preencha todos os campos!';
+      if (!title || !rawUrl) {
+        alert("Preencha o título e o ID/Link do vídeo!");
         return;
       }
 
-      // Salva credenciais localmente no navegador para não precisar re-digitar
-      localStorage.setItem('gh_owner', owner);
-      localStorage.setItem('gh_repo', repo);
-      localStorage.setItem('gh_token', token);
-
       const youtubeId = extrairYoutubeId(rawUrl);
-      btn.disabled = true;
-      msg.style.color = '#0b2545';
-      msg.innerText = 'Atualizando o repositório no GitHub...';
+      listaVideos.push({ title: title, youtubeId: youtubeId });
 
-      try {
-        // 1. Busca o arquivo index.html no GitHub
-        const fileUrl = `https://api.github.com/repos/${owner}/${repo}/contents/index.html`;
-        const resGet = await fetch(fileUrl, {
-          headers: { Authorization: `token ${token}` }
-        });
+      renderizarLista(listaVideos);
+      fecharModais();
 
-        if (!resGet.ok) throw new Error('Não foi possível carregar o arquivo index.html do repositório.');
-        const fileData = await resGet.json();
+      document.getElementById('new-video-title').value = '';
+      document.getElementById('new-video-url').value = '';
 
-        // Decode UTF-8 Base64
-        const contentDecoded = decodeURIComponent(escape(atob(fileData.content)));
-
-        // 2. Localiza a array listaVideos no código e adiciona o novo elemento
-        const novoItem = `{ title: "${title}", youtubeId: "${youtubeId}" }`;
-        const regexLista = /(const listaVideos = \[\s*)([\s\S]*?)(\s*\];)/;
-
-        if (!regexLista.test(contentDecoded)) {
-          throw new Error('Array listaVideos não encontrada no arquivo.');
-        }
-
-        const conteudoAtualizado = contentDecoded.replace(regexLista, (match, p1, p2, p3) => {
-          const virgula = p2.trim().length > 0 ? ',\n      ' : '\n      ';
-          return `${p1}${p2.trim()}${virgula}${novoItem}${p3}`;
-        });
-
-        // Encode Base64
-        const contentEncoded = btoa(unescape(encodeURIComponent(conteudoAtualizado)));
-
-        // 3. Envia o commit via GitHub API
-        const resPut = await fetch(fileUrl, {
-          method: 'PUT',
-          headers: {
-            Authorization: `token ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: `Adicionado novo vídeo: ${title}`,
-            content: contentEncoded,
-            sha: fileData.sha
-          })
-        });
-
-        if (resPut.ok) {
-          msg.style.color = 'green';
-          msg.innerText = 'Vídeo salvo com sucesso! O GitHub Pages atualizará o site em 1-2 minutos.';
-          document.getElementById('new-video-title').value = '';
-          document.getElementById('new-video-url').value = '';
-        } else {
-          const errData = await resPut.json();
-          throw new Error(errData.message || 'Erro ao fazer commit no GitHub.');
-        }
-
-      } catch (err) {
-        msg.style.color = 'red';
-        msg.innerText = 'Erro: ' + err.message;
-      } finally {
-        btn.disabled = false;
-      }
+      alert("Vídeo adicionado com sucesso na sessão atual!");
     }
   </script>
 </body>
