@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palavras CCB</title>
+  <style>
+    :root {
+      --ccb-blue: #0b2545;
+      --ccb-dark-blue: #06172e;
+      --ccb-gold: #c5a059;
+      --ccb-white: #f8f9fa;
+      --ccb-gray: #e9ecef;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+    body { background-color: var(--ccb-dark-blue); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+
+    /* Tela de Login */
+    #login-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(6, 23, 46, 0.95); display: flex;
+      justify-content: center; align-items: center; z-index: 1000;
+    }
+
+    .login-card {
+      background: #fff; padding: 2.5rem; border-radius: 8px;
+      border-top: 5px solid var(--ccb-gold); text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-width: 380px; width: 90%;
+    }
+
+    .login-card h2 { color: var(--ccb-blue); margin-bottom: 0.5rem; }
+    .login-card p { font-size: 0.9rem; color: #666; margin-bottom: 1.5rem; }
+    .login-card input {
+      width: 100%; padding: 0.75rem; border: 1px solid #ccc;
+      border-radius: 4px; margin-bottom: 1rem; font-size: 1rem; text-align: center;
+    }
+    .login-card button {
+      width: 100%; padding: 0.75rem; background: var(--ccb-blue);
+      color: #fff; border: none; border-radius: 4px; font-size: 1rem;
+      cursor: pointer; font-weight: bold; transition: 0.2s;
+    }
+    .login-card button:hover { background: var(--ccb-gold); color: var(--ccb-dark-blue); }
+
+    /* Container do App */
+    #app-container {
+      display: none; width: 95%; max-width: 1100px; background: #fff;
+      border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      margin: 20px 0;
+    }
+
+    /* Cabeçalho */
+    header {
+      background: var(--ccb-blue); color: var(--ccb-white);
+      padding: 1.2rem; text-align: center; border-bottom: 3px solid var(--ccb-gold);
+    }
+    header h1 { font-weight: 600; letter-spacing: 1px; font-size: 1.8rem; }
+
+    /* Layout do Player + Playlist */
+    .main-content { display: flex; flex-direction: column; }
+    @media(min-width: 768px) {
+      .main-content { flex-direction: row; }
+    }
+
+    /* Seção do Vídeo */
+    .player-section { flex: 2; padding: 1.5rem; background: #111; display: flex; flex-direction: column; align-items: center; }
+    video { width: 100%; max-height: 450px; background: #000; border-radius: 4px; }
+
+    .controls-extra {
+      display: flex; justify-content: space-between; width: 100%;
+      margin-top: 1rem; color: #fff; align-items: center;
+    }
+    .btn-shuffle {
+      background: transparent; border: 1px solid var(--ccb-gold);
+      color: var(--ccb-gold); padding: 0.5rem 1rem; border-radius: 4px;
+      cursor: pointer; transition: 0.3s;
+    }
+    .btn-shuffle.active, .btn-shuffle:hover { background: var(--ccb-gold); color: #000; }
+
+    /* Seção da Playlist */
+    .playlist-section { flex: 1; background: var(--ccb-white); padding: 1.5rem; border-left: 1px solid var(--ccb-gray); }
+    .search-box { margin-bottom: 1rem; }
+    .search-box input {
+      width: 100%; padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; outline: none;
+    }
+    .video-list { list-style: none; max-height: 380px; overflow-y: auto; }
+    .video-item {
+      padding: 0.75rem; border-bottom: 1px solid var(--ccb-gray);
+      cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; transition: 0.2s;
+    }
+    .video-item:hover { background: #e0e7ff; }
+    .video-item.active { background: var(--ccb-blue); color: #fff; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <!-- Tela de Login -->
+  <div id="login-overlay">
+    <div class="login-card">
+      <h2>Palavras CCB</h2>
+      <p>Acesso Restrito</p>
+      <input type="password" id="password-input" placeholder="Digite a senha de acesso">
+      <button onclick="autenticar()">Entrar</button>
+      <p id="login-error" style="color: red; font-size: 0.8rem; margin-top: 0.5rem; display: none;">Senha incorreta!</p>
+    </div>
+  </div>
+
+  <!-- Aplicação do Player -->
+  <div id="app-container">
+    <header>
+      <h1>Palavras CCB</h1>
+    </header>
+
+    <div class="main-content">
+      <!-- Player de Vídeo -->
+      <div class="player-section">
+        <video id="main-player" controls autoplay controlsList="nodownload">
+          <source src="" type="video/mp4">
+          Seu navegador não suporta a execução de vídeos.
+        </video>
+        <div class="controls-extra">
+          <span id="current-title">Selecione um vídeo</span>
+          <button class="btn-shuffle" id="btn-shuffle" onclick="toggleShuffle()">🔀 Aleatório: OFF</button>
+        </div>
+      </div>
+
+      <!-- Playlist e Busca -->
+      <div class="playlist-section">
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="🔍 Localizar vídeo..." onkeyup="filtrarVideos()">
+        </div>
+        <ul class="video-list" id="playlist">
+          <!-- Vídeos inseridos via JS -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // -------------------------------------------------------------
+    // 1. AQUI VOCÊ ALTERA A SUA SENHA DE ACESSO:
+    // -------------------------------------------------------------
+    const SENHA_MESTRA = "ccb123"; 
+
+    function autenticar() {
+      const input = document.getElementById('password-input').value;
+      if (input === SENHA_MESTRA) {
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+        carregarPlaylist();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 2. AQUI VOCÊ ADICIONA SEUS VÍDEOS DO ONEDRIVE:
+    // Cole a URL trocando 'embed' por 'download=1' no final
+    // -------------------------------------------------------------
+    let videos = [
+      { 
+      id: 1, 
+      title: "Palavra 2020-06-14-18h Salmos 91", 
+      url: "https://1drv.ms/download/c/26427e9cfaa3aa79/IQQrp9JzNC_ASY-Dk_LmwcKGAfTcgDrUFLy0L6lm8gnN1Wg" 
+      }
+    ];
+
+    let currentVideoIndex = 0;
+    let isShuffle = false;
+
+    const player = document.getElementById('main-player');
+    const playlistElement = document.getElementById('playlist');
+    const titleElement = document.getElementById('current-title');
+
+    function carregarPlaylist() {
+      renderizarLista(videos);
+      if(videos.length > 0) tocarVideo(0);
+    }
+
+    function renderizarLista(lista) {
+      playlistElement.innerHTML = '';
+      lista.forEach((vid, index) => {
+        const li = document.createElement('li');
+        li.className = `video-item ${index === currentVideoIndex ? 'active' : ''}`;
+        li.innerText = vid.title;
+        li.onclick = () => tocarVideo(index);
+        playlistElement.appendChild(li);
+      });
+    }
+
+    function tocarVideo(index) {
+      currentVideoIndex = index;
+      player.src = videos[index].url;
+      titleElement.innerText = videos[index].title;
+      player.play();
+      renderizarLista(videos);
+    }
+
+    // Reprodução Automática e Aleatória (Shuffle)
+    player.onended = () => {
+      if (isShuffle) {
+        let randomIndex = Math.floor(Math.random() * videos.length);
+        tocarVideo(randomIndex);
+      } else {
+        let nextIndex = (currentVideoIndex + 1) % videos.length;
+        tocarVideo(nextIndex);
+      }
+    };
+
+    function toggleShuffle() {
+      isShuffle = !isShuffle;
+      const btn = document.getElementById('btn-shuffle');
+      if (isShuffle) {
+        btn.classList.add('active');
+        btn.innerText = '🔀 Aleatório: ON';
+      } else {
+        btn.classList.remove('active');
+        btn.innerText = '🔀 Aleatório: OFF';
+      }
+    }
+
+    // Busca e Filtro de Vídeos
+    function filtrarVideos() {
+      const termo = document.getElementById('search-input').value.toLowerCase();
+      const itens = document.querySelectorAll('.video-item');
+      
+      videos.forEach((vid, i) => {
+        if (vid.title.toLowerCase().includes(termo)) {
+          itens[i].style.display = 'block';
+        } else {
+          itens[i].style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
