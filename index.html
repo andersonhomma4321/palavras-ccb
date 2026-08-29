@@ -67,20 +67,20 @@
     .video-container {
       position: relative;
       width: 100%;
-      padding-bottom: 56.25%; /* 16:9 */
+      padding-bottom: 56.25%; /* Proporção 16:9 */
       height: 0;
       background: #000;
       border-radius: 4px;
       overflow: hidden;
     }
 
-    .video-container video {
+    .video-container iframe {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      outline: none;
+      border: 0;
     }
 
     .controls-extra {
@@ -124,7 +124,7 @@
     <div class="main-content">
       <div class="player-section">
         <div class="video-container">
-          <video id="main-video" controls controlsList="nodownload"></video>
+          <iframe id="main-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
         <div class="controls-extra">
           <span id="current-title">Selecione um vídeo</span>
@@ -143,14 +143,14 @@
   <script>
     const SENHA_MESTRA = "ccb123"; 
 
-    // LISTA DE VÍDEOS DO GOOGLE DRIVE
+    // LISTA DE VÍDEOS DO YOUTUBE
     const listaVideos = [
-      { title: "Palavra 2026-04-22 Proverbios 27 IrLuiz", driveId: "1UFlUK7KwyYz3Y0sGzjhhihmb0iZ2uYna" }
+      { title: "Palavra 2026-04-22 Proverbios 27 IrLuiz", youtubeId: "cjp_4UM7ed8" }
     ];
 
     let currentVideoIndex = 0;
 
-    const videoPlayer = document.getElementById('main-video');
+    const iframePlayer = document.getElementById('main-iframe');
     const playlistElement = document.getElementById('playlist');
     const titleElement = document.getElementById('current-title');
 
@@ -175,7 +175,7 @@
     function renderizarLista(lista) {
       playlistElement.innerHTML = '';
       lista.forEach((vid) => {
-        const indexNaListaOriginal = listaVideos.findIndex(v => v.driveId === vid.driveId);
+        const indexNaListaOriginal = listaVideos.findIndex(v => v.youtubeId === vid.youtubeId);
         const li = document.createElement('li');
         li.className = `video-item ${indexNaListaOriginal === currentVideoIndex ? 'active' : ''}`;
         li.innerText = vid.title;
@@ -190,11 +190,8 @@
       if (!vid) return;
       
       titleElement.innerText = vid.title;
+      iframePlayer.src = `https://www.youtube.com/embed/${vid.youtubeId}?rel=0&vq=hd1080`;
       
-      // Carrega a fonte direta do arquivo sem a limitação do iframe
-      videoPlayer.src = `https://drive.google.com/uc?export=download&id=${vid.driveId}`;
-      videoPlayer.load();
-
       const termo = document.getElementById('search-input').value.toLowerCase();
       if (termo) {
         filtrarVideos();
