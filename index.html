@@ -57,15 +57,33 @@
     }
     header h1 { font-weight: 600; letter-spacing: 1px; font-size: 1.8rem; }
 
-    /* Layout do Player + Playlist */
+    /* Layout Principal */
     .main-content { display: flex; flex-direction: column; }
     @media(min-width: 768px) {
       .main-content { flex-direction: row; }
     }
 
-    /* Seção do Vídeo */
+    /* Seção do Player */
     .player-section { flex: 2; padding: 1.5rem; background: #111; display: flex; flex-direction: column; align-items: center; }
-    video { width: 100%; max-height: 450px; background: #000; border-radius: 4px; }
+    
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* Aspect Ratio 16:9 */
+      height: 0;
+      background: #000;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .video-container iframe, .video-container div {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
 
     .controls-extra {
       display: flex; justify-content: space-between; width: 100%;
@@ -113,29 +131,27 @@
     </header>
 
     <div class="main-content">
-      <!-- Player de Vídeo Nativo -->
       <div class="player-section">
-        <video id="main-player" controls preload="auto" controlsList="nodownload">
-          <source id="video-source" src="" type="video/mp4">
-          Seu navegador não suporta a execução de vídeos.
-        </video>
+        <div class="video-container">
+          <div id="yt-player"></div>
+        </div>
         <div class="controls-extra">
           <span id="current-title">Selecione um vídeo</span>
           <button class="btn-shuffle" id="btn-shuffle" onclick="toggleShuffle()">🔀 Aleatório: OFF</button>
         </div>
       </div>
 
-      <!-- Playlist e Busca -->
       <div class="playlist-section">
         <div class="search-box">
           <input type="text" id="search-input" placeholder="🔍 Localizar vídeo..." onkeyup="filtrarVideos()">
         </div>
-        <ul class="video-list" id="playlist">
-          <!-- Vídeos inseridos via JS -->
-        </ul>
+        <ul class="video-list" id="playlist"></ul>
       </div>
     </div>
   </div>
+
+  <!-- Carrega a API do YouTube -->
+  <script src="https://www.youtube.com/iframe_api"></script>
 
   <script>
     const SENHA_MESTRA = "ccb123"; 
@@ -151,28 +167,47 @@
       }
     }
 
-    // LISTA DE VÍDEOS COM LINK DE STREAM DIRETO DO ONEDRIVE
+    // LISTA DE VÍDEOS (Substitua 'youtubeId' pelos IDs dos seus vídeos no YouTube)
     let videos = [
       { 
         id: 1, 
         title: "Palavra 2020-06-14-18h Salmos 91", 
-        url: "https://onedrive.live.com/download?resid=26427E9CFAA3AA79%21105&authkey=%21IQQrp9JzNC_ASY-Dk_LmwcKGAfTcgDrUFLy0L6lm8gnN1Wg" 
+        youtubeId: "dQw4w9WgXcQ" // Insira o ID do seu vídeo aqui
       }
     ];
 
     let currentVideoIndex = 0;
     let isShuffle = false;
+    let player;
 
-    const player = document.getElementById('main-player');
-    const playlistElement = document.getElementById('playlist');
-    const titleElement = document.getElementById('current-title');
+    function onYouTubeIframeAPIReady() {
+      // API inicializada
+    }
 
     function carregarPlaylist() {
       renderizarLista(videos);
-      if(videos.length > 0) tocarVideo(0);
+      if (videos.length > 0) {
+        inicializarPlayer(videos[0].youtubeId);
+      }
+    }
+
+    function inicializarPlayer(videoId) {
+      player = new YT.Player('yt-player', {
+        videoId: videoId,
+        playerVars: {
+          'autoplay': 1,
+          'rel': 0,
+          'modestbranding': 1
+        },
+        events: {
+          'onStateChange': onPlayerStateChange
+        }
+      });
+      document.getElementById('current-title').innerText = videos[0].title;
     }
 
     function renderizarLista(lista) {
+      const playlistElement = document.getElementById('playlist');
       playlistElement.innerHTML = '';
       lista.forEach((vid, index) => {
         const li = document.createElement('li');
@@ -185,33 +220,33 @@
 
     function tocarVideo(index) {
       currentVideoIndex = index;
-      player.src = videos[index].url;
-      titleElement.innerText = videos[index].title;
-      player.load();
-      player.play().catch(e => console.log("Aguardando interação do usuário para reproduzir: ", e));
+      const vid = videos[index];
+      document.getElementById('current-title').innerText = vid.title;
+      
+      if (player && player.loadVideoById) {
+        player.loadVideoById(vid.youtubeId);
+      }
       renderizarLista(videos);
     }
 
-    player.onended = () => {
-      if (isShuffle) {
-        let randomIndex = Math.floor(Math.random() * videos.length);
-        tocarVideo(randomIndex);
-      } else {
-        let nextIndex = (currentVideoIndex + 1) % videos.length;
-        tocarVideo(nextIndex);
+    function onPlayerStateChange(event) {
+      // Quando o vídeo termina (YT.PlayerState.ENDED = 0)
+      if (event.data === 0) {
+        if (isShuffle) {
+          let randomIndex = Math.floor(Math.random() * videos.length);
+          tocarVideo(randomIndex);
+        } else {
+          let nextIndex = (currentVideoIndex + 1) % videos.length;
+          tocarVideo(nextIndex);
+        }
       }
-    };
+    }
 
     function toggleShuffle() {
       isShuffle = !isShuffle;
       const btn = document.getElementById('btn-shuffle');
-      if (isShuffle) {
-        btn.classList.add('active');
-        btn.innerText = '🔀 Aleatório: ON';
-      } else {
-        btn.classList.remove('active');
-        btn.innerText = '🔀 Aleatório: OFF';
-      }
+      btn.classList.toggle('active', isShuffle);
+      btn.innerText = isShuffle ? '🔀 Aleatório: ON' : '🔀 Aleatório: OFF';
     }
 
     function filtrarVideos() {
