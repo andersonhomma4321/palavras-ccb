@@ -65,24 +65,7 @@
 
     /* Seção do Vídeo */
     .player-section { flex: 2; padding: 1.5rem; background: #111; display: flex; flex-direction: column; align-items: center; }
-    
-    .iframe-wrapper {
-      position: relative;
-      width: 100%;
-      padding-bottom: 56.25%; /* proporção 16:9 */
-      height: 0;
-      background: #000;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    .iframe-wrapper iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
+    video { width: 100%; max-height: 450px; background: #000; border-radius: 4px; }
 
     .controls-extra {
       display: flex; justify-content: space-between; width: 100%;
@@ -130,11 +113,12 @@
     </header>
 
     <div class="main-content">
-      <!-- Player de Vídeo em iframe -->
+      <!-- Player de Vídeo Nativo -->
       <div class="player-section">
-        <div class="iframe-wrapper">
-          <iframe id="main-player" src="" allow="autoplay" allowfullscreen></iframe>
-        </div>
+        <video id="main-player" controls preload="auto" controlsList="nodownload">
+          <source id="video-source" src="" type="video/mp4">
+          Seu navegador não suporta a execução de vídeos.
+        </video>
         <div class="controls-extra">
           <span id="current-title">Selecione um vídeo</span>
           <button class="btn-shuffle" id="btn-shuffle" onclick="toggleShuffle()">🔀 Aleatório: OFF</button>
@@ -167,12 +151,12 @@
       }
     }
 
-    // LISTA DE VÍDEOS COM LINK DE EMBED NATIVO
+    // LISTA DE VÍDEOS COM LINK DE STREAM DIRETO DO ONEDRIVE
     let videos = [
       { 
         id: 1, 
         title: "Palavra 2020-06-14-18h Salmos 91", 
-        url: "https://onedrive.live.com/embed?resid=26427E9CFAA3AA79%21105&authkey=%21IQQrp9JzNC_ASY-Dk_LmwcKGAfTcgDrUFLy0L6lm8gnN1Wg" 
+        url: "https://onedrive.live.com/download?resid=26427E9CFAA3AA79%21105&authkey=%21IQQrp9JzNC_ASY-Dk_LmwcKGAfTcgDrUFLy0L6lm8gnN1Wg" 
       }
     ];
 
@@ -203,8 +187,20 @@
       currentVideoIndex = index;
       player.src = videos[index].url;
       titleElement.innerText = videos[index].title;
+      player.load();
+      player.play().catch(e => console.log("Aguardando interação do usuário para reproduzir: ", e));
       renderizarLista(videos);
     }
+
+    player.onended = () => {
+      if (isShuffle) {
+        let randomIndex = Math.floor(Math.random() * videos.length);
+        tocarVideo(randomIndex);
+      } else {
+        let nextIndex = (currentVideoIndex + 1) % videos.length;
+        tocarVideo(nextIndex);
+      }
+    };
 
     function toggleShuffle() {
       isShuffle = !isShuffle;
