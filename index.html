@@ -18,7 +18,7 @@
 
     body { background-color: var(--ccb-dark-blue); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
 
-    /* Overlay e Cartão de Login */
+    /* Tela de Login */
     #login-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(6, 23, 46, 0.95); display: flex;
@@ -44,27 +44,24 @@
     }
     .login-card button:hover { background: var(--ccb-gold); color: var(--ccb-dark-blue); }
 
-    /* Container do App */
+    /* Estrutura do Player */
     #app-container {
       display: none; width: 95%; max-width: 1100px; background: #fff;
       border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
       margin: 20px 0;
     }
 
-    /* Cabeçalho */
     header {
       background: var(--ccb-blue); color: var(--ccb-white);
       padding: 1.2rem; text-align: center; border-bottom: 3px solid var(--ccb-gold);
     }
     header h1 { font-weight: 600; letter-spacing: 1px; font-size: 1.8rem; }
 
-    /* Layout do Player + Playlist */
     .main-content { display: flex; flex-direction: column; }
     @media(min-width: 768px) {
       .main-content { flex-direction: row; }
     }
 
-    /* Seção do Vídeo */
     .player-section { flex: 2; padding: 1.5rem; background: #111; display: flex; flex-direction: column; align-items: center; }
     
     .video-wrapper {
@@ -93,7 +90,6 @@
     }
     .btn-shuffle.active, .btn-shuffle:hover { background: var(--ccb-gold); color: #000; }
 
-    /* Seção da Playlist */
     .playlist-section { flex: 1; background: var(--ccb-white); padding: 1.5rem; border-left: 1px solid var(--ccb-gray); }
     .search-box { margin-bottom: 1rem; }
     .search-box input {
@@ -133,7 +129,7 @@
           <video id="main-player" controls preload="metadata"></video>
         </div>
         <div class="controls-extra">
-          <span id="current-title">Selecione um vídeo</span>
+          <span id="current-title">Buscando vídeos no Drive...</span>
           <button class="btn-shuffle" id="btn-shuffle" onclick="toggleShuffle()">🔀 Aleatório: OFF</button>
         </div>
       </div>
@@ -150,26 +146,11 @@
   <script>
     const SENHA_MESTRA = "ccb123"; 
 
-    function autenticar() {
-      const input = document.getElementById('password-input').value;
-      if (input === SENHA_MESTRA) {
-        document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
-        carregarPlaylist();
-      } else {
-        document.getElementById('login-error').style.display = 'block';
-      }
-    }
+    // CONFIGURAÇÕES DO GOOGLE DRIVE
+    const GOOGLE_API_KEY = "SUA_CHAVE_API_AQUI"; // Coloque aqui sua Chave de API do Google Cloud
+    const FOLDER_ID = "13LGFdl1kKRz-EBeBYS2kGWObjKCYBg7s"; 
 
-    // URL convertida para o endpoint direto de download do OneDrive (download.aspx)
-    let videos = [
-      { 
-        id: 1, 
-        title: "Palavra 2020-06-14-18h Salmos 91", 
-        url: "https://onedrive.live.com/download.aspx?resid=26427E9CFAA3AA79%211218&authkey=%21IQTFiLgQDaMfR5gwzAGde9oa" 
-      }
-    ];
-
+    let videos = [];
     let currentVideoIndex = 0;
     let isShuffle = false;
 
@@ -177,13 +158,47 @@
     const playlistElement = document.getElementById('playlist');
     const titleElement = document.getElementById('current-title');
 
+    function autenticar() {
+      const input = document.getElementById('password-input').value;
+      if (input === SENHA_MESTRA) {
+        document.getElementById('login-overlay').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+        buscarVideosDoDrive();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
+    }
+
+    async function buscarVideosDoDrive() {
+      const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+mimeType+contains+'video/'&fields=files(id,name)&key=${GOOGLE_API_KEY}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.files && data.files.length > 0) {
+          videos = data.files.map(file => ({
+            id: file.id,
+            title: file.name.replace(/\.[^/.]+$/, ""), // remove extensão (.mp4)
+            url: `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&key=${GOOGLE_API_KEY}`
+          }));
+
+          carregarPlaylist();
+        } else {
+          titleElement.innerText = "Nenhum vídeo encontrado na pasta do Drive.";
+        }
+      } catch (error) {
+        console.error(error);
+        titleElement.innerText = "Erro ao acessar a pasta do Google Drive.";
+      }
+    }
+
     function carregarPlaylist() {
       renderizarLista(videos);
       if (videos.length > 0) {
         tocarVideo(0);
       }
-      
-      // Quando o vídeo atual terminar
+
       videoPlayer.onended = () => {
         if (isShuffle) {
           let randomIndex = Math.floor(Math.random() * videos.length);
@@ -211,7 +226,8 @@
       const vid = videos[index];
       titleElement.innerText = vid.title;
       videoPlayer.src = vid.url;
-      videoPlayer.play().catch(() => {}); // Tenta reproduzir automaticamente
+      videoPlayer.load();
+      videoPlayer.play().catch(() => {});
       renderizarLista(videos);
     }
 
