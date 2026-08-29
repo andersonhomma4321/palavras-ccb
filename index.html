@@ -64,31 +64,29 @@
 
     .player-section { flex: 2; padding: 1.5rem; background: #111; display: flex; flex-direction: column; align-items: center; }
     
-    .video-wrapper {
+    .video-container {
       position: relative;
       width: 100%;
+      padding-bottom: 56.25%; /* Proporção 16:9 */
+      height: 0;
       background: #000;
       border-radius: 4px;
       overflow: hidden;
     }
 
-    .video-wrapper video {
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
-      height: auto;
-      display: block;
-      max-height: 500px;
+      height: 100%;
+      border: 0;
     }
 
     .controls-extra {
       display: flex; justify-content: space-between; width: 100%;
       margin-top: 1rem; color: #fff; align-items: center;
     }
-    .btn-shuffle {
-      background: transparent; border: 1px solid var(--ccb-gold);
-      color: var(--ccb-gold); padding: 0.5rem 1rem; border-radius: 4px;
-      cursor: pointer; transition: 0.3s;
-    }
-    .btn-shuffle.active, .btn-shuffle:hover { background: var(--ccb-gold); color: #000; }
 
     .playlist-section { flex: 1; background: var(--ccb-white); padding: 1.5rem; border-left: 1px solid var(--ccb-gray); }
     .search-box { margin-bottom: 1rem; }
@@ -125,12 +123,11 @@
 
     <div class="main-content">
       <div class="player-section">
-        <div class="video-wrapper">
-          <video id="main-player" controls preload="metadata"></video>
+        <div class="video-container">
+          <iframe id="main-iframe" allow="autoplay" allowfullscreen></iframe>
         </div>
         <div class="controls-extra">
-          <span id="current-title">Buscando vídeos no Drive...</span>
-          <button class="btn-shuffle" id="btn-shuffle" onclick="toggleShuffle()">🔀 Aleatório: OFF</button>
+          <span id="current-title">Selecione um vídeo</span>
         </div>
       </div>
 
@@ -146,15 +143,21 @@
   <script>
     const SENHA_MESTRA = "ccb123"; 
 
-    // CONFIGURAÇÕES DO GOOGLE DRIVE
-    const GOOGLE_API_KEY = "SUA_CHAVE_API_AQUI"; // Coloque aqui sua Chave de API do Google Cloud
-    const FOLDER_ID = "13LGFdl1kKRz-EBeBYS2kGWObjKCYBg7s"; 
+    // LISTA DE VÍDEOS
+    const listaVideos = [
+      { title: "Palavra 2026-03-15 Mateus 7 IrSalvador", driveId: "ID_DO_VIDEO_1" },
+      { title: "Palavra 2026-03-18 Marcos 11 IrLuiz", driveId: "ID_DO_VIDEO_2" },
+      { title: "Palavra 2026-03-22 Hebreus 3 IrLuiz", driveId: "ID_DO_VIDEO_3" },
+      { title: "Palavra 2026-03-29 Isaías 54 IrHélio", driveId: "ID_DO_VIDEO_4" },
+      { title: "Palavra 2026-04-08 Romanos 5 IrLuiz", driveId: "ID_DO_VIDEO_5" },
+      { title: "Palavra 2026-04-12 Tiago 4 IrSalvador", driveId: "ID_DO_VIDEO_6" },
+      { title: "Palavra 2026-04-19 Salmos 23 IrHelio", driveId: "ID_DO_VIDEO_7" },
+      { title: "Palavra 2026-04-22 Proverbios 27 IrLuiz", driveId: "1UFlUK7KwyYz3Y0sGzjhhihmb0iZ2uYna" }
+    ];
 
-    let videos = [];
     let currentVideoIndex = 0;
-    let isShuffle = false;
 
-    const videoPlayer = document.getElementById('main-player');
+    const iframePlayer = document.getElementById('main-iframe');
     const playlistElement = document.getElementById('playlist');
     const titleElement = document.getElementById('current-title');
 
@@ -163,51 +166,17 @@
       if (input === SENHA_MESTRA) {
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
-        buscarVideosDoDrive();
+        carregarPlaylist();
       } else {
         document.getElementById('login-error').style.display = 'block';
       }
     }
 
-    async function buscarVideosDoDrive() {
-      const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents+and+mimeType+contains+'video/'&fields=files(id,name)&key=${GOOGLE_API_KEY}`;
-
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.files && data.files.length > 0) {
-          videos = data.files.map(file => ({
-            id: file.id,
-            title: file.name.replace(/\.[^/.]+$/, ""), // remove extensão (.mp4)
-            url: `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media&key=${GOOGLE_API_KEY}`
-          }));
-
-          carregarPlaylist();
-        } else {
-          titleElement.innerText = "Nenhum vídeo encontrado na pasta do Drive.";
-        }
-      } catch (error) {
-        console.error(error);
-        titleElement.innerText = "Erro ao acessar a pasta do Google Drive.";
-      }
-    }
-
     function carregarPlaylist() {
-      renderizarLista(videos);
-      if (videos.length > 0) {
+      renderizarLista(listaVideos);
+      if (listaVideos.length > 0) {
         tocarVideo(0);
       }
-
-      videoPlayer.onended = () => {
-        if (isShuffle) {
-          let randomIndex = Math.floor(Math.random() * videos.length);
-          tocarVideo(randomIndex);
-        } else {
-          let nextIndex = (currentVideoIndex + 1) % videos.length;
-          tocarVideo(nextIndex);
-        }
-      };
     }
 
     function renderizarLista(lista) {
@@ -223,26 +192,17 @@
 
     function tocarVideo(index) {
       currentVideoIndex = index;
-      const vid = videos[index];
+      const vid = listaVideos[index];
       titleElement.innerText = vid.title;
-      videoPlayer.src = vid.url;
-      videoPlayer.load();
-      videoPlayer.play().catch(() => {});
-      renderizarLista(videos);
-    }
-
-    function toggleShuffle() {
-      isShuffle = !isShuffle;
-      const btn = document.getElementById('btn-shuffle');
-      btn.classList.toggle('active', isShuffle);
-      btn.innerText = isShuffle ? '🔀 Aleatório: ON' : '🔀 Aleatório: OFF';
+      iframePlayer.src = `https://drive.google.com/file/d/${vid.driveId}/preview`;
+      renderizarLista(listaVideos);
     }
 
     function filtrarVideos() {
       const termo = document.getElementById('search-input').value.toLowerCase();
       const itens = document.querySelectorAll('.video-item');
       
-      videos.forEach((vid, i) => {
+      listaVideos.forEach((vid, i) => {
         if (vid.title.toLowerCase().includes(termo)) {
           itens[i].style.display = 'block';
         } else {
