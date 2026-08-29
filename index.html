@@ -44,9 +44,9 @@
     }
     .login-card button:hover { background: var(--ccb-gold); color: var(--ccb-dark-blue); }
 
-    /* Estrutura do Player */
+    /* Estrutura do Player - Ampliado para max-width: 1650px para suportar 1080p nativo */
     #app-container {
-      display: none; width: 95%; max-width: 1100px; background: #fff;
+      display: none; width: 95%; max-width: 1650px; background: #fff;
       border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
       margin: 20px 0;
     }
@@ -58,11 +58,11 @@
     header h1 { font-weight: 600; letter-spacing: 1px; font-size: 1.8rem; }
 
     .main-content { display: flex; flex-direction: column; }
-    @media(min-width: 768px) {
+    @media(min-width: 900px) {
       .main-content { flex-direction: row; }
     }
 
-    .player-section { flex: 2; padding: 1.5rem; background: #111; display: flex; flex-direction: column; align-items: center; }
+    .player-section { flex: 3; padding: 1.5rem; background: #111; display: flex; flex-direction: column; align-items: center; }
     
     .video-container {
       position: relative;
@@ -88,12 +88,12 @@
       margin-top: 1rem; color: #fff; align-items: center;
     }
 
-    .playlist-section { flex: 1; background: var(--ccb-white); padding: 1.5rem; border-left: 1px solid var(--ccb-gray); }
+    .playlist-section { flex: 1; background: var(--ccb-white); padding: 1.5rem; border-left: 1px solid var(--ccb-gray); min-width: 300px; }
     .search-box { margin-bottom: 1rem; }
     .search-box input {
       width: 100%; padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; outline: none;
     }
-    .video-list { list-style: none; max-height: 380px; overflow-y: auto; }
+    .video-list { list-style: none; max-height: 500px; overflow-y: auto; }
     .video-item {
       padding: 0.75rem; border-bottom: 1px solid var(--ccb-gray);
       cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; transition: 0.2s;
@@ -190,7 +190,8 @@
       if (!vid) return;
       
       titleElement.innerText = vid.title;
-      iframePlayer.src = `https://www.youtube.com/embed/${vid.youtubeId}?rel=0&vq=hd1080`;
+      // Parâmetros para forçar a requisição da qualidade HD
+      iframePlayer.src = `https://www.youtube.com/embed/${vid.youtubeId}?enablejsapi=1&vq=hd1080&rel=0`;
       
       const termo = document.getElementById('search-input').value.toLowerCase();
       if (termo) {
