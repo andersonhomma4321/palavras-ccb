@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Palavras CCB</title>
+  <title>Palavras CCB - Controle USB</title>
 
   <style>
     :root {
@@ -16,7 +16,17 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-    body { background-color: var(--ccb-dark-blue); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    body { background-color: var(--ccb-dark-blue); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
+
+    /* ESTILO DE FOCO PARA CONTROLE REMOTE / TECLADO */
+    .focusable:focus, 
+    button:focus, 
+    input:focus, 
+    .video-item:focus {
+      outline: 4px solid var(--ccb-gold) !important;
+      outline-offset: 2px !important;
+      border-radius: 4px;
+    }
 
     /* Overlay dos Modais */
     #login-overlay, .modal-overlay {
@@ -64,7 +74,7 @@
       color: var(--ccb-dark-blue) !important; 
     }
 
-    /* CORREÇÃO DEFINITIVA DO BOTÃO FECHAR (x) */
+    /* BOTÃO FECHAR (x) */
     button.btn-close {
       position: absolute !important;
       top: 10px !important;
@@ -156,8 +166,8 @@
     <div class="login-card">
       <h2>Palavras CCB</h2>
       <p>Acesso Restrito</p>
-      <input type="password" id="password-input" placeholder="Digite a senha de acesso" onkeyup="if(event.key === 'Enter') autenticar()">
-      <button onclick="autenticar()">Entrar</button>
+      <input type="password" id="password-input" class="focusable" tabindex="0" placeholder="Digite a senha de acesso" onkeyup="if(event.key === 'Enter') autenticar()">
+      <button class="focusable" tabindex="0" onclick="autenticar()">Entrar</button>
       <p id="login-error" style="color: red; margin-top: 10px; display: none;">Senha incorreta!</p>
     </div>
   </div>
@@ -165,11 +175,11 @@
   <!-- MODAL DE AUTENTICAÇÃO DA ENGRENAGEM -->
   <div id="admin-auth-overlay" class="modal-overlay">
     <div class="admin-card">
-      <button class="btn-close" onclick="fecharModais()">&times;</button>
+      <button class="btn-close focusable" tabindex="0" onclick="fecharModais()">&times;</button>
       <h2>Painel do Administrador</h2>
       <p>Digite a senha para gerenciar vídeos</p>
-      <input type="password" id="admin-password-input" placeholder="Digite a senha mestra" onkeyup="if(event.key === 'Enter') verificarSenhaAdmin()">
-      <button onclick="verificarSenhaAdmin()">Acessar</button>
+      <input type="password" id="admin-password-input" class="focusable" tabindex="0" placeholder="Digite a senha mestra" onkeyup="if(event.key === 'Enter') verificarSenhaAdmin()">
+      <button class="focusable" tabindex="0" onclick="verificarSenhaAdmin()">Acessar</button>
       <p id="admin-auth-error" style="color: red; margin-top: 10px; display: none;">Senha incorreta!</p>
     </div>
   </div>
@@ -177,19 +187,19 @@
   <!-- MODAL PARA ADICIONAR VÍDEO NO GITHUB -->
   <div id="admin-form-overlay" class="modal-overlay">
     <div class="admin-card">
-      <button class="btn-close" onclick="fecharModais()">&times;</button>
+      <button class="btn-close focusable" tabindex="0" onclick="fecharModais()">&times;</button>
       <h2>Adicionar Vídeo no GitHub</h2>
       <p>Preencha os dados abaixo para salvar no repositório</p>
       
-      <input type="text" id="gh-owner" placeholder="Usuário do GitHub (ex: andersonhomma4321)">
-      <input type="text" id="gh-repo" placeholder="Nome do Repositório (ex: palavras-ccb)">
-      <input type="password" id="gh-token" placeholder="Personal Access Token (PAT) do GitHub">
+      <input type="text" id="gh-owner" class="focusable" tabindex="0" placeholder="Usuário do GitHub (ex: andersonhomma4321)">
+      <input type="text" id="gh-repo" class="focusable" tabindex="0" placeholder="Nome do Repositório (ex: palavras-ccb)">
+      <input type="password" id="gh-token" class="focusable" tabindex="0" placeholder="Personal Access Token (PAT) do GitHub">
       <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ddd;">
       
-      <input type="text" id="new-video-title" placeholder="Título do Vídeo">
-      <input type="text" id="new-video-url" placeholder="ID ou URL do YouTube">
+      <input type="text" id="new-video-title" class="focusable" tabindex="0" placeholder="Título do Vídeo">
+      <input type="text" id="new-video-url" class="focusable" tabindex="0" placeholder="ID ou URL do YouTube">
       
-      <button id="btn-save-gh" onclick="adicionarVideoNoGitHub()">Salvar no GitHub</button>
+      <button id="btn-save-gh" class="focusable" tabindex="0" onclick="adicionarVideoNoGitHub()">Salvar no GitHub</button>
       <p id="admin-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
     </div>
   </div>
@@ -198,13 +208,13 @@
   <div id="app-container">
     <header>
       <h1>Palavras CCB</h1>
-      <button class="btn-gear" title="Gerenciar Vídeos" onclick="abrirAuthAdmin()">⚙️</button>
+      <button class="btn-gear focusable" tabindex="0" title="Gerenciar Vídeos" onclick="abrirAuthAdmin()">⚙️</button>
     </header>
 
     <div class="main-content">
       <div class="player-section">
         <div class="video-container">
-          <iframe id="main-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <iframe id="main-iframe" class="focusable" tabindex="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
         <div class="controls-extra">
           <span id="current-title">Selecione um vídeo</span>
@@ -213,7 +223,7 @@
 
       <div class="playlist-section">
         <div class="search-box">
-          <input type="text" id="search-input" placeholder="🔍 Localizar vídeo..." onkeyup="filtrarVideos()">
+          <input type="text" id="search-input" class="focusable" tabindex="0" placeholder="🔍 Localizar vídeo..." onkeyup="filtrarVideos()">
         </div>
         <ul class="video-list" id="playlist"></ul>
       </div>
@@ -221,13 +231,12 @@
   </div>
 
   <script>
-    const SENHA_MESTRA = "ccb081078"; 
+    const SENHA_MESTRA = "ccb123"; 
 
     // LISTA DE VÍDEOS DO YOUTUBE
     const listaVideos = [
       { title: "Palavra 2026-04-22 Proverbios 27 IrLuiz", youtubeId: "cjp_4UM7ed8" },
-      { title: "Palavra 2026 04 19 Salmos 23 IrHelio", youtubeId: "XCC3hGWZ5Hw" },
-      { title: "Palavra 2026 04 12 Tiago 4 IrSalvador", youtubeId: "VwPzeskGiVg" }
+      { title: "Palavra 2026 04 19 Salmos 23 IrHelio", youtubeId: "XCC3hGWZ5Hw" }
     ];
 
     let currentVideoIndex = 0;
@@ -236,12 +245,22 @@
     const playlistElement = document.getElementById('playlist');
     const titleElement = document.getElementById('current-title');
 
+    // Focar no primeiro campo de senha ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('password-input').focus();
+    });
+
     function autenticar() {
       const input = document.getElementById('password-input').value;
       if (input === SENHA_MESTRA) {
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
         carregarPlaylist();
+        
+        // Coloca o foco na busca ou no primeiro vídeo para navegação por controle
+        setTimeout(() => {
+          document.getElementById('search-input').focus();
+        }, 100);
       } else {
         document.getElementById('login-error').style.display = 'block';
       }
@@ -259,9 +278,18 @@
       lista.forEach((vid) => {
         const indexNaListaOriginal = listaVideos.findIndex(v => v.youtubeId === vid.youtubeId);
         const li = document.createElement('li');
-        li.className = `video-item ${indexNaListaOriginal === currentVideoIndex ? 'active' : ''}`;
+        li.className = `video-item focusable ${indexNaListaOriginal === currentVideoIndex ? 'active' : ''}`;
+        li.tabIndex = 0; // Torna focável via navegação por controle
         li.innerText = vid.title;
         li.onclick = () => tocarVideo(indexNaListaOriginal);
+        
+        // Suporte para acionamento via Tecla 'OK' / 'Enter'
+        li.onkeydown = (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            tocarVideo(indexNaListaOriginal);
+          }
+        };
+
         playlistElement.appendChild(li);
       });
     }
@@ -293,11 +321,13 @@
       document.getElementById('admin-password-input').value = '';
       document.getElementById('admin-auth-error').style.display = 'none';
       document.getElementById('admin-auth-overlay').style.display = 'flex';
+      setTimeout(() => document.getElementById('admin-password-input').focus(), 100);
     }
 
     function fecharModais() {
       document.getElementById('admin-auth-overlay').style.display = 'none';
       document.getElementById('admin-form-overlay').style.display = 'none';
+      document.getElementById('search-input').focus();
     }
 
     function verificarSenhaAdmin() {
@@ -306,6 +336,7 @@
         document.getElementById('admin-auth-overlay').style.display = 'none';
         document.getElementById('admin-form-overlay').style.display = 'flex';
         carregarCredenciaisGitHub();
+        setTimeout(() => document.getElementById('gh-owner').focus(), 100);
       } else {
         document.getElementById('admin-auth-error').style.display = 'block';
       }
@@ -413,6 +444,97 @@
         msg.innerText = 'Erro: ' + err.message;
       } finally {
         btn.disabled = false;
+      }
+    }
+
+    /* =================================================================
+       SISTEMA DE NAVEGAÇÃO ESPACIAL VIA CONTROLE REMOTO / TECLADO USB
+       ================================================================= */
+    document.addEventListener('keydown', (e) => {
+      const key = e.key;
+
+      // BLOQUEIO RIGOROSO DE ROLAGEM DA PÁGINA
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Space'].includes(key)) {
+        if (document.activeElement.tagName !== 'INPUT') {
+          e.preventDefault();
+        }
+      }
+
+      // 1. TECLA VOLTAR (Escape ou Backspace fora de inputs)
+      if (key === 'Escape' || (key === 'Backspace' && document.activeElement.tagName !== 'INPUT')) {
+        e.preventDefault();
+        const modaisAbertos = document.querySelectorAll('.modal-overlay[style*="display: flex"]');
+        if (modaisAbertos.length > 0) {
+          fecharModais();
+        } else {
+          document.getElementById('search-input').focus();
+        }
+        return;
+      }
+
+      // 2. TECLA HOME
+      if (key === 'Home' || key === 'BrowserHome') {
+        e.preventDefault();
+        document.getElementById('search-input').focus();
+        return;
+      }
+
+      // 3. NAVEGAÇÃO POR SETAS (D-PAD)
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
+        if (document.activeElement.tagName === 'INPUT' && (key === 'ArrowLeft' || key === 'ArrowRight')) {
+          return;
+        }
+
+        e.preventDefault();
+        navegarPorSetas(key);
+      }
+    }, { passive: false });
+
+    // Função de Navegação Espacial Inteligente
+    function navegarPorSetas(direcao) {
+      const focaveis = Array.from(document.querySelectorAll('.focusable, input, button'))
+        .filter(el => {
+          const style = window.getComputedStyle(el);
+          return style.display !== 'none' && style.visibility !== 'hidden' && el.offsetParent !== null;
+        });
+
+      const atual = document.activeElement;
+      if (!focaveis.includes(atual)) {
+        if (focaveis.length > 0) focaveis[0].focus();
+        return;
+      }
+
+      const rectAtual = atual.getBoundingClientRect();
+      let proximoElemento = null;
+      let menorDistancia = Infinity;
+
+      focaveis.forEach(el => {
+        if (el === atual) return;
+        const rect = el.getBoundingClientRect();
+
+        const dx = rect.left + rect.width / 2 - (rectAtual.left + rectAtual.width / 2);
+        const dy = rect.top + rect.height / 2 - (rectAtual.top + rectAtual.height / 2);
+
+        let valido = false;
+        if (direcao === 'ArrowUp' && dy < -5) valido = true;
+        if (direcao === 'ArrowDown' && dy > 5) valido = true;
+        if (direcao === 'ArrowLeft' && dx < -5) valido = true;
+        if (direcao === 'ArrowRight' && dx > 5) valido = true;
+
+        if (valido) {
+          const distancia = Math.sqrt(dx * dx + dy * dy);
+          if (distancia < menorDistancia) {
+            menorDistancia = distancia;
+            proximoElemento = el;
+          }
+        }
+      });
+
+      if (proximoElemento) {
+        proximoElemento.focus();
+        if (proximoElemento.classList.contains('video-item')) {
+          proximoElemento.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
       }
     }
   </script>
