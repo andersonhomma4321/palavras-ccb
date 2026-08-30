@@ -12,6 +12,7 @@
       --ccb-gold: #c5a059;
       --ccb-white: #f8f9fa;
       --ccb-gray: #e9ecef;
+      --ccb-red: #d9534f;
     }
 
     * { 
@@ -53,9 +54,11 @@
       border-top: 5px solid var(--ccb-gold); 
       text-align: center;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
-      max-width: 450px; 
-      width: 90%;
+      max-width: 500px; 
+      width: 92%;
       position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     .login-card h2, .admin-card h2 { 
@@ -81,8 +84,8 @@
     }
 
     /* Botões principais nos cards */
-    .login-card button:not(.btn-close), 
-    .admin-card button:not(.btn-close) {
+    .login-card button:not(.btn-close):not(.btn-delete-item), 
+    .admin-card button:not(.btn-close):not(.btn-delete-item) {
       width: 100% !important;
       padding: 0.75rem !important;
       background: var(--ccb-blue) !important;
@@ -96,8 +99,8 @@
       margin-top: 0.25rem !important;
     }
     
-    .login-card button:not(.btn-close):hover, 
-    .admin-card button:not(.btn-close):hover { 
+    .login-card button:not(.btn-close):not(.btn-delete-item):hover, 
+    .admin-card button:not(.btn-close):not(.btn-delete-item):hover { 
       background: var(--ccb-gold) !important; 
       color: var(--ccb-dark-blue) !important; 
     }
@@ -129,6 +132,64 @@
     button.btn-close:hover { 
       color: var(--ccb-blue) !important; 
       background: transparent !important;
+    }
+
+    /* Lista de Gestão do Admin (Exclusão) */
+    .admin-manage-section {
+      text-align: left;
+      margin-top: 15px;
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+    }
+
+    .admin-manage-section h3 {
+      font-size: 1rem;
+      color: var(--ccb-blue);
+      margin-bottom: 10px;
+    }
+
+    .admin-video-list {
+      list-style: none;
+      max-height: 180px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 5px;
+    }
+
+    .admin-video-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 8px;
+      border-bottom: 1px solid #eee;
+      font-size: 0.85rem;
+    }
+
+    .admin-video-item:last-child {
+      border-bottom: none;
+    }
+
+    .admin-video-item span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 75%;
+    }
+
+    .btn-delete-item {
+      background: var(--ccb-red);
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .btn-delete-item:hover {
+      background: #c9302c;
     }
 
     /* App Player */
@@ -288,22 +349,29 @@
     </div>
   </div>
 
-  <!-- MODAL PARA ADICIONAR VÍDEO NO GITHUB -->
+  <!-- MODAL GERENCIADOR DE VÍDEOS (ADICIONAR / EXCLUIR) -->
   <div id="admin-form-overlay" class="modal-overlay">
     <div class="admin-card">
       <button class="btn-close" onclick="fecharModais()">&times;</button>
-      <h2>Adicionar Vídeo no GitHub</h2>
-      <p>Preencha os dados abaixo para salvar no repositório</p>
+      <h2>Gerenciar Vídeos no GitHub</h2>
+      <p>Configure e atualize o repositório</p>
       
       <input type="text" id="gh-owner" placeholder="Usuário do GitHub (ex: andersonhomma4321)">
       <input type="text" id="gh-repo" placeholder="Nome do Repositório (ex: palavras-ccb)">
       <input type="password" id="gh-token" placeholder="Personal Access Token (PAT) do GitHub">
       <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ddd;">
       
-      <input type="text" id="new-video-title" placeholder="Título do Vídeo">
+      <input type="text" id="new-video-title" placeholder="Título do Vídeo Novo">
       <input type="text" id="new-video-url" placeholder="ID ou URL do YouTube">
       
-      <button id="btn-save-gh" onclick="adicionarVideoNoGitHub()">Salvar no GitHub</button>
+      <button id="btn-save-gh" onclick="adicionarVideoNoGitHub()">Salvar Novo Vídeo</button>
+      
+      <!-- SEÇÃO PARA EXCLUSÃO DE VÍDEOS -->
+      <div class="admin-manage-section">
+        <h3>Vídeos Cadastrados (Excluir)</h3>
+        <ul id="admin-video-list" class="admin-video-list"></ul>
+      </div>
+
       <p id="admin-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
     </div>
   </div>
@@ -364,6 +432,9 @@
       renderizarLista(listaVideos);
       if (listaVideos.length > 0) {
         tocarVideo(0);
+      } else {
+        titleElement.innerText = "Nenhum vídeo disponível";
+        iframePlayer.src = "";
       }
     }
 
@@ -419,9 +490,38 @@
         document.getElementById('admin-auth-overlay').style.display = 'none';
         document.getElementById('admin-form-overlay').style.display = 'flex';
         carregarCredenciaisGitHub();
+        renderizarListaAdmin();
       } else {
         document.getElementById('admin-auth-error').style.display = 'block';
       }
+    }
+
+    function renderizarListaAdmin() {
+      const adminList = document.getElementById('admin-video-list');
+      adminList.innerHTML = '';
+
+      if (listaVideos.length === 0) {
+        adminList.innerHTML = '<li class="admin-video-item">Nenhum vídeo cadastrado</li>';
+        return;
+      }
+
+      listaVideos.forEach((vid, index) => {
+        const li = document.createElement('li');
+        li.className = 'admin-video-item';
+        
+        const titleSpan = document.createElement('span');
+        titleSpan.innerText = vid.title;
+        titleSpan.title = vid.title;
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn-delete-item';
+        delBtn.innerText = 'Excluir';
+        delBtn.onclick = () => excluirVideoDoGitHub(index);
+
+        li.appendChild(titleSpan);
+        li.appendChild(delBtn);
+        adminList.appendChild(li);
+      });
     }
 
     function extrairYoutubeId(entrada) {
@@ -455,97 +555,145 @@
       return new TextDecoder().decode(bytes);
     }
 
-    /* INTEGRAÇÃO COM A API DO GITHUB */
-    async function adicionarVideoNoGitHub() {
+    /* FORMATAR ARRAY EM JAVASCRIPT STRING DE MANEIRA LIMPA */
+    function formatarArrayParaCodigo(array) {
+      const itensFormatados = array.map(item => `  { title: "${item.title.replace(/"/g, '\\"')}", youtubeId: "${item.youtubeId}" }`);
+      return `const listaVideos = [\n${itensFormatados.join(',\n')}\n];`;
+    }
+
+    /* ATUALIZAR ARQUIVO NO GITHUB */
+    async function salvarListaNoGitHub(novaLista, mensagemCommit) {
       const owner = document.getElementById('gh-owner').value.trim();
       const repo = document.getElementById('gh-repo').value.trim();
       const token = document.getElementById('gh-token').value.trim().replace(/\s+/g, '');
-      const title = document.getElementById('new-video-title').value.trim();
-      const rawUrl = document.getElementById('new-video-url').value.trim();
       const msg = document.getElementById('admin-msg');
-      const btn = document.getElementById('btn-save-gh');
 
-      if (!owner || !repo || !token || !title || !rawUrl) {
-        msg.style.color = 'red';
-        msg.innerText = 'Preencha todos os campos!';
-        return;
+      if (!owner || !repo || !token) {
+        throw new Error('Preencha os dados do GitHub (Usuário, Repositório e PAT).');
       }
 
       localStorage.setItem('gh_owner', owner);
       localStorage.setItem('gh_repo', repo);
       localStorage.setItem('gh_token', token);
 
-      const youtubeId = extrairYoutubeId(rawUrl);
-      btn.disabled = true;
       msg.style.color = '#0b2545';
       msg.innerText = 'Enviando alterações para o GitHub...';
 
+      const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/index.html`;
+      
+      const resGet = await fetch(apiUrl, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      if (!resGet.ok) {
+        if (resGet.status === 401) throw new Error('Token inválido ou revogado.');
+        if (resGet.status === 404) throw new Error('Repositório ou arquivo index.html não encontrado.');
+        throw new Error(`Erro na busca (${resGet.status})`);
+      }
+
+      const fileData = await resGet.json();
+      const contentDecoded = base64ToUtf8(fileData.content);
+
+      const regexLista = /const listaVideos = \[\s*[\s\S]*?\s*\];/;
+
+      if (!regexLista.test(contentDecoded)) {
+        throw new Error('A estrutura listaVideos não foi encontrada no arquivo.');
+      }
+
+      const novoCodigoArray = formatarArrayParaCodigo(novaLista);
+      const conteudoAtualizado = contentDecoded.replace(regexLista, novoCodigoArray);
+      const contentEncoded = utf8ToBase64(conteudoAtualizado);
+
+      const resPut = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: mensagemCommit,
+          content: contentEncoded,
+          sha: fileData.sha
+        })
+      });
+
+      if (!resPut.ok) {
+        const errData = await resPut.json();
+        throw new Error(errData.message || 'Erro ao salvar no GitHub.');
+      }
+    }
+
+    /* ADICIONAR VÍDEO */
+    async function adicionarVideoNoGitHub() {
+      const title = document.getElementById('new-video-title').value.trim();
+      const rawUrl = document.getElementById('new-video-url').value.trim();
+      const msg = document.getElementById('admin-msg');
+      const btn = document.getElementById('btn-save-gh');
+
+      if (!title || !rawUrl) {
+        msg.style.color = 'red';
+        msg.innerText = 'Preencha o título e a URL/ID do vídeo!';
+        return;
+      }
+
+      const youtubeId = extrairYoutubeId(rawUrl);
+      btn.disabled = true;
+
       try {
-        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/index.html`;
-        const resGet = await fetch(apiUrl, {
-          headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/vnd.github.v3+json'
-          }
-        });
+        const novaLista = [...listaVideos, { title: title, youtubeId: youtubeId }];
+        await salvarListaNoGitHub(novaLista, `Adicionado vídeo: ${title}`);
 
-        if (!resGet.ok) {
-          if (resGet.status === 401) throw new Error('Token inválido ou revogado.');
-          if (resGet.status === 404) throw new Error('Repositório ou arquivo index.html não encontrado.');
-          throw new Error(`Erro na busca (${resGet.status})`);
-        }
-        
-        const fileData = await resGet.json();
-        const contentDecoded = base64ToUtf8(fileData.content);
+        listaVideos.push({ title: title, youtubeId: youtubeId });
+        renderizarLista(listaVideos);
+        renderizarListaAdmin();
 
-        const novoItem = `{ title: "${title}", youtubeId: "${youtubeId}" }`;
-        const regexLista = /(const listaVideos = \[\s*)([\s\S]*?)(\s*\];)/;
+        msg.style.color = 'green';
+        msg.innerText = 'Vídeo salvo com sucesso! O GitHub Pages atualizará o site em 1-2 minutos.';
 
-        if (!regexLista.test(contentDecoded)) {
-          throw new Error('A lista de vídeos (listaVideos) não foi encontrada no arquivo.');
-        }
-
-        const conteudoAtualizado = contentDecoded.replace(regexLista, (match, p1, p2, p3) => {
-          const listaAtual = p2.trim();
-          const virgula = listaAtual.length > 0 ? ',\n      ' : '\n      ';
-          return `${p1}${listaAtual}${virgula}${novoItem}${p3}`;
-        });
-
-        const contentEncoded = utf8ToBase64(conteudoAtualizado);
-
-        const resPut = await fetch(apiUrl, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: `Adicionado novo vídeo: ${title}`,
-            content: contentEncoded,
-            sha: fileData.sha
-          })
-        });
-
-        if (resPut.ok) {
-          msg.style.color = 'green';
-          msg.innerText = 'Vídeo salvo com sucesso! O GitHub Pages atualizará o site em alguns minutos.';
-          
-          listaVideos.push({ title: title, youtubeId: youtubeId });
-          renderizarLista(listaVideos);
-
-          document.getElementById('new-video-title').value = '';
-          document.getElementById('new-video-url').value = '';
-        } else {
-          const errData = await resPut.json();
-          throw new Error(errData.message || 'Erro ao salvar no GitHub.');
-        }
-
+        document.getElementById('new-video-title').value = '';
+        document.getElementById('new-video-url').value = '';
       } catch (err) {
         msg.style.color = 'red';
         msg.innerText = 'Erro: ' + err.message;
       } finally {
         btn.disabled = false;
+      }
+    }
+
+    /* EXCLUIR VÍDEO */
+    async function excluirVideoDoGitHub(index) {
+      const videoRemover = listaVideos[index];
+      if (!videoRemover) return;
+
+      if (!confirm(`Tem certeza que deseja excluir o vídeo:\n"${videoRemover.title}"?`)) {
+        return;
+      }
+
+      const msg = document.getElementById('admin-msg');
+
+      try {
+        const novaLista = listaVideos.filter((_, i) => i !== index);
+        await salvarListaNoGitHub(novaLista, `Removido vídeo: ${videoRemover.title}`);
+
+        listaVideos.splice(index, 1);
+        renderizarLista(listaVideos);
+        renderizarListaAdmin();
+
+        if (currentVideoIndex === index) {
+          tocarVideo(0);
+        } else if (currentVideoIndex > index) {
+          currentVideoIndex--;
+        }
+
+        msg.style.color = 'green';
+        msg.innerText = 'Vídeo removido com sucesso! O site atualizará em breve no GitHub Pages.';
+      } catch (err) {
+        msg.style.color = 'red';
+        msg.innerText = 'Erro ao excluir: ' + err.message;
       }
     }
   </script>
