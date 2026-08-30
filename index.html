@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Palavras CCB - Controle USB</title>
+  <title>Palavras CCB</title>
 
   <style>
     :root {
@@ -14,45 +14,73 @@
       --ccb-gray: #e9ecef;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-
-    body { background-color: var(--ccb-dark-blue); color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-
-    /* ESTILO DE FOCO PARA CONTROLE REMOTE / TECLADO */
-    .focusable:focus, 
-    button:focus, 
-    input:focus, 
-    .video-item:focus {
-      outline: 4px solid var(--ccb-gold) !important;
-      outline-offset: 2px !important;
-      border-radius: 4px;
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
     }
 
-    /* Overlay dos Modais */
+    body { 
+      background-color: var(--ccb-dark-blue); 
+      color: #333; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh; 
+    }
+
+    /* Modais e Overlays */
     #login-overlay, .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(6, 23, 46, 0.95); display: flex;
-      justify-content: center; align-items: center; z-index: 2000;
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%;
+      background: rgba(6, 23, 46, 0.95); 
+      display: flex;
+      justify-content: center; 
+      align-items: center; 
+      z-index: 2000;
     }
 
     .modal-overlay { display: none; }
 
     .login-card, .admin-card {
-      background: #fff; padding: 2.5rem 2rem 2rem 2rem; border-radius: 8px;
-      border-top: 5px solid var(--ccb-gold); text-align: center;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-width: 450px; width: 90%;
+      background: #fff; 
+      padding: 2.5rem 2rem 2rem 2rem; 
+      border-radius: 8px;
+      border-top: 5px solid var(--ccb-gold); 
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
+      max-width: 450px; 
+      width: 90%;
       position: relative;
     }
 
-    .login-card h2, .admin-card h2 { color: var(--ccb-blue); margin-bottom: 0.5rem; font-size: 1.5rem; }
-    .login-card p, .admin-card p { font-size: 0.9rem; color: #666; margin-bottom: 1rem; }
+    .login-card h2, .admin-card h2 { 
+      color: var(--ccb-blue); 
+      margin-bottom: 0.5rem; 
+      font-size: 1.5rem; 
+    }
+    
+    .login-card p, .admin-card p { 
+      font-size: 0.9rem; 
+      color: #666; 
+      margin-bottom: 1rem; 
+    }
     
     .login-card input, .admin-card input {
-      width: 100%; padding: 0.75rem; border: 1px solid #ccc;
-      border-radius: 4px; margin-bottom: 0.75rem; font-size: 0.95rem; outline: none;
+      width: 100%; 
+      padding: 0.75rem; 
+      border: 1px solid #ccc;
+      border-radius: 4px; 
+      margin-bottom: 0.75rem; 
+      font-size: 0.95rem; 
+      outline: none;
     }
 
-    /* Estilo aplicado APENAS aos botões principais de ação */
+    /* Botões principais nos cards */
     .login-card button:not(.btn-close), 
     .admin-card button:not(.btn-close) {
       width: 100% !important;
@@ -64,8 +92,8 @@
       font-size: 1rem !important;
       cursor: pointer !important;
       font-weight: bold !important;
-      transition: 0.2s !important;
-      margin-top: 0 !important;
+      transition: background 0.2s !important;
+      margin-top: 0.25rem !important;
     }
     
     .login-card button:not(.btn-close):hover, 
@@ -74,7 +102,7 @@
       color: var(--ccb-dark-blue) !important; 
     }
 
-    /* BOTÃO FECHAR (x) */
+    /* Botão fechar (X) */
     button.btn-close {
       position: absolute !important;
       top: 10px !important;
@@ -103,71 +131,147 @@
       background: transparent !important;
     }
 
-    /* Estrutura do Player */
+    /* App Player */
     #app-container {
-      display: none; width: 95%; max-width: 1650px; background: #fff;
-      border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      display: none; 
+      width: 95%; 
+      max-width: 1650px; 
+      background: #fff;
+      border-radius: 8px; 
+      overflow: hidden; 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
       margin: 20px 0;
     }
 
     header {
-      background: var(--ccb-blue); color: var(--ccb-white);
-      padding: 1.2rem; text-align: center; border-bottom: 3px solid var(--ccb-gold);
+      background: var(--ccb-blue); 
+      color: var(--ccb-white);
+      padding: 1.2rem; 
+      text-align: center; 
+      border-bottom: 3px solid var(--ccb-gold);
       position: relative;
     }
-    header h1 { font-weight: 600; letter-spacing: 1px; font-size: 1.8rem; }
+    
+    header h1 { 
+      font-weight: 600; 
+      letter-spacing: 1px; 
+      font-size: 1.8rem; 
+    }
 
     .btn-gear {
-      position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-      background: transparent; border: none; color: var(--ccb-gold);
-      font-size: 1.5rem; cursor: pointer; padding: 5px;
+      position: absolute; 
+      right: 20px; 
+      top: 50%; 
+      transform: translateY(-50%);
+      background: transparent; 
+      border: none; 
+      color: var(--ccb-gold);
+      font-size: 1.5rem; 
+      cursor: pointer; 
+      padding: 5px;
+      transition: color 0.2s;
     }
+    
     .btn-gear:hover { color: #fff; }
 
-    .main-content { display: flex; flex-direction: column; }
+    .main-content { 
+      display: flex; 
+      flex-direction: column; 
+    }
+    
     @media(min-width: 900px) {
       .main-content { flex-direction: row; }
     }
 
-    .player-section { flex: 3; padding: 1.5rem; background: #111; display: flex; flex-direction: column; align-items: center; }
+    .player-section { 
+      flex: 3; 
+      padding: 1.5rem; 
+      background: #111; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+    }
     
     .video-container {
-      position: relative; width: 100%; padding-bottom: 56.25%; height: 0;
-      background: #000; border-radius: 4px; overflow: hidden;
+      position: relative; 
+      width: 100%; 
+      padding-bottom: 56.25%; 
+      height: 0;
+      background: #000; 
+      border-radius: 4px; 
+      overflow: hidden;
     }
 
     .video-container iframe {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;
+      position: absolute; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      border: 0;
     }
 
     .controls-extra {
-      display: flex; justify-content: space-between; width: 100%;
-      margin-top: 1rem; color: #fff; align-items: center;
+      display: flex; 
+      justify-content: space-between; 
+      width: 100%;
+      margin-top: 1rem; 
+      color: #fff; 
+      align-items: center;
     }
 
-    .playlist-section { flex: 1; background: var(--ccb-white); padding: 1.5rem; border-left: 1px solid var(--ccb-gray); min-width: 300px; }
+    .playlist-section { 
+      flex: 1; 
+      background: var(--ccb-white); 
+      padding: 1.5rem; 
+      border-left: 1px solid var(--ccb-gray); 
+      min-width: 300px; 
+    }
+    
     .search-box { margin-bottom: 1rem; }
+    
     .search-box input {
-      width: 100%; padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; outline: none;
+      width: 100%; 
+      padding: 0.6rem; 
+      border: 1px solid #ccc; 
+      border-radius: 4px; 
+      outline: none;
     }
-    .video-list { list-style: none; max-height: 500px; overflow-y: auto; }
+    
+    .video-list { 
+      list-style: none; 
+      max-height: 500px; 
+      overflow-y: auto; 
+    }
+    
     .video-item {
-      padding: 0.75rem; border-bottom: 1px solid var(--ccb-gray);
-      cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; transition: 0.2s;
+      padding: 0.75rem; 
+      border-bottom: 1px solid var(--ccb-gray);
+      cursor: pointer; 
+      font-size: 0.95rem; 
+      display: flex; 
+      align-items: center; 
+      transition: background 0.2s;
     }
+    
     .video-item:hover { background: #e0e7ff; }
-    .video-item.active { background: var(--ccb-blue); color: #fff; font-weight: bold; }
+    
+    .video-item.active { 
+      background: var(--ccb-blue); 
+      color: #fff; 
+      font-weight: bold; 
+    }
   </style>
 </head>
 <body>
 
-  <!-- TELA DE LOGIN -->
+  <!-- TELA DE LOGIN PRINCIPAL -->
   <div id="login-overlay">
     <div class="login-card">
       <h2>Palavras CCB</h2>
       <p>Acesso Restrito</p>
-      <input type="password" id="password-input" class="focusable" tabindex="0" placeholder="Digite a senha de acesso" onkeyup="if(event.key === 'Enter') autenticar()">
-      <button class="focusable" tabindex="0" onclick="autenticar()">Entrar</button>
+      <input type="password" id="password-input" placeholder="Digite a senha de acesso" onkeyup="if(event.key === 'Enter') autenticar()">
+      <button onclick="autenticar()">Entrar</button>
       <p id="login-error" style="color: red; margin-top: 10px; display: none;">Senha incorreta!</p>
     </div>
   </div>
@@ -175,11 +279,11 @@
   <!-- MODAL DE AUTENTICAÇÃO DA ENGRENAGEM -->
   <div id="admin-auth-overlay" class="modal-overlay">
     <div class="admin-card">
-      <button class="btn-close focusable" tabindex="0" onclick="fecharModais()">&times;</button>
+      <button class="btn-close" onclick="fecharModais()">&times;</button>
       <h2>Painel do Administrador</h2>
       <p>Digite a senha para gerenciar vídeos</p>
-      <input type="password" id="admin-password-input" class="focusable" tabindex="0" placeholder="Digite a senha mestra" onkeyup="if(event.key === 'Enter') verificarSenhaAdmin()">
-      <button class="focusable" tabindex="0" onclick="verificarSenhaAdmin()">Acessar</button>
+      <input type="password" id="admin-password-input" placeholder="Digite a senha mestra" onkeyup="if(event.key === 'Enter') verificarSenhaAdmin()">
+      <button onclick="verificarSenhaAdmin()">Acessar</button>
       <p id="admin-auth-error" style="color: red; margin-top: 10px; display: none;">Senha incorreta!</p>
     </div>
   </div>
@@ -187,19 +291,19 @@
   <!-- MODAL PARA ADICIONAR VÍDEO NO GITHUB -->
   <div id="admin-form-overlay" class="modal-overlay">
     <div class="admin-card">
-      <button class="btn-close focusable" tabindex="0" onclick="fecharModais()">&times;</button>
+      <button class="btn-close" onclick="fecharModais()">&times;</button>
       <h2>Adicionar Vídeo no GitHub</h2>
       <p>Preencha os dados abaixo para salvar no repositório</p>
       
-      <input type="text" id="gh-owner" class="focusable" tabindex="0" placeholder="Usuário do GitHub (ex: andersonhomma4321)">
-      <input type="text" id="gh-repo" class="focusable" tabindex="0" placeholder="Nome do Repositório (ex: palavras-ccb)">
-      <input type="password" id="gh-token" class="focusable" tabindex="0" placeholder="Personal Access Token (PAT) do GitHub">
+      <input type="text" id="gh-owner" placeholder="Usuário do GitHub (ex: andersonhomma4321)">
+      <input type="text" id="gh-repo" placeholder="Nome do Repositório (ex: palavras-ccb)">
+      <input type="password" id="gh-token" placeholder="Personal Access Token (PAT) do GitHub">
       <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ddd;">
       
-      <input type="text" id="new-video-title" class="focusable" tabindex="0" placeholder="Título do Vídeo">
-      <input type="text" id="new-video-url" class="focusable" tabindex="0" placeholder="ID ou URL do YouTube">
+      <input type="text" id="new-video-title" placeholder="Título do Vídeo">
+      <input type="text" id="new-video-url" placeholder="ID ou URL do YouTube">
       
-      <button id="btn-save-gh" class="focusable" tabindex="0" onclick="adicionarVideoNoGitHub()">Salvar no GitHub</button>
+      <button id="btn-save-gh" onclick="adicionarVideoNoGitHub()">Salvar no GitHub</button>
       <p id="admin-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
     </div>
   </div>
@@ -208,13 +312,13 @@
   <div id="app-container">
     <header>
       <h1>Palavras CCB</h1>
-      <button class="btn-gear focusable" tabindex="0" title="Gerenciar Vídeos" onclick="abrirAuthAdmin()">⚙️</button>
+      <button class="btn-gear" title="Gerenciar Vídeos" onclick="abrirAuthAdmin()">⚙️</button>
     </header>
 
     <div class="main-content">
       <div class="player-section">
         <div class="video-container">
-          <iframe id="main-iframe" class="focusable" tabindex="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <iframe id="main-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
         <div class="controls-extra">
           <span id="current-title">Selecione um vídeo</span>
@@ -223,7 +327,7 @@
 
       <div class="playlist-section">
         <div class="search-box">
-          <input type="text" id="search-input" class="focusable" tabindex="0" placeholder="🔍 Localizar vídeo..." onkeyup="filtrarVideos()">
+          <input type="text" id="search-input" placeholder="🔍 Localizar vídeo..." onkeyup="filtrarVideos()">
         </div>
         <ul class="video-list" id="playlist"></ul>
       </div>
@@ -245,22 +349,12 @@
     const playlistElement = document.getElementById('playlist');
     const titleElement = document.getElementById('current-title');
 
-    // Focar no primeiro campo de senha ao carregar a página
-    window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('password-input').focus();
-    });
-
     function autenticar() {
       const input = document.getElementById('password-input').value;
       if (input === SENHA_MESTRA) {
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
         carregarPlaylist();
-        
-        // Coloca o foco na busca ou no primeiro vídeo para navegação por controle
-        setTimeout(() => {
-          document.getElementById('search-input').focus();
-        }, 100);
       } else {
         document.getElementById('login-error').style.display = 'block';
       }
@@ -278,18 +372,9 @@
       lista.forEach((vid) => {
         const indexNaListaOriginal = listaVideos.findIndex(v => v.youtubeId === vid.youtubeId);
         const li = document.createElement('li');
-        li.className = `video-item focusable ${indexNaListaOriginal === currentVideoIndex ? 'active' : ''}`;
-        li.tabIndex = 0; // Torna focável via navegação por controle
+        li.className = `video-item ${indexNaListaOriginal === currentVideoIndex ? 'active' : ''}`;
         li.innerText = vid.title;
         li.onclick = () => tocarVideo(indexNaListaOriginal);
-        
-        // Suporte para acionamento via Tecla 'OK' / 'Enter'
-        li.onkeydown = (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            tocarVideo(indexNaListaOriginal);
-          }
-        };
-
         playlistElement.appendChild(li);
       });
     }
@@ -316,18 +401,16 @@
       renderizarLista(filtrados);
     }
 
-    /* FUNÇÕES DA ENGRENAGEM E MODAL */
+    /* MODAL E CONTROLE ADMIN */
     function abrirAuthAdmin() {
       document.getElementById('admin-password-input').value = '';
       document.getElementById('admin-auth-error').style.display = 'none';
       document.getElementById('admin-auth-overlay').style.display = 'flex';
-      setTimeout(() => document.getElementById('admin-password-input').focus(), 100);
     }
 
     function fecharModais() {
       document.getElementById('admin-auth-overlay').style.display = 'none';
       document.getElementById('admin-form-overlay').style.display = 'none';
-      document.getElementById('search-input').focus();
     }
 
     function verificarSenhaAdmin() {
@@ -336,7 +419,6 @@
         document.getElementById('admin-auth-overlay').style.display = 'none';
         document.getElementById('admin-form-overlay').style.display = 'flex';
         carregarCredenciaisGitHub();
-        setTimeout(() => document.getElementById('gh-owner').focus(), 100);
       } else {
         document.getElementById('admin-auth-error').style.display = 'block';
       }
@@ -352,6 +434,25 @@
       if (localStorage.getItem('gh_owner')) document.getElementById('gh-owner').value = localStorage.getItem('gh_owner');
       if (localStorage.getItem('gh_repo')) document.getElementById('gh-repo').value = localStorage.getItem('gh_repo');
       if (localStorage.getItem('gh_token')) document.getElementById('gh-token').value = localStorage.getItem('gh_token');
+    }
+
+    /* SUPORTE UTF-8 PARA BASE64 (GITHUB API) */
+    function utf8ToBase64(str) {
+      const bytes = new TextEncoder().encode(str);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    }
+
+    function base64ToUtf8(base64) {
+      const binary = atob(base64.replace(/\s/g, ''));
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return new TextDecoder().decode(bytes);
     }
 
     /* INTEGRAÇÃO COM A API DO GITHUB */
@@ -389,13 +490,13 @@
         });
 
         if (!resGet.ok) {
-          if (resGet.status === 401) throw new Error('Token inválido ou revogado. Gere um novo token no GitHub.');
+          if (resGet.status === 401) throw new Error('Token inválido ou revogado.');
           if (resGet.status === 404) throw new Error('Repositório ou arquivo index.html não encontrado.');
           throw new Error(`Erro na busca (${resGet.status})`);
         }
         
         const fileData = await resGet.json();
-        const contentDecoded = decodeURIComponent(escape(atob(fileData.content)));
+        const contentDecoded = base64ToUtf8(fileData.content);
 
         const novoItem = `{ title: "${title}", youtubeId: "${youtubeId}" }`;
         const regexLista = /(const listaVideos = \[\s*)([\s\S]*?)(\s*\];)/;
@@ -405,11 +506,12 @@
         }
 
         const conteudoAtualizado = contentDecoded.replace(regexLista, (match, p1, p2, p3) => {
-          const virgula = p2.trim().length > 0 ? ',\n      ' : '\n      ';
-          return `${p1}${p2.trim()}${virgula}${novoItem}${p3}`;
+          const listaAtual = p2.trim();
+          const virgula = listaAtual.length > 0 ? ',\n      ' : '\n      ';
+          return `${p1}${listaAtual}${virgula}${novoItem}${p3}`;
         });
 
-        const contentEncoded = btoa(unescape(encodeURIComponent(conteudoAtualizado)));
+        const contentEncoded = utf8ToBase64(conteudoAtualizado);
 
         const resPut = await fetch(apiUrl, {
           method: 'PUT',
@@ -427,7 +529,7 @@
 
         if (resPut.ok) {
           msg.style.color = 'green';
-          msg.innerText = 'Vídeo salvo com sucesso! O GitHub Pages atualizará o site em 1-2 minutos.';
+          msg.innerText = 'Vídeo salvo com sucesso! O GitHub Pages atualizará o site em alguns minutos.';
           
           listaVideos.push({ title: title, youtubeId: youtubeId });
           renderizarLista(listaVideos);
@@ -444,97 +546,6 @@
         msg.innerText = 'Erro: ' + err.message;
       } finally {
         btn.disabled = false;
-      }
-    }
-
-    /* =================================================================
-       SISTEMA DE NAVEGAÇÃO ESPACIAL VIA CONTROLE REMOTO / TECLADO USB
-       ================================================================= */
-    document.addEventListener('keydown', (e) => {
-      const key = e.key;
-
-      // BLOQUEIO RIGOROSO DE ROLAGEM DA PÁGINA
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Space'].includes(key)) {
-        if (document.activeElement.tagName !== 'INPUT') {
-          e.preventDefault();
-        }
-      }
-
-      // 1. TECLA VOLTAR (Escape ou Backspace fora de inputs)
-      if (key === 'Escape' || (key === 'Backspace' && document.activeElement.tagName !== 'INPUT')) {
-        e.preventDefault();
-        const modaisAbertos = document.querySelectorAll('.modal-overlay[style*="display: flex"]');
-        if (modaisAbertos.length > 0) {
-          fecharModais();
-        } else {
-          document.getElementById('search-input').focus();
-        }
-        return;
-      }
-
-      // 2. TECLA HOME
-      if (key === 'Home' || key === 'BrowserHome') {
-        e.preventDefault();
-        document.getElementById('search-input').focus();
-        return;
-      }
-
-      // 3. NAVEGAÇÃO POR SETAS (D-PAD)
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(key)) {
-        if (document.activeElement.tagName === 'INPUT' && (key === 'ArrowLeft' || key === 'ArrowRight')) {
-          return;
-        }
-
-        e.preventDefault();
-        navegarPorSetas(key);
-      }
-    }, { passive: false });
-
-    // Função de Navegação Espacial Inteligente
-    function navegarPorSetas(direcao) {
-      const focaveis = Array.from(document.querySelectorAll('.focusable, input, button'))
-        .filter(el => {
-          const style = window.getComputedStyle(el);
-          return style.display !== 'none' && style.visibility !== 'hidden' && el.offsetParent !== null;
-        });
-
-      const atual = document.activeElement;
-      if (!focaveis.includes(atual)) {
-        if (focaveis.length > 0) focaveis[0].focus();
-        return;
-      }
-
-      const rectAtual = atual.getBoundingClientRect();
-      let proximoElemento = null;
-      let menorDistancia = Infinity;
-
-      focaveis.forEach(el => {
-        if (el === atual) return;
-        const rect = el.getBoundingClientRect();
-
-        const dx = rect.left + rect.width / 2 - (rectAtual.left + rectAtual.width / 2);
-        const dy = rect.top + rect.height / 2 - (rectAtual.top + rectAtual.height / 2);
-
-        let valido = false;
-        if (direcao === 'ArrowUp' && dy < -5) valido = true;
-        if (direcao === 'ArrowDown' && dy > 5) valido = true;
-        if (direcao === 'ArrowLeft' && dx < -5) valido = true;
-        if (direcao === 'ArrowRight' && dx > 5) valido = true;
-
-        if (valido) {
-          const distancia = Math.sqrt(dx * dx + dy * dy);
-          if (distancia < menorDistancia) {
-            menorDistancia = distancia;
-            proximoElemento = el;
-          }
-        }
-      });
-
-      if (proximoElemento) {
-        proximoElemento.focus();
-        if (proximoElemento.classList.contains('video-item')) {
-          proximoElemento.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-        }
       }
     }
   </script>
