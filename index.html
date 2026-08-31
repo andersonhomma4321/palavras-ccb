@@ -179,6 +179,7 @@
  
     .btn-delete-item:hover { background: #c9302c; }
  
+    /* App Player */
     #app-container {
       display: none; 
       width: 95%; 
@@ -332,19 +333,18 @@
       <input type="text" id="gh-owner" placeholder="Usuário do GitHub">
       <input type="text" id="gh-repo" placeholder="Nome do Repositório">
       <input type="password" id="gh-token" placeholder="Personal Access Token (PAT) do GitHub">
-      <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ddd;">
       
-      <input type="text" id="new-video-title" placeholder="Título do Vídeo Novo">
-      <input type="text" id="new-video-url" placeholder="ID ou URL do YouTube">
-      
-      <button id="btn-save-gh" class="btn-action" type="button" onclick="adicionarVideoNoGitHub()">Salvar Novo Vídeo</button>
-
-      <!-- SEÇÃO PARA ALTERAÇÃO DE SENHAS -->
+      <!-- BOTÃO PARA ABRIR A TELA DE ALTERAÇÃO DE SENHAS -->
       <div class="admin-manage-section">
-        <h3>Alterar Senhas de Acesso</h3>
-        <input type="password" id="new-user-pass" placeholder="Nova Senha de Usuário">
-        <input type="password" id="new-admin-pass" placeholder="Nova Senha de Administrador">
-        <button type="button" class="btn-action" onclick="atualizarSenhas()" style="background: var(--ccb-gold) !important; color: #000 !important; margin-bottom: 10px;">Atualizar Senhas no Código</button>
+        <h3>Segurança e Senhas</h3>
+        <button type="button" class="btn-action" onclick="abrirModalSenhas()" style="background: #2b4c7e !important; margin-bottom: 5px;">🔑 Alterar Senhas de Acesso</button>
+      </div>
+
+      <div class="admin-manage-section">
+        <h3>Adicionar Novo Vídeo</h3>
+        <input type="text" id="new-video-title" placeholder="Título do Vídeo Novo">
+        <input type="text" id="new-video-url" placeholder="ID ou URL do YouTube">
+        <button id="btn-save-gh" class="btn-action" type="button" onclick="adicionarVideoNoGitHub()">Salvar Novo Vídeo</button>
       </div>
  
       <!-- SEÇÃO PARA EXCLUSÃO DE VÍDEOS -->
@@ -354,6 +354,28 @@
       </div>
  
       <p id="admin-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
+    </div>
+  </div>
+
+  <!-- MODAL EXCLUSIVO PARA ALTERAÇÃO DE SENHAS -->
+  <div id="admin-passwords-overlay" class="modal-overlay">
+    <div class="admin-card">
+      <button class="btn-close" type="button" onclick="voltarParaAdmin()">&times;</button>
+      <h2>Alterar Senhas</h2>
+      <p>Digite as novas senhas desejadas</p>
+
+      <div style="text-align: left; margin-bottom: 15px;">
+        <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue);">Nova Senha de Usuário (Acesso Geral):</label>
+        <input type="password" id="new-user-pass" placeholder="Deixe em branco para não alterar">
+        
+        <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue); margin-top: 10px; display: block;">Nova Senha de Administrador (Engrenagem):</label>
+        <input type="password" id="new-admin-pass" placeholder="Deixe em branco para não alterar">
+      </div>
+
+      <button type="button" class="btn-action" onclick="atualizarSenhas()" style="background: var(--ccb-gold) !important; color: #000 !important; margin-bottom: 10px;">Salvar Novas Senhas</button>
+      <button type="button" class="btn-action" onclick="voltarParaAdmin()" style="background: #888 !important;">Voltar</button>
+
+      <p id="pass-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
     </div>
   </div>
  
@@ -404,8 +426,6 @@
       const inputField = document.getElementById('password-input');
       const input = inputField ? inputField.value.trim() : "";
       const errorMsg = document.getElementById('login-error');
-
-      console.log("Tentativa de login com:", input);
 
       if (input.toLowerCase() === SENHA_USUARIO.toLowerCase()) {
         document.getElementById('login-overlay').style.display = 'none';
@@ -473,6 +493,20 @@
     function fecharModais() {
       document.getElementById('admin-auth-overlay').style.display = 'none';
       document.getElementById('admin-form-overlay').style.display = 'none';
+      document.getElementById('admin-passwords-overlay').style.display = 'none';
+    }
+
+    function abrirModalSenhas() {
+      document.getElementById('admin-form-overlay').style.display = 'none';
+      document.getElementById('admin-passwords-overlay').style.display = 'flex';
+      document.getElementById('new-user-pass').value = '';
+      document.getElementById('new-admin-pass').value = '';
+      document.getElementById('pass-msg').innerText = '';
+    }
+
+    function voltarParaAdmin() {
+      document.getElementById('admin-passwords-overlay').style.display = 'none';
+      document.getElementById('admin-form-overlay').style.display = 'flex';
     }
  
     function verificarSenhaAdmin(event) {
@@ -557,8 +591,7 @@
       const owner = document.getElementById('gh-owner').value.trim();
       const repo = document.getElementById('gh-repo').value.trim();
       const token = document.getElementById('gh-token').value.trim().replace(/\s+/g, '');
-      const msg = document.getElementById('admin-msg');
- 
+
       if (!owner || !repo || !token) {
         throw new Error('Preencha os dados do GitHub (Usuário, Repositório e PAT).');
       }
@@ -566,9 +599,6 @@
       localStorage.setItem('gh_owner', owner);
       localStorage.setItem('gh_repo', repo);
       localStorage.setItem('gh_token', token);
- 
-      msg.style.color = '#0b2545';
-      msg.innerText = 'Enviando alterações para o GitHub...';
  
       const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/index.html`;
       
@@ -641,6 +671,8 @@
  
       const youtubeId = extrairYoutubeId(rawUrl);
       btn.disabled = true;
+      msg.style.color = '#0b2545';
+      msg.innerText = 'Enviando alterações...';
  
       try {
         const novaLista = [...listaVideos, { title: title, youtubeId: youtubeId }];
@@ -670,6 +702,8 @@
       if (!confirm(`Excluir o vídeo:\n"${videoRemover.title}"?`)) return;
  
       const msg = document.getElementById('admin-msg');
+      msg.style.color = '#0b2545';
+      msg.innerText = 'Removendo vídeo...';
  
       try {
         const novaLista = listaVideos.filter((_, i) => i !== index);
@@ -696,13 +730,16 @@
     async function atualizarSenhas() {
       const newPassUser = document.getElementById('new-user-pass').value.trim();
       const newPassAdmin = document.getElementById('new-admin-pass').value.trim();
-      const msg = document.getElementById('admin-msg');
+      const msg = document.getElementById('pass-msg');
 
       if (!newPassUser && !newPassAdmin) {
         msg.style.color = 'red';
         msg.innerText = 'Preencha ao menos uma das senhas!';
         return;
       }
+
+      msg.style.color = '#0b2545';
+      msg.innerText = 'Salvando senhas no GitHub...';
 
       try {
         await salvarListaNoGitHub(listaVideos, 'Atualização de Senhas de Acesso', newPassUser || null, newPassAdmin || null);
