@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   
-  <title>Palavras CCB</title>
+  <title>CCB</title>
  
   <style>
     :root {
@@ -85,6 +85,11 @@
       font-size: 0.95rem; 
       outline: none;
     }
+
+    .login-card input:focus, .admin-card input:focus {
+      border-color: var(--ccb-blue);
+      box-shadow: 0 0 5px rgba(11, 37, 69, 0.3);
+    }
  
     .login-card button[type="submit"], 
     .admin-card button[type="submit"],
@@ -104,9 +109,13 @@
     
     .login-card button[type="submit"]:hover, 
     .admin-card button[type="submit"]:hover,
-    .admin-card button.btn-action:hover { 
+    .admin-card button.btn-action:hover,
+    .login-card button[type="submit"]:focus, 
+    .admin-card button[type="submit"]:focus,
+    .admin-card button.btn-action:focus { 
       background: var(--ccb-gold); 
       color: var(--ccb-dark-blue); 
+      outline: none;
     }
 
     .menu-grid {
@@ -132,10 +141,11 @@
       gap: 10px;
     }
 
-    .btn-menu:hover {
-      background: var(--ccb-gold);
-      color: var(--ccb-dark-blue);
+    .btn-menu:hover, .btn-menu:focus, .btn-menu.kb-focus {
+      background: var(--ccb-gold) !important;
+      color: var(--ccb-dark-blue) !important;
       transform: translateY(-2px);
+      outline: 2px solid var(--ccb-dark-blue);
     }
  
     button.btn-close {
@@ -156,7 +166,7 @@
       z-index: 10;
     }
     
-    button.btn-close:hover { color: var(--ccb-blue); }
+    button.btn-close:hover, button.btn-close:focus { color: var(--ccb-blue); outline: none; }
  
     .admin-manage-section {
       text-align: left;
@@ -209,7 +219,7 @@
       font-weight: bold;
     }
  
-    .btn-delete-item:hover { background: #c9302c; }
+    .btn-delete-item:hover, .btn-delete-item:focus { background: #c9302c; outline: none; }
  
     #app-container {
       display: none; 
@@ -249,9 +259,10 @@
       transition: all 0.2s;
     }
     
-    .btn-back-menu:hover { 
+    .btn-back-menu:hover, .btn-back-menu:focus { 
       background: var(--ccb-gold); 
       color: var(--ccb-dark-blue); 
+      outline: none;
     }
  
     .main-content { display: flex; flex-direction: column; }
@@ -323,8 +334,23 @@
       border-radius: 4px; 
       outline: none;
     }
+
+    .search-box input:focus {
+      border-color: var(--ccb-blue);
+      box-shadow: 0 0 4px rgba(11, 37, 69, 0.3);
+    }
     
-    .video-list { list-style: none; max-height: 500px; overflow-y: auto; }
+    .video-list { 
+      list-style: none; 
+      max-height: 500px; 
+      overflow-y: auto; 
+      outline: none;
+    }
+
+    .video-list:focus {
+      border: 1px solid var(--ccb-blue);
+      border-radius: 4px;
+    }
     
     .video-item {
       padding: 0.75rem; 
@@ -336,8 +362,9 @@
       transition: background 0.2s;
     }
     
-    .video-item:hover { background: #e0e7ff; }
+    .video-item:hover, .video-item.kb-focus { background: #e0e7ff; }
     .video-item.active { background: var(--ccb-blue); color: #fff; font-weight: bold; }
+    .video-item.active.kb-focus { background: var(--ccb-gold); color: var(--ccb-dark-blue); }
   </style>
 </head>
 <body>
@@ -345,11 +372,11 @@
   <!-- TELA DE LOGIN PRINCIPAL -->
   <div id="login-overlay">
     <div class="login-card">
-      <h2>Palavras CCB</h2>
+      <h2>CCB</h2>
       <p>Acesso Restrito</p>
       <form id="login-form" onsubmit="autenticar(event)">
-        <input type="password" id="password-input" placeholder="Digite a senha de acesso" required autocomplete="current-password">
-        <button type="submit">Entrar</button>
+        <input type="password" id="password-input" placeholder="Digite a senha de acesso" required autocomplete="current-password" autofocus>
+        <button type="submit" id="btn-login-submit">Entrar</button>
       </form>
       <p id="login-error" style="color: red; margin-top: 10px; display: none; font-weight: bold;">Senha incorreta!</p>
     </div>
@@ -360,7 +387,7 @@
     <div class="menu-card">
       <h2>Menu Principal</h2>
       <p>Selecione a opção desejada</p>
-      <div class="menu-grid">
+      <div class="menu-grid" id="main-menu-grid">
         <button class="btn-menu" type="button" onclick="navegarPara('palavras')">📹 Palavras</button>
         <button class="btn-menu" type="button" onclick="navegarPara('biblia')">📖 Bíblia</button>
         <button class="btn-menu" type="button" onclick="navegarPara('hinos')">🎵 Hinos</button>
@@ -389,7 +416,7 @@
       <button class="btn-close" type="button" onclick="voltarParaMenu()">&times;</button>
       <h2>Painel de Gerenciamento</h2>
       <p>Escolha o que deseja configurar</p>
-      <div class="menu-grid">
+      <div class="menu-grid" id="admin-menu-grid">
         <button class="btn-menu" type="button" onclick="abrirGerenciadorVideos()">📹 Gerenciar Vídeos</button>
         <button class="btn-menu" type="button" onclick="abrirModalSenhas()" style="background: #2b4c7e !important;">🔑 Alterar Senhas</button>
         <button class="btn-menu" type="button" onclick="voltarParaMenu()" style="background: #888 !important;">Voltar ao Menu Principal</button>
@@ -403,10 +430,11 @@
       <button class="btn-close" type="button" onclick="voltarParaAdminMenu()">&times;</button>
       <h2>Gerenciar Vídeos</h2>
       <p>Adicione ou remova vídeos do repositório</p>
-      
-      <input type="text" id="gh-owner" placeholder="Usuário do GitHub">
-      <input type="text" id="gh-repo" placeholder="Nome do Repositório">
-      <input type="password" id="gh-token" placeholder="Personal Access Token (PAT) do GitHub">
+
+      <div style="text-align: left; margin-bottom: 10px;">
+        <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue);">Token do GitHub (PAT):</label>
+        <input type="password" id="gh-token-videos" placeholder="Cole seu token de acesso aqui">
+      </div>
 
       <div class="admin-manage-section">
         <h3>Adicionar Novo Vídeo</h3>
@@ -433,7 +461,10 @@
       <p>Digite as novas senhas desejadas</p>
 
       <div style="text-align: left; margin-bottom: 15px;">
-        <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue);">Nova Senha de Usuário (Acesso Geral):</label>
+        <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue);">Token do GitHub (PAT):</label>
+        <input type="password" id="gh-token-pass" placeholder="Cole seu token de acesso aqui">
+
+        <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue); margin-top: 10px; display: block;">Nova Senha de Usuário (Acesso Geral):</label>
         <input type="password" id="new-user-pass" placeholder="Deixe em branco para não alterar">
         
         <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue); margin-top: 10px; display: block;">Nova Senha de Administrador:</label>
@@ -453,14 +484,14 @@
       <button class="btn-close" type="button" onclick="voltarParaMenu()">&times;</button>
       <h2 id="placeholder-title">Recurso</h2>
       <p id="placeholder-desc" style="margin-top: 20px; font-size: 1rem; color: #555;">Esta seção estará disponível em breve.</p>
-      <button type="button" class="btn-action" onclick="voltarParaMenu()" style="background: var(--ccb-blue) !important; margin-top: 20px;">Voltar ao Menu Principal</button>
+      <button type="button" id="btn-placeholder-back" class="btn-action" onclick="voltarParaMenu()" style="background: var(--ccb-blue) !important; margin-top: 20px;">Voltar ao Menu Principal</button>
     </div>
   </div>
  
   <!-- APLICAÇÃO DO PLAYER ("PALAVRAS CCB") -->
   <div id="app-container">
     <header>
-      <button class="btn-back-menu" type="button" title="Voltar ao Menu" onclick="voltarParaMenu()">⬅ Menu</button>
+      <button class="btn-back-menu" id="btn-app-back" type="button" title="Voltar ao Menu" onclick="voltarParaMenu()">⬅ Menu</button>
       <h1>Palavras CCB</h1>
     </header>
  
@@ -476,9 +507,9 @@
  
       <div class="playlist-section">
         <div class="search-box">
-          <input type="text" id="search-input" placeholder="🔍 Localizar vídeo..." onkeyup="filtrarVideos()">
+          <input type="text" id="search-input" placeholder="🔍 Localizar vídeo (Pressione Setas para navegar)" onkeyup="filtrarVideos()">
         </div>
-        <ul class="video-list" id="playlist"></ul>
+        <ul class="video-list" id="playlist" tabindex="0"></ul>
       </div>
     </div>
   </div>
@@ -487,12 +518,19 @@
     let SENHA_USUARIO = "ccb2026";
     let SENHA_ADMIN = "admin2026";
 
+    // Dados fixos do Repositório GitHub
+    const GITHUB_OWNER = "andersonhomma4321";
+    const GITHUB_REPO = "palavras-ccb";
+
     const listaVideos = [
       { title: "Palavra 2026-04-22 Proverbios 27 IrLuiz", youtubeId: "cjp_4UM7ed8" },
       { title: "Palavra 2026 04 19 Salmos 23 IrHelio", youtubeId: "XCC3hGWZ5Hw" }
     ];
  
     let currentVideoIndex = 0;
+    let menuFocusIndex = 0;
+    let adminMenuFocusIndex = 0;
+    let kbPlaylistIndex = 0;
 
     function autenticar(event) {
       if (event) event.preventDefault();
@@ -505,6 +543,7 @@
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('menu-overlay').style.display = 'flex';
         if (errorMsg) errorMsg.style.display = 'none';
+        focarMenuPrincipal(0);
       } else {
         if (errorMsg) {
           errorMsg.innerText = "Senha incorreta!";
@@ -519,16 +558,19 @@
       if (opcao === 'palavras') {
         document.getElementById('app-container').style.display = 'block';
         carregarPlaylist();
+        document.getElementById('playlist').focus();
       } else if (opcao === 'configuracao') {
         abrirAuthAdmin();
       } else if (opcao === 'biblia') {
         document.getElementById('placeholder-title').innerText = '📖 Bíblia';
         document.getElementById('placeholder-desc').innerText = 'O leitor e buscador da Bíblia Sagrada estará disponível em breve.';
         document.getElementById('placeholder-overlay').style.display = 'flex';
+        document.getElementById('btn-placeholder-back').focus();
       } else if (opcao === 'hinos') {
         document.getElementById('placeholder-title').innerText = '🎵 Hinos';
         document.getElementById('placeholder-desc').innerText = 'O hinoário em áudio estará disponível em breve.';
         document.getElementById('placeholder-overlay').style.display = 'flex';
+        document.getElementById('btn-placeholder-back').focus();
       }
     }
 
@@ -536,11 +578,13 @@
       fecharModais();
       document.getElementById('app-container').style.display = 'none';
       document.getElementById('menu-overlay').style.display = 'flex';
+      focarMenuPrincipal(menuFocusIndex);
     }
 
     function voltarParaAdminMenu() {
       fecharModais();
       document.getElementById('admin-menu-overlay').style.display = 'flex';
+      focarAdminMenu(adminMenuFocusIndex);
     }
  
     function carregarPlaylist() {
@@ -559,12 +603,15 @@
       if (!playlistElement) return;
       
       playlistElement.innerHTML = '';
-      lista.forEach((vid) => {
+      lista.forEach((vid, idx) => {
         const indexNaListaOriginal = listaVideos.findIndex(v => v.youtubeId === vid.youtubeId);
         const li = document.createElement('li');
-        li.className = `video-item ${indexNaListaOriginal === currentVideoIndex ? 'active' : ''}`;
+        li.className = `video-item ${indexNaListaOriginal === currentVideoIndex ? 'active' : ''} ${idx === kbPlaylistIndex ? 'kb-focus' : ''}`;
         li.innerText = vid.title;
-        li.onclick = () => tocarVideo(indexNaListaOriginal);
+        li.onclick = () => {
+          kbPlaylistIndex = idx;
+          tocarVideo(indexNaListaOriginal);
+        };
         playlistElement.appendChild(li);
       });
     }
@@ -574,13 +621,11 @@
       currentVideoIndex = index;
       const vid = listaVideos[index];
 
-      // Atualiza o iframe
       const iframePlayer = document.getElementById('main-iframe');
       if (iframePlayer) {
         iframePlayer.src = `https://www.youtube.com/embed/${vid.youtubeId}?enablejsapi=1&vq=hd1080&rel=0`;
       }
       
-      // Atualiza a legenda/descrição do vídeo
       atualizarTextoElemento('current-title', vid.title);
       
       const searchBox = document.getElementById('search-input');
@@ -603,6 +648,7 @@
       const searchBox = document.getElementById('search-input');
       const termo = searchBox ? searchBox.value.toLowerCase() : "";
       const filtrados = listaVideos.filter(vid => vid.title.toLowerCase().includes(termo));
+      kbPlaylistIndex = 0;
       renderizarLista(filtrados);
     }
  
@@ -610,6 +656,7 @@
       document.getElementById('admin-password-input').value = '';
       document.getElementById('admin-auth-error').style.display = 'none';
       document.getElementById('admin-auth-overlay').style.display = 'flex';
+      setTimeout(() => document.getElementById('admin-password-input').focus(), 50);
     }
  
     function fecharModais() {
@@ -623,8 +670,8 @@
     function abrirGerenciadorVideos() {
       fecharModais();
       document.getElementById('admin-form-overlay').style.display = 'flex';
-      carregarCredenciaisGitHub();
       renderizarListaAdmin();
+      setTimeout(() => document.getElementById('gh-token-videos').focus(), 50);
     }
 
     function abrirModalSenhas() {
@@ -633,6 +680,7 @@
       document.getElementById('new-user-pass').value = '';
       document.getElementById('new-admin-pass').value = '';
       document.getElementById('pass-msg').innerText = '';
+      setTimeout(() => document.getElementById('gh-token-pass').focus(), 50);
     }
  
     function verificarSenhaAdmin(event) {
@@ -642,6 +690,7 @@
       if (input.toLowerCase() === SENHA_ADMIN.toLowerCase()) {
         document.getElementById('admin-auth-overlay').style.display = 'none';
         document.getElementById('admin-menu-overlay').style.display = 'flex';
+        focarAdminMenu(0);
       } else {
         document.getElementById('admin-auth-error').style.display = 'block';
       }
@@ -682,12 +731,6 @@
       return match ? match[1] : entrada.trim();
     }
  
-    function carregarCredenciaisGitHub() {
-      if (localStorage.getItem('gh_owner')) document.getElementById('gh-owner').value = localStorage.getItem('gh_owner');
-      if (localStorage.getItem('gh_repo')) document.getElementById('gh-repo').value = localStorage.getItem('gh_repo');
-      if (localStorage.getItem('gh_token')) document.getElementById('gh-token').value = localStorage.getItem('gh_token');
-    }
- 
     function utf8ToBase64(str) {
       return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
         return String.fromCharCode('0x' + p1);
@@ -705,20 +748,12 @@
       return `const listaVideos = [\n${itensFormatados.join(',\n')}\n];`;
     }
  
-    async function salvarListaNoGitHub(novaLista, mensagemCommit, novaSenhaUser = null, novaSenhaAdmin = null) {
-      const owner = document.getElementById('gh-owner').value.trim();
-      const repo = document.getElementById('gh-repo').value.trim();
-      const token = document.getElementById('gh-token').value.trim().replace(/\s+/g, '');
-
-      if (!owner || !repo || !token) {
-        throw new Error('Preencha os dados do GitHub (Usuário, Repositório e PAT).');
+    async function salvarListaNoGitHub(token, novaLista, mensagemCommit, novaSenhaUser = null, novaSenhaAdmin = null) {
+      if (!token) {
+        throw new Error('Informe o Token do GitHub.');
       }
  
-      localStorage.setItem('gh_owner', owner);
-      localStorage.setItem('gh_repo', repo);
-      localStorage.setItem('gh_token', token);
- 
-      const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/index.html`;
+      const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/index.html`;
       
       const resGet = await fetch(apiUrl, {
         headers: { 
@@ -728,7 +763,7 @@
       });
  
       if (!resGet.ok) {
-        if (resGet.status === 401) throw new Error('Token inválido ou revogado.');
+        if (resGet.status === 401) throw new Error('Token do GitHub inválido.');
         if (resGet.status === 404) throw new Error('Repositório ou arquivo index.html não encontrado.');
         throw new Error(`Erro na busca (${resGet.status})`);
       }
@@ -776,10 +811,17 @@
     }
  
     async function adicionarVideoNoGitHub() {
+      const token = document.getElementById('gh-token-videos').value.trim();
       const title = document.getElementById('new-video-title').value.trim();
       const rawUrl = document.getElementById('new-video-url').value.trim();
       const msg = document.getElementById('admin-msg');
       const btn = document.getElementById('btn-save-gh');
+
+      if (!token) {
+        msg.style.color = 'red';
+        msg.innerText = 'Preencha o Token do GitHub!';
+        return;
+      }
  
       if (!title || !rawUrl) {
         msg.style.color = 'red';
@@ -794,7 +836,7 @@
  
       try {
         const novaLista = [...listaVideos, { title: title, youtubeId: youtubeId }];
-        await salvarListaNoGitHub(novaLista, `Adicionado vídeo: ${title}`);
+        await salvarListaNoGitHub(token, novaLista, `Adicionado vídeo: ${title}`);
  
         listaVideos.push({ title: title, youtubeId: youtubeId });
         renderizarLista(listaVideos);
@@ -814,18 +856,26 @@
     }
  
     async function excluirVideoDoGitHub(index) {
+      const token = document.getElementById('gh-token-videos').value.trim();
+      const msg = document.getElementById('admin-msg');
+
+      if (!token) {
+        msg.style.color = 'red';
+        msg.innerText = 'Digite o Token do GitHub antes de excluir!';
+        return;
+      }
+
       const videoRemover = listaVideos[index];
       if (!videoRemover) return;
  
       if (!confirm(`Excluir o vídeo:\n"${videoRemover.title}"?`)) return;
  
-      const msg = document.getElementById('admin-msg');
       msg.style.color = '#0b2545';
       msg.innerText = 'Removendo vídeo...';
  
       try {
         const novaLista = listaVideos.filter((_, i) => i !== index);
-        await salvarListaNoGitHub(novaLista, `Removido vídeo: ${videoRemover.title}`);
+        await salvarListaNoGitHub(token, novaLista, `Removido vídeo: ${videoRemover.title}`);
  
         listaVideos.splice(index, 1);
         renderizarLista(listaVideos);
@@ -846,9 +896,16 @@
     }
 
     async function atualizarSenhas() {
+      const token = document.getElementById('gh-token-pass').value.trim();
       const newPassUser = document.getElementById('new-user-pass').value.trim();
       const newPassAdmin = document.getElementById('new-admin-pass').value.trim();
       const msg = document.getElementById('pass-msg');
+
+      if (!token) {
+        msg.style.color = 'red';
+        msg.innerText = 'Informe o Token do GitHub!';
+        return;
+      }
 
       if (!newPassUser && !newPassAdmin) {
         msg.style.color = 'red';
@@ -860,7 +917,7 @@
       msg.innerText = 'Salvando senhas no GitHub...';
 
       try {
-        await salvarListaNoGitHub(listaVideos, 'Atualização de Senhas de Acesso', newPassUser || null, newPassAdmin || null);
+        await salvarListaNoGitHub(token, listaVideos, 'Atualização de Senhas de Acesso', newPassUser || null, newPassAdmin || null);
 
         if (newPassUser) SENHA_USUARIO = newPassUser;
         if (newPassAdmin) SENHA_ADMIN = newPassAdmin;
@@ -875,6 +932,110 @@
         msg.innerText = 'Erro ao atualizar senhas: ' + err.message;
       }
     }
+
+    // --- NAVEGAÇÃO VIA TECLADO ---
+
+    function focarMenuPrincipal(idx) {
+      const botoes = document.querySelectorAll('#main-menu-grid .btn-menu');
+      if (botoes.length === 0) return;
+      menuFocusIndex = (idx + botoes.length) % botoes.length;
+      botoes.forEach((b, i) => {
+        if (i === menuFocusIndex) b.classList.add('kb-focus');
+        else b.classList.remove('kb-focus');
+      });
+      botoes[menuFocusIndex].focus();
+    }
+
+    function focarAdminMenu(idx) {
+      const botoes = document.querySelectorAll('#admin-menu-grid .btn-menu');
+      if (botoes.length === 0) return;
+      adminMenuFocusIndex = (idx + botoes.length) % botoes.length;
+      botoes.forEach((b, i) => {
+        if (i === adminMenuFocusIndex) b.classList.add('kb-focus');
+        else b.classList.remove('kb-focus');
+      });
+      botoes[adminMenuFocusIndex].focus();
+    }
+
+    document.addEventListener('keydown', function(e) {
+      const menuOverlayVisivel = document.getElementById('menu-overlay').style.display === 'flex';
+      const adminMenuOverlayVisivel = document.getElementById('admin-menu-overlay').style.display === 'flex';
+      const appContainerVisivel = document.getElementById('app-container').style.display === 'block';
+
+      // TECLA ESCAPE
+      if (e.key === 'Escape') {
+        if (appContainerVisivel) {
+          voltarParaMenu();
+        } else if (document.getElementById('admin-form-overlay').style.display === 'flex' ||
+                   document.getElementById('admin-passwords-overlay').style.display === 'flex') {
+          voltarParaAdminMenu();
+        } else if (document.getElementById('admin-auth-overlay').style.display === 'flex' ||
+                   document.getElementById('placeholder-overlay').style.display === 'flex' ||
+                   adminMenuOverlayVisivel) {
+          voltarParaMenu();
+        }
+        return;
+      }
+
+      // TECLAS DE SETAS NO MENU PRINCIPAL
+      if (menuOverlayVisivel) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          focarMenuPrincipal(menuFocusIndex + 1);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          focarMenuPrincipal(menuFocusIndex - 1);
+        } else if (e.key === 'Enter') {
+          const botoes = document.querySelectorAll('#main-menu-grid .btn-menu');
+          if (botoes[menuFocusIndex]) botoes[menuFocusIndex].click();
+        }
+        return;
+      }
+
+      // TECLAS DE SETAS NO MENU DE ADMINISTRADOR
+      if (adminMenuOverlayVisivel) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          focarAdminMenu(adminMenuFocusIndex + 1);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          focarAdminMenu(adminMenuFocusIndex - 1);
+        } else if (e.key === 'Enter') {
+          const botoes = document.querySelectorAll('#admin-menu-grid .btn-menu');
+          if (botoes[adminMenuFocusIndex]) botoes[adminMenuFocusIndex].click();
+        }
+        return;
+      }
+
+      // TECLAS DE SETAS NO PLAYER DE VÍDEOS
+      if (appContainerVisivel) {
+        const searchInput = document.getElementById('search-input');
+        const searchBoxFocada = document.activeElement === searchInput;
+
+        const searchBoxVal = searchInput ? searchInput.value.toLowerCase() : "";
+        const listaExibida = searchBoxVal ? listaVideos.filter(v => v.title.toLowerCase().includes(searchBoxVal)) : listaVideos;
+
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (listaExibida.length > 0) {
+            kbPlaylistIndex = (kbPlaylistIndex + 1) % listaExibida.length;
+            renderizarLista(listaExibida);
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (listaExibida.length > 0) {
+            kbPlaylistIndex = (kbPlaylistIndex - 1 + listaExibida.length) % listaExibida.length;
+            renderizarLista(listaExibida);
+          }
+        } else if (e.key === 'Enter' && !searchBoxFocada) {
+          e.preventDefault();
+          if (listaExibida[kbPlaylistIndex]) {
+            const indexOriginal = listaVideos.findIndex(v => v.youtubeId === listaExibida[kbPlaylistIndex].youtubeId);
+            tocarVideo(indexOriginal);
+          }
+        }
+      }
+    });
   </script>
 </body>
 </html>
