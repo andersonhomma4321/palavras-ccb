@@ -111,7 +111,7 @@
       color: var(--ccb-dark-blue); 
     }
 
-    /* Botões do Menu Principal */
+    /* Botões dos Menus */
     .menu-grid {
       display: flex;
       flex-direction: column;
@@ -368,8 +368,8 @@
   <div id="admin-auth-overlay" class="modal-overlay">
     <div class="admin-card">
       <button class="btn-close" type="button" onclick="voltarParaMenu()">&times;</button>
-      <h2>Painel do Administrador</h2>
-      <p>Digite a senha para acessar as configurações</p>
+      <h2>Autenticação do Administrador</h2>
+      <p>Digite a senha para gerenciar o sistema</p>
       <form onsubmit="verificarSenhaAdmin(event)">
         <input type="password" id="admin-password-input" placeholder="Digite a senha mestra" required>
         <button type="submit">Acessar</button>
@@ -377,22 +377,31 @@
       <p id="admin-auth-error" style="color: red; margin-top: 10px; display: none; font-weight: bold;">Senha incorreta!</p>
     </div>
   </div>
- 
-  <!-- MODAL GERENCIADOR DE VÍDEOS / CONFIGURAÇÕES -->
-  <div id="admin-form-overlay" class="modal-overlay">
+
+  <!-- TELA DE GERENCIAMENTO (MENU DO ADMINISTRADOR) -->
+  <div id="admin-menu-overlay" class="modal-overlay">
     <div class="admin-card">
       <button class="btn-close" type="button" onclick="voltarParaMenu()">&times;</button>
-      <h2>Gerenciar Vídeos no GitHub</h2>
-      <p>Configure e atualize o repositório</p>
+      <h2>Painel de Gerenciamento</h2>
+      <p>Escolha o que deseja configurar</p>
+      <div class="menu-grid">
+        <button class="btn-menu" type="button" onclick="abrirGerenciadorVideos()">📹 Gerenciar Vídeos</button>
+        <button class="btn-menu" type="button" onclick="abrirModalSenhas()" style="background: #2b4c7e !important;">🔑 Alterar Senhas</button>
+        <button class="btn-menu" type="button" onclick="voltarParaMenu()" style="background: #888 !important;">Voltar ao Menu Principal</button>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- MODAL INCLUIR E EXCLUIR VÍDEOS -->
+  <div id="admin-form-overlay" class="modal-overlay">
+    <div class="admin-card">
+      <button class="btn-close" type="button" onclick="voltarParaAdminMenu()">&times;</button>
+      <h2>Gerenciar Vídeos</h2>
+      <p>Adicione ou remova vídeos do repositório</p>
       
       <input type="text" id="gh-owner" placeholder="Usuário do GitHub">
       <input type="text" id="gh-repo" placeholder="Nome do Repositório">
       <input type="password" id="gh-token" placeholder="Personal Access Token (PAT) do GitHub">
-      
-      <div class="admin-manage-section">
-        <h3>Segurança e Senhas</h3>
-        <button type="button" class="btn-action" onclick="abrirModalSenhas()" style="background: #2b4c7e !important; margin-bottom: 5px;">🔑 Alterar Senhas de Acesso</button>
-      </div>
 
       <div class="admin-manage-section">
         <h3>Adicionar Novo Vídeo</h3>
@@ -407,14 +416,14 @@
       </div>
  
       <p id="admin-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
-      <button type="button" class="btn-action" onclick="voltarParaMenu()" style="background: #888 !important; margin-top: 15px;">Voltar ao Menu Principal</button>
+      <button type="button" class="btn-action" onclick="voltarParaAdminMenu()" style="background: #888 !important; margin-top: 15px;">Voltar ao Painel</button>
     </div>
   </div>
 
   <!-- MODAL EXCLUSIVO PARA ALTERAÇÃO DE SENHAS -->
   <div id="admin-passwords-overlay" class="modal-overlay">
     <div class="admin-card">
-      <button class="btn-close" type="button" onclick="voltarParaAdmin()">&times;</button>
+      <button class="btn-close" type="button" onclick="voltarParaAdminMenu()">&times;</button>
       <h2>Alterar Senhas</h2>
       <p>Digite as novas senhas desejadas</p>
 
@@ -427,7 +436,7 @@
       </div>
 
       <button type="button" class="btn-action" onclick="atualizarSenhas()" style="background: var(--ccb-gold) !important; color: #000 !important; margin-bottom: 10px;">Salvar Novas Senhas</button>
-      <button type="button" class="btn-action" onclick="voltarParaAdmin()" style="background: #888 !important;">Voltar</button>
+      <button type="button" class="btn-action" onclick="voltarParaAdminMenu()" style="background: #888 !important;">Voltar ao Painel</button>
 
       <p id="pass-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
     </div>
@@ -527,6 +536,11 @@
       document.getElementById('app-container').style.display = 'none';
       document.getElementById('menu-overlay').style.display = 'flex';
     }
+
+    function voltarParaAdminMenu() {
+      fecharModais();
+      document.getElementById('admin-menu-overlay').style.display = 'flex';
+    }
  
     function carregarPlaylist() {
       renderizarLista(listaVideos);
@@ -580,22 +594,25 @@
  
     function fecharModais() {
       document.getElementById('admin-auth-overlay').style.display = 'none';
+      document.getElementById('admin-menu-overlay').style.display = 'none';
       document.getElementById('admin-form-overlay').style.display = 'none';
       document.getElementById('admin-passwords-overlay').style.display = 'none';
       document.getElementById('placeholder-overlay').style.display = 'none';
     }
 
+    function abrirGerenciadorVideos() {
+      fecharModais();
+      document.getElementById('admin-form-overlay').style.display = 'flex';
+      carregarCredenciaisGitHub();
+      renderizarListaAdmin();
+    }
+
     function abrirModalSenhas() {
-      document.getElementById('admin-form-overlay').style.display = 'none';
+      fecharModais();
       document.getElementById('admin-passwords-overlay').style.display = 'flex';
       document.getElementById('new-user-pass').value = '';
       document.getElementById('new-admin-pass').value = '';
       document.getElementById('pass-msg').innerText = '';
-    }
-
-    function voltarParaAdmin() {
-      document.getElementById('admin-passwords-overlay').style.display = 'none';
-      document.getElementById('admin-form-overlay').style.display = 'flex';
     }
  
     function verificarSenhaAdmin(event) {
@@ -604,9 +621,7 @@
 
       if (input.toLowerCase() === SENHA_ADMIN.toLowerCase()) {
         document.getElementById('admin-auth-overlay').style.display = 'none';
-        document.getElementById('admin-form-overlay').style.display = 'flex';
-        carregarCredenciaisGitHub();
-        renderizarListaAdmin();
+        document.getElementById('admin-menu-overlay').style.display = 'flex';
       } else {
         document.getElementById('admin-auth-error').style.display = 'block';
       }
