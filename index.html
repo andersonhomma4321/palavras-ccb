@@ -83,58 +83,49 @@
       outline: none;
     }
  
-    /* Botões principais nos cards */
-    .login-card button:not(.btn-close):not(.btn-delete-item), 
-    .admin-card button:not(.btn-close):not(.btn-delete-item) {
-      width: 100% !important;
-      padding: 0.75rem !important;
-      background: var(--ccb-blue) !important;
-      color: #fff !important;
-      border: none !important;
-      border-radius: 4px !important;
-      font-size: 1rem !important;
-      cursor: pointer !important;
-      font-weight: bold !important;
-      transition: background 0.2s !important;
-      margin-top: 0.25rem !important;
+    .login-card button[type="submit"], 
+    .admin-card button[type="submit"],
+    .admin-card button.btn-action {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--ccb-blue);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+      margin-top: 0.25rem;
     }
     
-    .login-card button:not(.btn-close):not(.btn-delete-item):hover, 
-    .admin-card button:not(.btn-close):not(.btn-delete-item):hover { 
-      background: var(--ccb-gold) !important; 
-      color: var(--ccb-dark-blue) !important; 
+    .login-card button[type="submit"]:hover, 
+    .admin-card button[type="submit"]:hover,
+    .admin-card button.btn-action:hover { 
+      background: var(--ccb-gold); 
+      color: var(--ccb-dark-blue); 
     }
  
-    /* Botão fechar (X) */
     button.btn-close {
-      position: absolute !important;
-      top: 10px !important;
-      right: 12px !important;
-      width: 30px !important;
-      height: 30px !important;
-      min-width: unset !important;
-      padding: 0 !important;
-      margin: 0 !important;
-      background: transparent !important;
-      border: none !important;
-      font-size: 1.5rem !important;
-      font-weight: bold !important;
-      color: #888 !important;
-      cursor: pointer !important;
-      line-height: 1 !important;
-      box-shadow: none !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      z-index: 10 !important;
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 30px;
+      height: 30px;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #888;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
     }
     
-    button.btn-close:hover { 
-      color: var(--ccb-blue) !important; 
-      background: transparent !important;
-    }
+    button.btn-close:hover { color: var(--ccb-blue); }
  
-    /* Lista de Gestão do Admin */
     .admin-manage-section {
       text-align: left;
       margin-top: 15px;
@@ -166,9 +157,7 @@
       font-size: 0.85rem;
     }
  
-    .admin-video-item:last-child {
-      border-bottom: none;
-    }
+    .admin-video-item:last-child { border-bottom: none; }
  
     .admin-video-item span {
       white-space: nowrap;
@@ -188,11 +177,8 @@
       font-weight: bold;
     }
  
-    .btn-delete-item:hover {
-      background: #c9302c;
-    }
+    .btn-delete-item:hover { background: #c9302c; }
  
-    /* App Player */
     #app-container {
       display: none; 
       width: 95%; 
@@ -213,11 +199,7 @@
       position: relative;
     }
     
-    header h1 { 
-      font-weight: 600; 
-      letter-spacing: 1px; 
-      font-size: 1.8rem; 
-    }
+    header h1 { font-weight: 600; letter-spacing: 1px; font-size: 1.8rem; }
  
     .btn-gear {
       position: absolute; 
@@ -230,15 +212,11 @@
       font-size: 1.5rem; 
       cursor: pointer;
       padding: 5px;
-      transition: color 0.2s;
     }
     
     .btn-gear:hover { color: #fff; }
  
-    .main-content { 
-      display: flex; 
-      flex-direction: column; 
-    }
+    .main-content { display: flex; flex-direction: column; }
     
     @media(min-width: 900px) {
       .main-content { flex-direction: row; }
@@ -299,11 +277,7 @@
       outline: none;
     }
     
-    .video-list { 
-      list-style: none; 
-      max-height: 500px; 
-      overflow-y: auto; 
-    }
+    .video-list { list-style: none; max-height: 500px; overflow-y: auto; }
     
     .video-item {
       padding: 0.75rem; 
@@ -316,12 +290,7 @@
     }
     
     .video-item:hover { background: #e0e7ff; }
-    
-    .video-item.active { 
-      background: var(--ccb-blue); 
-      color: #fff; 
-      font-weight: bold; 
-    }
+    .video-item.active { background: var(--ccb-blue); color: #fff; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -331,28 +300,32 @@
     <div class="login-card">
       <h2>Palavras CCB</h2>
       <p>Acesso Restrito</p>
-      <input type="password" id="password-input" placeholder="Digite a senha de acesso" onkeyup="if(event.key === 'Enter') autenticar()">
-      <button onclick="autenticar()">Entrar</button>
-      <p id="login-error" style="color: red; margin-top: 10px; display: none;">Senha incorreta!</p>
+      <form id="login-form" onsubmit="autenticar(event)">
+        <input type="password" id="password-input" placeholder="Digite a senha de acesso" required autocomplete="current-password">
+        <button type="submit">Entrar</button>
+      </form>
+      <p id="login-error" style="color: red; margin-top: 10px; display: none; font-weight: bold;">Senha incorreta!</p>
     </div>
   </div>
  
   <!-- MODAL DE AUTENTICAÇÃO DA ENGRENAGEM -->
   <div id="admin-auth-overlay" class="modal-overlay">
     <div class="admin-card">
-      <button class="btn-close" onclick="fecharModais()">&times;</button>
+      <button class="btn-close" type="button" onclick="fecharModais()">&times;</button>
       <h2>Painel do Administrador</h2>
       <p>Digite a senha para gerenciar vídeos</p>
-      <input type="password" id="admin-password-input" placeholder="Digite a senha mestra" onkeyup="if(event.key === 'Enter') verificarSenhaAdmin()">
-      <button onclick="verificarSenhaAdmin()">Acessar</button>
-      <p id="admin-auth-error" style="color: red; margin-top: 10px; display: none;">Senha incorreta!</p>
+      <form onsubmit="verificarSenhaAdmin(event)">
+        <input type="password" id="admin-password-input" placeholder="Digite a senha mestra" required>
+        <button type="submit">Acessar</button>
+      </form>
+      <p id="admin-auth-error" style="color: red; margin-top: 10px; display: none; font-weight: bold;">Senha incorreta!</p>
     </div>
   </div>
  
   <!-- MODAL GERENCIADOR DE VÍDEOS -->
   <div id="admin-form-overlay" class="modal-overlay">
     <div class="admin-card">
-      <button class="btn-close" onclick="fecharModais()">&times;</button>
+      <button class="btn-close" type="button" onclick="fecharModais()">&times;</button>
       <h2>Gerenciar Vídeos no GitHub</h2>
       <p>Configure e atualize o repositório</p>
       
@@ -364,14 +337,14 @@
       <input type="text" id="new-video-title" placeholder="Título do Vídeo Novo">
       <input type="text" id="new-video-url" placeholder="ID ou URL do YouTube">
       
-      <button id="btn-save-gh" onclick="adicionarVideoNoGitHub()">Salvar Novo Vídeo</button>
+      <button id="btn-save-gh" class="btn-action" type="button" onclick="adicionarVideoNoGitHub()">Salvar Novo Vídeo</button>
 
       <!-- SEÇÃO PARA ALTERAÇÃO DE SENHAS -->
       <div class="admin-manage-section">
         <h3>Alterar Senhas de Acesso</h3>
         <input type="password" id="new-user-pass" placeholder="Nova Senha de Usuário">
         <input type="password" id="new-admin-pass" placeholder="Nova Senha de Administrador">
-        <button onclick="atualizarSenhas()" style="background: var(--ccb-gold) !important; color: #000 !important; margin-bottom: 10px;">Atualizar Senhas no Código</button>
+        <button type="button" class="btn-action" onclick="atualizarSenhas()" style="background: var(--ccb-gold) !important; color: #000 !important; margin-bottom: 10px;">Atualizar Senhas no Código</button>
       </div>
  
       <!-- SEÇÃO PARA EXCLUSÃO DE VÍDEOS -->
@@ -388,7 +361,7 @@
   <div id="app-container">
     <header>
       <h1>Palavras CCB</h1>
-      <button class="btn-gear" title="Gerenciar Vídeos" onclick="abrirAuthAdmin()">⚙️</button>
+      <button class="btn-gear" type="button" title="Gerenciar Vídeos" onclick="abrirAuthAdmin()">⚙️</button>
     </header>
  
     <div class="main-content">
@@ -411,11 +384,9 @@
   </div>
  
   <script>
-    /* SENHAS DEFINIDAS (COMPARATIVE STRING DIRECTA) */
     let SENHA_USUARIO = "ccb2026";
     let SENHA_ADMIN = "admin2026";
 
-    /* LISTA DE VÍDEOS DO YOUTUBE */
     const listaVideos = [
       { title: "Palavra 2026-04-22 Proverbios 27 IrLuiz", youtubeId: "cjp_4UM7ed8" },
       { title: "Palavra 2026 04 19 Salmos 23 IrHelio", youtubeId: "XCC3hGWZ5Hw" }
@@ -427,15 +398,25 @@
     const playlistElement = document.getElementById('playlist');
     const titleElement = document.getElementById('current-title');
 
-    function autenticar() {
-      const input = document.getElementById('password-input').value.trim();
+    function autenticar(event) {
+      if (event) event.preventDefault();
+      
+      const inputField = document.getElementById('password-input');
+      const input = inputField ? inputField.value.trim() : "";
+      const errorMsg = document.getElementById('login-error');
+
+      console.log("Tentativa de login com:", input);
 
       if (input.toLowerCase() === SENHA_USUARIO.toLowerCase()) {
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
+        if (errorMsg) errorMsg.style.display = 'none';
         carregarPlaylist();
       } else {
-        document.getElementById('login-error').style.display = 'block';
+        if (errorMsg) {
+          errorMsg.innerText = "Senha incorreta!";
+          errorMsg.style.display = 'block';
+        }
       }
     }
  
@@ -483,7 +464,6 @@
       renderizarLista(filtrados);
     }
  
-    /* MODAL E CONTROLE ADMIN */
     function abrirAuthAdmin() {
       document.getElementById('admin-password-input').value = '';
       document.getElementById('admin-auth-error').style.display = 'none';
@@ -495,7 +475,8 @@
       document.getElementById('admin-form-overlay').style.display = 'none';
     }
  
-    function verificarSenhaAdmin() {
+    function verificarSenhaAdmin(event) {
+      if (event) event.preventDefault();
       const input = document.getElementById('admin-password-input').value.trim();
 
       if (input.toLowerCase() === SENHA_ADMIN.toLowerCase()) {
@@ -527,6 +508,7 @@
  
         const delBtn = document.createElement('button');
         delBtn.className = 'btn-delete-item';
+        delBtn.type = 'button';
         delBtn.innerText = 'Excluir';
         delBtn.onclick = () => excluirVideoDoGitHub(index);
  
