@@ -349,15 +349,15 @@
     </div>
   </div>
  
-  <!-- MODAL GERENCIADOR DE VÍDEOS (ADICIONAR / EXCLUIR / CONFIGURAÇÕES) -->
+  <!-- MODAL GERENCIADOR DE VÍDEOS -->
   <div id="admin-form-overlay" class="modal-overlay">
     <div class="admin-card">
       <button class="btn-close" onclick="fecharModais()">&times;</button>
       <h2>Gerenciar Vídeos no GitHub</h2>
       <p>Configure e atualize o repositório</p>
       
-      <input type="text" id="gh-owner" placeholder="Usuário do GitHub (ex: andersonhomma4321)">
-      <input type="text" id="gh-repo" placeholder="Nome do Repositório (ex: palavras-ccb)">
+      <input type="text" id="gh-owner" placeholder="Usuário do GitHub">
+      <input type="text" id="gh-repo" placeholder="Nome do Repositório">
       <input type="password" id="gh-token" placeholder="Personal Access Token (PAT) do GitHub">
       <hr style="margin: 10px 0; border: 0; border-top: 1px solid #ddd;">
       
@@ -369,7 +369,7 @@
       <!-- SEÇÃO PARA ALTERAÇÃO DE SENHAS -->
       <div class="admin-manage-section">
         <h3>Alterar Senhas de Acesso</h3>
-        <input type="password" id="new-user-pass" placeholder="Nova Senha de Acesso (Usuário)">
+        <input type="password" id="new-user-pass" placeholder="Nova Senha de Usuário">
         <input type="password" id="new-admin-pass" placeholder="Nova Senha de Administrador">
         <button onclick="atualizarSenhas()" style="background: var(--ccb-gold) !important; color: #000 !important; margin-bottom: 10px;">Atualizar Senhas no Código</button>
       </div>
@@ -411,12 +411,9 @@
   </div>
  
   <script>
-    /* HASHES CRIPTOGRAFADOS DAS SENHAS (SHA-256 EM MINÚSCULAS) */
-    // Senha de Acesso do Usuário: ccb2026
-    let HASH_SENHA_USUARIO = "8d3e9114d5ec25a073f139fb2305ca7b9a5449942d4a1932ea4e64f786d70543";
-    
-    // Senha do Administrador: admin2026
-    let HASH_SENHA_ADMIN = "480436a5b15d263a233f269a8385d38b00693a7761eb8f1614749f7b02c8188e";
+    /* SENHAS DEFINIDAS (COMPARATIVE STRING DIRECTA) */
+    let SENHA_USUARIO = "ccb2026";
+    let SENHA_ADMIN = "admin2026";
 
     /* LISTA DE VÍDEOS DO YOUTUBE */
     const listaVideos = [
@@ -430,19 +427,10 @@
     const playlistElement = document.getElementById('playlist');
     const titleElement = document.getElementById('current-title');
 
-    /* FUNÇÃO DE CRIPTOGRAFIA SHA-256 */
-    async function gerarHashSHA256(texto) {
-      const msgUint8 = new TextEncoder().encode(texto.trim());
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toLowerCase();
-    }
- 
-    async function autenticar() {
-      const input = document.getElementById('password-input').value;
-      const hashInput = await gerarHashSHA256(input);
+    function autenticar() {
+      const input = document.getElementById('password-input').value.trim();
 
-      if (hashInput === HASH_SENHA_USUARIO.toLowerCase()) {
+      if (input.toLowerCase() === SENHA_USUARIO.toLowerCase()) {
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
         carregarPlaylist();
@@ -507,11 +495,10 @@
       document.getElementById('admin-form-overlay').style.display = 'none';
     }
  
-    async function verificarSenhaAdmin() {
-      const input = document.getElementById('admin-password-input').value;
-      const hashInput = await gerarHashSHA256(input);
+    function verificarSenhaAdmin() {
+      const input = document.getElementById('admin-password-input').value.trim();
 
-      if (hashInput === HASH_SENHA_ADMIN.toLowerCase()) {
+      if (input.toLowerCase() === SENHA_ADMIN.toLowerCase()) {
         document.getElementById('admin-auth-overlay').style.display = 'none';
         document.getElementById('admin-form-overlay').style.display = 'flex';
         carregarCredenciaisGitHub();
@@ -561,7 +548,6 @@
       if (localStorage.getItem('gh_token')) document.getElementById('gh-token').value = localStorage.getItem('gh_token');
     }
  
-    /* SUPORTE UTF-8 PARA BASE64 (GITHUB API) */
     function utf8ToBase64(str) {
       const bytes = new TextEncoder().encode(str);
       let binary = '';
@@ -580,14 +566,12 @@
       return new TextDecoder().decode(bytes);
     }
  
-    /* FORMATAR ARRAY EM JAVASCRIPT STRING */
     function formatarArrayParaCodigo(array) {
       const itensFormatados = array.map(item => `  { title: "${item.title.replace(/"/g, '\\"')}", youtubeId: "${item.youtubeId}" }`);
       return `const listaVideos = [\n${itensFormatados.join(',\n')}\n];`;
     }
  
-    /* ATUALIZAR ARQUIVO NO GITHUB */
-    async function salvarListaNoGitHub(novaLista, mensagemCommit, novoHashUser = null, novoHashAdmin = null) {
+    async function salvarListaNoGitHub(novaLista, mensagemCommit, novaSenhaUser = null, novaSenhaAdmin = null) {
       const owner = document.getElementById('gh-owner').value.trim();
       const repo = document.getElementById('gh-repo').value.trim();
       const token = document.getElementById('gh-token').value.trim().replace(/\s+/g, '');
@@ -623,7 +607,6 @@
       let contentDecoded = base64ToUtf8(fileData.content);
  
       const regexLista = /const listaVideos = \[\s*[\s\S]*?\s*\];/;
- 
       if (!regexLista.test(contentDecoded)) {
         throw new Error('A estrutura listaVideos não foi encontrada no arquivo.');
       }
@@ -631,13 +614,13 @@
       const novoCodigoArray = formatarArrayParaCodigo(novaLista);
       contentDecoded = contentDecoded.replace(regexLista, novoCodigoArray);
 
-      if (novoHashUser) {
-        const regexUserHash = /let HASH_SENHA_USUARIO = ".*?";/;
-        contentDecoded = contentDecoded.replace(regexUserHash, `let HASH_SENHA_USUARIO = "${novoHashUser}";`);
+      if (novaSenhaUser) {
+        const regexUser = /let SENHA_USUARIO = ".*?";/;
+        contentDecoded = contentDecoded.replace(regexUser, `let SENHA_USUARIO = "${novaSenhaUser}";`);
       }
-      if (novoHashAdmin) {
-        const regexAdminHash = /let HASH_SENHA_ADMIN = ".*?";/;
-        contentDecoded = contentDecoded.replace(regexAdminHash, `let HASH_SENHA_ADMIN = "${novoHashAdmin}";`);
+      if (novaSenhaAdmin) {
+        const regexAdmin = /let SENHA_ADMIN = ".*?";/;
+        contentDecoded = contentDecoded.replace(regexAdmin, `let SENHA_ADMIN = "${novaSenhaAdmin}";`);
       }
 
       const contentEncoded = utf8ToBase64(contentDecoded);
@@ -662,7 +645,6 @@
       }
     }
  
-    /* ADICIONAR VÍDEO */
     async function adicionarVideoNoGitHub() {
       const title = document.getElementById('new-video-title').value.trim();
       const rawUrl = document.getElementById('new-video-url').value.trim();
@@ -687,7 +669,7 @@
         renderizarListaAdmin();
  
         msg.style.color = 'green';
-        msg.innerText = 'Vídeo salvo com sucesso! O GitHub Pages atualizará o site em 1-2 minutos.';
+        msg.innerText = 'Vídeo salvo com sucesso!';
  
         document.getElementById('new-video-title').value = '';
         document.getElementById('new-video-url').value = '';
@@ -699,14 +681,11 @@
       }
     }
  
-    /* EXCLUIR VÍDEO */
     async function excluirVideoDoGitHub(index) {
       const videoRemover = listaVideos[index];
       if (!videoRemover) return;
  
-      if (!confirm(`Tem certeza que deseja excluir o vídeo:\n"${videoRemover.title}"?`)) {
-        return;
-      }
+      if (!confirm(`Excluir o vídeo:\n"${videoRemover.title}"?`)) return;
  
       const msg = document.getElementById('admin-msg');
  
@@ -725,14 +704,13 @@
         }
  
         msg.style.color = 'green';
-        msg.innerText = 'Vídeo removido com sucesso! O site atualizará em breve no GitHub Pages.';
+        msg.innerText = 'Vídeo removido com sucesso!';
       } catch (err) {
         msg.style.color = 'red';
         msg.innerText = 'Erro ao excluir: ' + err.message;
       }
     }
 
-    /* ATUALIZAR SENHAS */
     async function atualizarSenhas() {
       const newPassUser = document.getElementById('new-user-pass').value.trim();
       const newPassAdmin = document.getElementById('new-admin-pass').value.trim();
@@ -740,24 +718,18 @@
 
       if (!newPassUser && !newPassAdmin) {
         msg.style.color = 'red';
-        msg.innerText = 'Preencha ao menos uma das senhas para atualizar!';
+        msg.innerText = 'Preencha ao menos uma das senhas!';
         return;
       }
 
       try {
-        let hashUser = null;
-        let hashAdmin = null;
+        await salvarListaNoGitHub(listaVideos, 'Atualização de Senhas de Acesso', newPassUser || null, newPassAdmin || null);
 
-        if (newPassUser) hashUser = await gerarHashSHA256(newPassUser);
-        if (newPassAdmin) hashAdmin = await gerarHashSHA256(newPassAdmin);
-
-        await salvarListaNoGitHub(listaVideos, 'Atualização de Senhas de Acesso', hashUser, hashAdmin);
-
-        if (hashUser) HASH_SENHA_USUARIO = hashUser;
-        if (hashAdmin) HASH_SENHA_ADMIN = hashAdmin;
+        if (newPassUser) SENHA_USUARIO = newPassUser;
+        if (newPassAdmin) SENHA_ADMIN = newPassAdmin;
 
         msg.style.color = 'green';
-        msg.innerText = 'Senhas atualizadas e salvas no repositório GitHub com sucesso!';
+        msg.innerText = 'Senhas atualizadas com sucesso!';
 
         document.getElementById('new-user-pass').value = '';
         document.getElementById('new-admin-pass').value = '';
