@@ -31,8 +31,8 @@
       min-height: 100vh; 
     }
  
-    /* Modais e Overlays */
-    #login-overlay, .modal-overlay {
+    /* Modais, Overlays e Cards */
+    #login-overlay, #menu-overlay, .modal-overlay {
       position: fixed;
       top: 0; 
       left: 0; 
@@ -45,9 +45,9 @@
       z-index: 2000;
     }
  
-    .modal-overlay { display: none; }
+    #menu-overlay, .modal-overlay { display: none; }
  
-    .login-card, .admin-card {
+    .login-card, .admin-card, .menu-card {
       background: #fff; 
       padding: 2.5rem 2rem 2rem 2rem; 
       border-radius: 8px;
@@ -61,16 +61,16 @@
       overflow-y: auto;
     }
  
-    .login-card h2, .admin-card h2 { 
+    .login-card h2, .admin-card h2, .menu-card h2 { 
       color: var(--ccb-blue); 
       margin-bottom: 0.5rem; 
       font-size: 1.5rem; 
     }
     
-    .login-card p, .admin-card p { 
+    .login-card p, .admin-card p, .menu-card p { 
       font-size: 0.9rem; 
       color: #666; 
-      margin-bottom: 1rem; 
+      margin-bottom: 1.5rem; 
     }
     
     .login-card input, .admin-card input {
@@ -104,6 +104,36 @@
     .admin-card button.btn-action:hover { 
       background: var(--ccb-gold); 
       color: var(--ccb-dark-blue); 
+    }
+
+    /* Botões do Menu Principal */
+    .menu-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-menu {
+      width: 100%;
+      padding: 1rem;
+      background: var(--ccb-blue);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-menu:hover {
+      background: var(--ccb-gold);
+      color: var(--ccb-dark-blue);
+      transform: translateY(-2px);
     }
  
     button.btn-close {
@@ -202,20 +232,26 @@
     
     header h1 { font-weight: 600; letter-spacing: 1px; font-size: 1.8rem; }
  
-    .btn-gear {
+    .btn-back-menu {
       position: absolute; 
-      right: 20px; 
+      left: 20px; 
       top: 50%; 
       transform: translateY(-50%);
       background: transparent; 
-      border: none; 
+      border: 1px solid var(--ccb-gold); 
       color: var(--ccb-gold);
-      font-size: 1.5rem; 
+      font-size: 0.9rem; 
+      font-weight: bold;
       cursor: pointer;
-      padding: 5px;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: all 0.2s;
     }
     
-    .btn-gear:hover { color: #fff; }
+    .btn-back-menu:hover { 
+      background: var(--ccb-gold); 
+      color: var(--ccb-dark-blue); 
+    }
  
     .main-content { display: flex; flex-direction: column; }
     
@@ -308,13 +344,27 @@
       <p id="login-error" style="color: red; margin-top: 10px; display: none; font-weight: bold;">Senha incorreta!</p>
     </div>
   </div>
+
+  <!-- TELA DO MENU PRINCIPAL -->
+  <div id="menu-overlay">
+    <div class="menu-card">
+      <h2>Menu Principal</h2>
+      <p>Selecione a opção desejada</p>
+      <div class="menu-grid">
+        <button class="btn-menu" type="button" onclick="navegarPara('palavras')">📹 Palavras</button>
+        <button class="btn-menu" type="button" onclick="navegarPara('biblia')">📖 Bíblia</button>
+        <button class="btn-menu" type="button" onclick="navegarPara('hinos')">🎵 Hinos</button>
+        <button class="btn-menu" type="button" onclick="navegarPara('configuracao')" style="background: var(--ccb-gold) !important; color: var(--ccb-dark-blue) !important;">⚙️ Configuração</button>
+      </div>
+    </div>
+  </div>
  
-  <!-- MODAL DE AUTENTICAÇÃO DA ENGRENAGEM -->
+  <!-- MODAL DE AUTENTICAÇÃO DA CONFIGURAÇÃO/ADMINISTRADOR -->
   <div id="admin-auth-overlay" class="modal-overlay">
     <div class="admin-card">
-      <button class="btn-close" type="button" onclick="fecharModais()">&times;</button>
+      <button class="btn-close" type="button" onclick="voltarParaMenu()">&times;</button>
       <h2>Painel do Administrador</h2>
-      <p>Digite a senha para gerenciar vídeos</p>
+      <p>Digite a senha para acessar as configurações</p>
       <form onsubmit="verificarSenhaAdmin(event)">
         <input type="password" id="admin-password-input" placeholder="Digite a senha mestra" required>
         <button type="submit">Acessar</button>
@@ -323,10 +373,10 @@
     </div>
   </div>
  
-  <!-- MODAL GERENCIADOR DE VÍDEOS -->
+  <!-- MODAL GERENCIADOR DE VÍDEOS / CONFIGURAÇÕES -->
   <div id="admin-form-overlay" class="modal-overlay">
     <div class="admin-card">
-      <button class="btn-close" type="button" onclick="fecharModais()">&times;</button>
+      <button class="btn-close" type="button" onclick="voltarParaMenu()">&times;</button>
       <h2>Gerenciar Vídeos no GitHub</h2>
       <p>Configure e atualize o repositório</p>
       
@@ -334,7 +384,6 @@
       <input type="text" id="gh-repo" placeholder="Nome do Repositório">
       <input type="password" id="gh-token" placeholder="Personal Access Token (PAT) do GitHub">
       
-      <!-- BOTÃO PARA ABRIR A TELA DE ALTERAÇÃO DE SENHAS -->
       <div class="admin-manage-section">
         <h3>Segurança e Senhas</h3>
         <button type="button" class="btn-action" onclick="abrirModalSenhas()" style="background: #2b4c7e !important; margin-bottom: 5px;">🔑 Alterar Senhas de Acesso</button>
@@ -347,13 +396,13 @@
         <button id="btn-save-gh" class="btn-action" type="button" onclick="adicionarVideoNoGitHub()">Salvar Novo Vídeo</button>
       </div>
  
-      <!-- SEÇÃO PARA EXCLUSÃO DE VÍDEOS -->
       <div class="admin-manage-section">
         <h3>Vídeos Cadastrados (Excluir)</h3>
         <ul id="admin-video-list" class="admin-video-list"></ul>
       </div>
  
       <p id="admin-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
+      <button type="button" class="btn-action" onclick="voltarParaMenu()" style="background: #888 !important; margin-top: 15px;">Voltar ao Menu Principal</button>
     </div>
   </div>
 
@@ -368,7 +417,7 @@
         <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue);">Nova Senha de Usuário (Acesso Geral):</label>
         <input type="password" id="new-user-pass" placeholder="Deixe em branco para não alterar">
         
-        <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue); margin-top: 10px; display: block;">Nova Senha de Administrador (Engrenagem):</label>
+        <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue); margin-top: 10px; display: block;">Nova Senha de Administrador:</label>
         <input type="password" id="new-admin-pass" placeholder="Deixe em branco para não alterar">
       </div>
 
@@ -378,12 +427,22 @@
       <p id="pass-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
     </div>
   </div>
+
+  <!-- MODAL GENÉRICO PARA RECURSOS EM DESENVOLVIMENTO (BÍBLIA / HINOS) -->
+  <div id="placeholder-overlay" class="modal-overlay">
+    <div class="admin-card">
+      <button class="btn-close" type="button" onclick="voltarParaMenu()">&times;</button>
+      <h2 id="placeholder-title">Recurso</h2>
+      <p id="placeholder-desc" style="margin-top: 20px; font-size: 1rem; color: #555;">Esta seção estará disponível em breve.</p>
+      <button type="button" class="btn-action" onclick="voltarParaMenu()" style="background: var(--ccb-blue) !important; margin-top: 20px;">Voltar ao Menu Principal</button>
+    </div>
+  </div>
  
-  <!-- APLICAÇÃO DO PLAYER -->
+  <!-- APLICAÇÃO DO PLAYER ("PALAVRAS CCB") -->
   <div id="app-container">
     <header>
+      <button class="btn-back-menu" type="button" title="Voltar ao Menu" onclick="voltarParaMenu()">⬅ Menu</button>
       <h1>Palavras CCB</h1>
-      <button class="btn-gear" type="button" title="Gerenciar Vídeos" onclick="abrirAuthAdmin()">⚙️</button>
     </header>
  
     <div class="main-content">
@@ -429,15 +488,39 @@
 
       if (input.toLowerCase() === SENHA_USUARIO.toLowerCase()) {
         document.getElementById('login-overlay').style.display = 'none';
-        document.getElementById('app-container').style.display = 'block';
+        document.getElementById('menu-overlay').style.display = 'flex';
         if (errorMsg) errorMsg.style.display = 'none';
-        carregarPlaylist();
       } else {
         if (errorMsg) {
           errorMsg.innerText = "Senha incorreta!";
           errorMsg.style.display = 'block';
         }
       }
+    }
+
+    function navegarPara(opcao) {
+      document.getElementById('menu-overlay').style.display = 'none';
+
+      if (opcao === 'palavras') {
+        document.getElementById('app-container').style.display = 'block';
+        carregarPlaylist();
+      } else if (opcao === 'configuracao') {
+        abrirAuthAdmin();
+      } else if (opcao === 'biblia') {
+        document.getElementById('placeholder-title').innerText = '📖 Bíblia';
+        document.getElementById('placeholder-desc').innerText = 'O leitor e buscador da Bíblia Sagrada estará disponível em breve.';
+        document.getElementById('placeholder-overlay').style.display = 'flex';
+      } else if (opcao === 'hinos') {
+        document.getElementById('placeholder-title').innerText = '🎵 Hinos';
+        document.getElementById('placeholder-desc').innerText = 'O hinoário em áudio estará disponível em breve.';
+        document.getElementById('placeholder-overlay').style.display = 'flex';
+      }
+    }
+
+    function voltarParaMenu() {
+      fecharModais();
+      document.getElementById('app-container').style.display = 'none';
+      document.getElementById('menu-overlay').style.display = 'flex';
     }
  
     function carregarPlaylist() {
@@ -494,6 +577,7 @@
       document.getElementById('admin-auth-overlay').style.display = 'none';
       document.getElementById('admin-form-overlay').style.display = 'none';
       document.getElementById('admin-passwords-overlay').style.display = 'none';
+      document.getElementById('placeholder-overlay').style.display = 'none';
     }
 
     function abrirModalSenhas() {
