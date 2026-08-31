@@ -412,10 +412,10 @@
  
   <script>
     /* HASHES CRIPTOGRAFADOS DAS SENHAS (SHA-256 EM MINÚSCULAS) */
-    // Senha de Acesso: "ccb2026"
+    // Senha de Acesso do Usuário: ccb2026
     let HASH_SENHA_USUARIO = "8d3e9114d5ec25a073f139fb2305ca7b9a5449942d4a1932ea4e64f786d70543";
     
-    // Senha de Administrador: "admin2026"
+    // Senha do Administrador: admin2026
     let HASH_SENHA_ADMIN = "480436a5b15d263a233f269a8385d38b00693a7761eb8f1614749f7b02c8188e";
 
     /* LISTA DE VÍDEOS DO YOUTUBE */
@@ -430,7 +430,7 @@
     const playlistElement = document.getElementById('playlist');
     const titleElement = document.getElementById('current-title');
 
-    /* FUNÇÃO DE CRIPTOGRAFIA (SHA-256) */
+    /* FUNÇÃO DE CRIPTOGRAFIA SHA-256 */
     async function gerarHashSHA256(texto) {
       const msgUint8 = new TextEncoder().encode(texto.trim());
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -580,7 +580,7 @@
       return new TextDecoder().decode(bytes);
     }
  
-    /* FORMATAR ARRAY EM JAVASCRIPT STRING DE MANEIRA LIMPA */
+    /* FORMATAR ARRAY EM JAVASCRIPT STRING */
     function formatarArrayParaCodigo(array) {
       const itensFormatados = array.map(item => `  { title: "${item.title.replace(/"/g, '\\"')}", youtubeId: "${item.youtubeId}" }`);
       return `const listaVideos = [\n${itensFormatados.join(',\n')}\n];`;
@@ -631,7 +631,6 @@
       const novoCodigoArray = formatarArrayParaCodigo(novaLista);
       contentDecoded = contentDecoded.replace(regexLista, novoCodigoArray);
 
-      // Substitui os hashes de senhas caso tenham sido alterados
       if (novoHashUser) {
         const regexUserHash = /let HASH_SENHA_USUARIO = ".*?";/;
         contentDecoded = contentDecoded.replace(regexUserHash, `let HASH_SENHA_USUARIO = "${novoHashUser}";`);
