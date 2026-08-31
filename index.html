@@ -411,11 +411,11 @@
   </div>
  
   <script>
-    /* HASHES CRIPTOGRAFADOS DAS SENHAS (SHA-256) */
-    // Senha padrão de Acesso: "ccb2026"
+    /* HASHES CRIPTOGRAFADOS DAS SENHAS (SHA-256 EM MINÚSCULAS) */
+    // Senha de Acesso: "ccb2026"
     let HASH_SENHA_USUARIO = "8d3e9114d5ec25a073f139fb2305ca7b9a5449942d4a1932ea4e64f786d70543";
     
-    // Senha padrão de Administrador: "admin2026"
+    // Senha de Administrador: "admin2026"
     let HASH_SENHA_ADMIN = "480436a5b15d263a233f269a8385d38b00693a7761eb8f1614749f7b02c8188e";
 
     /* LISTA DE VÍDEOS DO YOUTUBE */
@@ -432,17 +432,17 @@
 
     /* FUNÇÃO DE CRIPTOGRAFIA (SHA-256) */
     async function gerarHashSHA256(texto) {
-      const msgUint8 = new TextEncoder().encode(texto);
+      const msgUint8 = new TextEncoder().encode(texto.trim());
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
       const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toLowerCase();
     }
  
     async function autenticar() {
       const input = document.getElementById('password-input').value;
       const hashInput = await gerarHashSHA256(input);
 
-      if (hashInput === HASH_SENHA_USUARIO) {
+      if (hashInput === HASH_SENHA_USUARIO.toLowerCase()) {
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('app-container').style.display = 'block';
         carregarPlaylist();
@@ -511,7 +511,7 @@
       const input = document.getElementById('admin-password-input').value;
       const hashInput = await gerarHashSHA256(input);
 
-      if (hashInput === HASH_SENHA_ADMIN) {
+      if (hashInput === HASH_SENHA_ADMIN.toLowerCase()) {
         document.getElementById('admin-auth-overlay').style.display = 'none';
         document.getElementById('admin-form-overlay').style.display = 'flex';
         carregarCredenciaisGitHub();
