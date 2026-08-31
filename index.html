@@ -433,7 +433,7 @@
 
       <div style="text-align: left; margin-bottom: 10px;">
         <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue);">Token do GitHub (PAT):</label>
-        <input type="password" id="gh-token-videos" placeholder="Cole seu token de acesso aqui">
+        <input type="password" id="gh-token-videos" placeholder="Digite apenas o seu token aqui">
       </div>
 
       <div class="admin-manage-section">
@@ -458,20 +458,20 @@
     <div class="admin-card">
       <button class="btn-close" type="button" onclick="voltarParaAdminMenu()">&times;</button>
       <h2>Alterar Senhas</h2>
-      <p>Digite as novas senhas desejadas</p>
+      <p>Altere as senhas de acesso do sistema</p>
 
       <div style="text-align: left; margin-bottom: 15px;">
         <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue);">Token do GitHub (PAT):</label>
-        <input type="password" id="gh-token-pass" placeholder="Cole seu token de acesso aqui">
+        <input type="password" id="gh-token-pass" placeholder="Digite apenas o seu token aqui">
 
         <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue); margin-top: 10px; display: block;">Nova Senha de Usuário (Acesso Geral):</label>
-        <input type="password" id="new-user-pass" placeholder="Deixe em branco para não alterar">
+        <input type="password" id="new-user-pass" placeholder="Deixe em branco se não desejar alterar">
         
         <label style="font-size: 0.85rem; font-weight: bold; color: var(--ccb-blue); margin-top: 10px; display: block;">Nova Senha de Administrador:</label>
-        <input type="password" id="new-admin-pass" placeholder="Deixe em branco para não alterar">
+        <input type="password" id="new-admin-pass" placeholder="Deixe em branco se não desejar alterar">
       </div>
 
-      <button type="button" class="btn-action" onclick="atualizarSenhas()" style="background: var(--ccb-gold) !important; color: #000 !important; margin-bottom: 10px;">Salvar Novas Senhas</button>
+      <button id="btn-save-pass" type="button" class="btn-action" onclick="atualizarSenhas()" style="background: var(--ccb-gold) !important; color: #000 !important; margin-bottom: 10px;">Salvar Novas Senhas</button>
       <button type="button" class="btn-action" onclick="voltarParaAdminMenu()" style="background: #888 !important;">Voltar ao Painel</button>
 
       <p id="pass-msg" style="margin-top: 10px; font-size: 0.85rem; font-weight: bold;"></p>
@@ -507,7 +507,7 @@
  
       <div class="playlist-section">
         <div class="search-box">
-          <input type="text" id="search-input" placeholder="🔍 Localizar vídeo (Pressione Setas para navegar)" onkeyup="filtrarVideos()">
+          <input type="text" id="search-input" placeholder="🔍 Localizar vídeo (Use Setas ↑ ↓ e Enter)" onkeyup="filtrarVideos()">
         </div>
         <ul class="video-list" id="playlist" tabindex="0"></ul>
       </div>
@@ -518,7 +518,7 @@
     let SENHA_USUARIO = "ccb2026";
     let SENHA_ADMIN = "admin2026";
 
-    // Dados fixos do Repositório GitHub
+    // Dados do Repositório Fixados no Código
     const GITHUB_OWNER = "andersonhomma4321";
     const GITHUB_REPO = "palavras-ccb";
 
@@ -900,6 +900,7 @@
       const newPassUser = document.getElementById('new-user-pass').value.trim();
       const newPassAdmin = document.getElementById('new-admin-pass').value.trim();
       const msg = document.getElementById('pass-msg');
+      const btn = document.getElementById('btn-save-pass');
 
       if (!token) {
         msg.style.color = 'red';
@@ -913,6 +914,7 @@
         return;
       }
 
+      btn.disabled = true;
       msg.style.color = '#0b2545';
       msg.innerText = 'Salvando senhas no GitHub...';
 
@@ -930,10 +932,12 @@
       } catch (err) {
         msg.style.color = 'red';
         msg.innerText = 'Erro ao atualizar senhas: ' + err.message;
+      } finally {
+        btn.disabled = false;
       }
     }
 
-    // --- NAVEGAÇÃO VIA TECLADO ---
+    // --- NAVEGAÇÃO VIA TECLADO POR TODO O PROGRAMA ---
 
     function focarMenuPrincipal(idx) {
       const botoes = document.querySelectorAll('#main-menu-grid .btn-menu');
@@ -961,13 +965,14 @@
       const menuOverlayVisivel = document.getElementById('menu-overlay').style.display === 'flex';
       const adminMenuOverlayVisivel = document.getElementById('admin-menu-overlay').style.display === 'flex';
       const appContainerVisivel = document.getElementById('app-container').style.display === 'block';
+      const formVideoOverlayVisivel = document.getElementById('admin-form-overlay').style.display === 'flex';
+      const formPassOverlayVisivel = document.getElementById('admin-passwords-overlay').style.display === 'flex';
 
-      // TECLA ESCAPE
+      // TECLA ESCAPE (FECHAR / VOLTAR)
       if (e.key === 'Escape') {
         if (appContainerVisivel) {
           voltarParaMenu();
-        } else if (document.getElementById('admin-form-overlay').style.display === 'flex' ||
-                   document.getElementById('admin-passwords-overlay').style.display === 'flex') {
+        } else if (formVideoOverlayVisivel || formPassOverlayVisivel) {
           voltarParaAdminMenu();
         } else if (document.getElementById('admin-auth-overlay').style.display === 'flex' ||
                    document.getElementById('placeholder-overlay').style.display === 'flex' ||
@@ -977,7 +982,7 @@
         return;
       }
 
-      // TECLAS DE SETAS NO MENU PRINCIPAL
+      // NAVEGAÇÃO POR SETAS NO MENU PRINCIPAL
       if (menuOverlayVisivel) {
         if (e.key === 'ArrowDown') {
           e.preventDefault();
@@ -992,7 +997,7 @@
         return;
       }
 
-      // TECLAS DE SETAS NO MENU DE ADMINISTRADOR
+      // NAVEGAÇÃO POR SETAS NO MENU DE ADMINISTRADOR
       if (adminMenuOverlayVisivel) {
         if (e.key === 'ArrowDown') {
           e.preventDefault();
@@ -1007,7 +1012,26 @@
         return;
       }
 
-      // TECLAS DE SETAS NO PLAYER DE VÍDEOS
+      // ENTER NOS FORMULÁRIOS ADMINISTRATIVOS
+      if (formVideoOverlayVisivel && e.key === 'Enter') {
+        const ativo = document.activeElement;
+        if (ativo && (ativo.id === 'new-video-title' || ativo.id === 'new-video-url' || ativo.id === 'gh-token-videos')) {
+          e.preventDefault();
+          adicionarVideoNoGitHub();
+          return;
+        }
+      }
+
+      if (formPassOverlayVisivel && e.key === 'Enter') {
+        const ativo = document.activeElement;
+        if (ativo && (ativo.id === 'new-user-pass' || ativo.id === 'new-admin-pass' || ativo.id === 'gh-token-pass')) {
+          e.preventDefault();
+          atualizarSenhas();
+          return;
+        }
+      }
+
+      // NAVEGAÇÃO POR SETAS E ENTER NO PLAYER DE VÍDEOS
       if (appContainerVisivel) {
         const searchInput = document.getElementById('search-input');
         const searchBoxFocada = document.activeElement === searchInput;
