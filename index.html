@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Tags para evitar cache no navegador -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -36,7 +35,6 @@
       min-height: 100vh; 
     }
  
-    /* Modais, Overlays e Cards */
     #login-overlay, #menu-overlay, .modal-overlay {
       position: fixed;
       top: 0; 
@@ -111,7 +109,6 @@
       color: var(--ccb-dark-blue); 
     }
 
-    /* Botões dos Menus */
     .menu-grid {
       display: flex;
       flex-direction: column;
@@ -214,7 +211,6 @@
  
     .btn-delete-item:hover { background: #c9302c; }
  
-    /* App Player */
     #app-container {
       display: none; 
       width: 95%; 
@@ -299,6 +295,15 @@
       margin-top: 1rem; 
       color: #fff; 
       align-items: center;
+    }
+
+    #current-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ccb-gold);
+      word-break: break-word;
+      display: block;
+      width: 100%;
     }
  
     .playlist-section { 
@@ -442,7 +447,7 @@
     </div>
   </div>
 
-  <!-- MODAL GENÉRICO PARA RECURSOS EM DESENVOLVIMENTO (BÍBLIA / HINOS) -->
+  <!-- MODAL GENÉRICO PARA RECURSOS EM DESENVOLVIMENTO -->
   <div id="placeholder-overlay" class="modal-overlay">
     <div class="admin-card">
       <button class="btn-close" type="button" onclick="voltarParaMenu()">&times;</button>
@@ -488,10 +493,6 @@
     ];
  
     let currentVideoIndex = 0;
- 
-    const iframePlayer = document.getElementById('main-iframe');
-    const playlistElement = document.getElementById('playlist');
-    const titleElement = document.getElementById('current-title');
 
     function autenticar(event) {
       if (event) event.preventDefault();
@@ -545,14 +546,18 @@
     function carregarPlaylist() {
       renderizarLista(listaVideos);
       if (listaVideos.length > 0) {
-        tocarVideo(0);
+        tocarVideo(currentVideoIndex);
       } else {
-        titleElement.innerText = "Nenhum vídeo disponível";
-        iframePlayer.src = "";
+        atualizarTextoElemento('current-title', "Nenhum vídeo disponível");
+        const iframe = document.getElementById('main-iframe');
+        if (iframe) iframe.src = "";
       }
     }
  
     function renderizarLista(lista) {
+      const playlistElement = document.getElementById('playlist');
+      if (!playlistElement) return;
+      
       playlistElement.innerHTML = '';
       lista.forEach((vid) => {
         const indexNaListaOriginal = listaVideos.findIndex(v => v.youtubeId === vid.youtubeId);
@@ -565,23 +570,38 @@
     }
  
     function tocarVideo(index) {
+      if (index < 0 || index >= listaVideos.length) return;
       currentVideoIndex = index;
       const vid = listaVideos[index];
-      if (!vid) return;
+
+      // Atualiza o iframe
+      const iframePlayer = document.getElementById('main-iframe');
+      if (iframePlayer) {
+        iframePlayer.src = `https://www.youtube.com/embed/${vid.youtubeId}?enablejsapi=1&vq=hd1080&rel=0`;
+      }
       
-      titleElement.innerText = vid.title;
-      iframePlayer.src = `https://www.youtube.com/embed/${vid.youtubeId}?enablejsapi=1&vq=hd1080&rel=0`;
+      // Atualiza a legenda/descrição do vídeo
+      atualizarTextoElemento('current-title', vid.title);
       
-      const termo = document.getElementById('search-input').value.toLowerCase();
+      const searchBox = document.getElementById('search-input');
+      const termo = searchBox ? searchBox.value.toLowerCase() : "";
       if (termo) {
         filtrarVideos();
       } else {
         renderizarLista(listaVideos);
       }
     }
+
+    function atualizarTextoElemento(id, texto) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = texto;
+      }
+    }
  
     function filtrarVideos() {
-      const termo = document.getElementById('search-input').value.toLowerCase();
+      const searchBox = document.getElementById('search-input');
+      const termo = searchBox ? searchBox.value.toLowerCase() : "";
       const filtrados = listaVideos.filter(vid => vid.title.toLowerCase().includes(termo));
       renderizarLista(filtrados);
     }
@@ -669,21 +689,15 @@
     }
  
     function utf8ToBase64(str) {
-      const bytes = new TextEncoder().encode(str);
-      let binary = '';
-      for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      return btoa(binary);
+      return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+        return String.fromCharCode('0x' + p1);
+      }));
     }
  
     function base64ToUtf8(base64) {
-      const binary = atob(base64.replace(/\s/g, ''));
-      const bytes = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-      }
-      return new TextDecoder().decode(bytes);
+      return decodeURIComponent(Array.prototype.map.call(atob(base64.replace(/\s/g, '')), function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
     }
  
     function formatarArrayParaCodigo(array) {
