@@ -1,0 +1,732 @@
+:root {
+  --ccb-blue: #0b2545;
+  --ccb-dark-blue: #06172e;
+  --ccb-gold: #c5a059;
+  --ccb-white: #f8f9fa;
+  --ccb-gray: #e9ecef;
+  --ccb-red: #d9534f;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: var(--ccb-dark-blue);
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+
+/* =========================================
+   OVERLAYS
+   ========================================= */
+
+#login-overlay,
+#menu-overlay,
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: rgba(6, 23, 46, 0.95);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 2000;
+}
+
+#menu-overlay,
+.modal-overlay {
+  display: none;
+}
+
+
+/* =========================================
+   CARDS
+   ========================================= */
+
+.login-card,
+.admin-card,
+.menu-card {
+  background: #fff;
+
+  padding: 2.5rem 2rem 2rem 2rem;
+
+  border-radius: 8px;
+
+  border-top: 5px solid var(--ccb-gold);
+
+  text-align: center;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+
+  max-width: 500px;
+
+  width: 92%;
+
+  position: relative;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+}
+
+.login-card h2,
+.admin-card h2,
+.menu-card h2 {
+  color: var(--ccb-blue);
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.login-card p,
+.admin-card p,
+.menu-card p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+
+/* =========================================
+   INPUTS
+   ========================================= */
+
+.login-card input,
+.admin-card input {
+  width: 100%;
+
+  padding: 0.75rem;
+
+  border: 1px solid #ccc;
+
+  border-radius: 4px;
+
+  margin-bottom: 0.75rem;
+
+  font-size: 0.95rem;
+
+  outline: none;
+}
+
+.login-card input:focus,
+.admin-card input:focus {
+  border-color: var(--ccb-blue);
+
+  box-shadow:
+    0 0 5px rgba(11, 37, 69, 0.3);
+}
+
+
+/* =========================================
+   BOTÕES
+   ========================================= */
+
+.login-card button[type="submit"],
+.admin-card button[type="submit"],
+.admin-card button.btn-action {
+
+  width: 100%;
+
+  padding: 0.75rem;
+
+  background: var(--ccb-blue);
+
+  color: #fff;
+
+  border: none;
+
+  border-radius: 4px;
+
+  font-size: 1rem;
+
+  cursor: pointer;
+
+  font-weight: bold;
+
+  transition: background 0.2s;
+
+  margin-top: 0.25rem;
+}
+
+.login-card button[type="submit"]:hover,
+.admin-card button[type="submit"]:hover,
+.admin-card button.btn-action:hover {
+
+  background: var(--ccb-gold);
+
+  color: var(--ccb-dark-blue);
+}
+
+
+/* =========================================
+   MENU
+   ========================================= */
+
+.menu-grid {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.btn-menu {
+
+  width: 100%;
+
+  padding: 1rem;
+
+  background: var(--ccb-blue);
+
+  color: #fff;
+
+  border: none;
+
+  border-radius: 6px;
+
+  font-size: 1.1rem;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+}
+
+.btn-menu:hover,
+.btn-menu:focus,
+.btn-menu.kb-focus {
+
+  background: var(--ccb-gold) !important;
+
+  color: var(--ccb-dark-blue) !important;
+
+  transform: translateY(-2px);
+
+  outline: 2px solid var(--ccb-dark-blue);
+}
+
+.menu-config {
+  background: var(--ccb-gold) !important;
+  color: var(--ccb-dark-blue) !important;
+}
+
+.admin-password-button {
+  background: #2b4c7e !important;
+}
+
+.admin-back-button {
+  background: #888 !important;
+}
+
+
+/* =========================================
+   FECHAR MODAL
+   ========================================= */
+
+button.btn-close {
+
+  position: absolute;
+
+  top: 10px;
+
+  right: 12px;
+
+  width: 30px;
+
+  height: 30px;
+
+  background: transparent;
+
+  border: none;
+
+  font-size: 1.5rem;
+
+  font-weight: bold;
+
+  color: #888;
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 10;
+}
+
+button.btn-close:hover,
+button.btn-close:focus {
+  color: var(--ccb-blue);
+  outline: none;
+}
+
+
+/* =========================================
+   ADMIN
+   ========================================= */
+
+.admin-manage-section {
+
+  text-align: left;
+
+  margin-top: 15px;
+
+  border-top: 1px solid #ddd;
+
+  padding-top: 15px;
+}
+
+.admin-manage-section h3 {
+
+  font-size: 1rem;
+
+  color: var(--ccb-blue);
+
+  margin-bottom: 10px;
+}
+
+.admin-video-list {
+
+  list-style: none;
+
+  max-height: 180px;
+
+  overflow-y: auto;
+
+  border: 1px solid #ccc;
+
+  border-radius: 4px;
+
+  padding: 5px;
+}
+
+.admin-video-item {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  padding: 6px 8px;
+
+  border-bottom: 1px solid #eee;
+
+  font-size: 0.85rem;
+}
+
+.admin-video-item:last-child {
+  border-bottom: none;
+}
+
+.admin-video-item span {
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  max-width: 75%;
+}
+
+.btn-delete-item {
+
+  background: var(--ccb-red);
+
+  color: #fff;
+
+  border: none;
+
+  border-radius: 3px;
+
+  padding: 4px 8px;
+
+  cursor: pointer;
+
+  font-size: 0.75rem;
+
+  font-weight: bold;
+}
+
+.btn-delete-item:hover {
+  background: #c9302c;
+}
+
+.token-area {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.token-area label {
+
+  font-size: 0.85rem;
+
+  font-weight: bold;
+
+  color: var(--ccb-blue);
+
+  display: block;
+
+  margin-top: 10px;
+
+  margin-bottom: 4px;
+}
+
+.admin-message {
+
+  margin-top: 10px;
+
+  font-size: 0.85rem;
+
+  font-weight: bold;
+}
+
+.error-message {
+
+  color: red !important;
+
+  margin-top: 10px;
+
+  display: none;
+
+  font-weight: bold;
+}
+
+.gray-button {
+  background: #888 !important;
+}
+
+.save-password-button {
+  background: var(--ccb-gold) !important;
+  color: #000 !important;
+  margin-bottom: 10px;
+}
+
+.placeholder-description {
+  margin-top: 20px;
+
+  font-size: 1rem !important;
+
+  color: #555 !important;
+}
+
+
+/* =========================================
+   APLICAÇÃO
+   ========================================= */
+
+#app-container {
+
+  display: none;
+
+  width: 95%;
+
+  max-width: 1650px;
+
+  background: #fff;
+
+  border-radius: 8px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.4);
+
+  margin: 20px 0;
+}
+
+
+/* =========================================
+   HEADER
+   ========================================= */
+
+header {
+
+  background: var(--ccb-blue);
+
+  color: var(--ccb-white);
+
+  padding: 1.2rem;
+
+  text-align: center;
+
+  border-bottom: 3px solid var(--ccb-gold);
+
+  position: relative;
+}
+
+header h1 {
+
+  font-weight: 600;
+
+  letter-spacing: 1px;
+
+  font-size: 1.8rem;
+}
+
+.btn-back-menu {
+
+  position: absolute;
+
+  left: 20px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  background: transparent;
+
+  border: 1px solid var(--ccb-gold);
+
+  color: var(--ccb-gold);
+
+  font-size: 0.9rem;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  padding: 6px 12px;
+
+  border-radius: 4px;
+}
+
+.btn-back-menu:hover {
+
+  background: var(--ccb-gold);
+
+  color: var(--ccb-dark-blue);
+}
+
+
+/* =========================================
+   CONTEÚDO
+   ========================================= */
+
+.main-content {
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+.player-section {
+
+  flex: 3;
+
+  padding: 1.5rem;
+
+  background: #111;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+}
+
+.video-container {
+
+  position: relative;
+
+  width: 100%;
+
+  padding-bottom: 56.25%;
+
+  height: 0;
+
+  background: #000;
+
+  border-radius: 4px;
+
+  overflow: hidden;
+}
+
+.video-container iframe {
+
+  position: absolute;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 100%;
+
+  border: 0;
+}
+
+.controls-extra {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  width: 100%;
+
+  margin-top: 1rem;
+
+  color: #fff;
+
+  align-items: center;
+}
+
+#current-title {
+
+  font-size: 1.1rem;
+
+  font-weight: 600;
+
+  color: var(--ccb-gold);
+
+  word-break: break-word;
+
+  display: block;
+
+  width: 100%;
+}
+
+
+/* =========================================
+   PLAYLIST
+   ========================================= */
+
+.playlist-section {
+
+  flex: 1;
+
+  background: var(--ccb-white);
+
+  padding: 1.5rem;
+
+  border-left: 1px solid var(--ccb-gray);
+
+  min-width: 300px;
+}
+
+.search-box {
+  margin-bottom: 1rem;
+}
+
+.search-box input {
+
+  width: 100%;
+
+  padding: 0.6rem;
+
+  border: 1px solid #ccc;
+
+  border-radius: 4px;
+
+  outline: none;
+}
+
+.video-list {
+
+  list-style: none;
+
+  max-height: 500px;
+
+  overflow-y: auto;
+
+  outline: none;
+}
+
+.video-list:focus {
+
+  border: 1px solid var(--ccb-blue);
+
+  border-radius: 4px;
+}
+
+.video-item {
+
+  padding: 0.75rem;
+
+  border-bottom: 1px solid var(--ccb-gray);
+
+  cursor: pointer;
+
+  font-size: 0.95rem;
+
+  display: flex;
+
+  align-items: center;
+
+  transition: background 0.2s;
+}
+
+.video-item:hover,
+.video-item.kb-focus {
+
+  background: #e0e7ff;
+}
+
+.video-item.active {
+
+  background: var(--ccb-blue);
+
+  color: #fff;
+
+  font-weight: bold;
+}
+
+.video-item.active.kb-focus {
+
+  background: var(--ccb-gold);
+
+  color: var(--ccb-dark-blue);
+}
+
+
+/* =========================================
+   RESPONSIVIDADE
+   ========================================= */
+
+@media (min-width: 900px) {
+
+  .main-content {
+    flex-direction: row;
+  }
+
+}
+3. js/config.js
+Crie a pasta js e dentro dela:
+
+export const CONFIG = {
+
+  GITHUB_OWNER: "andersonhomma4321",
+
+  GITHUB_REPO: "palavras-ccb",
+
+  GITHUB_FILE: "index.html",
+
+  YOUTUBE_EMBED_URL:
+    "https://www.youtube.com/embed/"
+
+};
