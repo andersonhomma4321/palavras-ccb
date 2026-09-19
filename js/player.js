@@ -17,21 +17,20 @@ function renderizarIframePlayer(videoId) {
   const host = document.getElementById("youtube-player-host");
   if (!host) return;
 
-  // Pega a origem atual da página (funciona perfeitamente no GitHub Pages)
   const currentOrigin = window.location.origin;
 
-  // Limpa o container e injeta o iframe diretamente, garantindo 1080p, controlos e sem erros de postMessage
+  // Injeção limpa de Iframe sem dependências de scripts globais do YouTube
   host.innerHTML = `
     <iframe 
       id="yt-iframe-engine"
       width="100%" 
       height="100%" 
-      src="https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0&enablejsapi=1&vq=hd1080&origin=${encodeURIComponent(currentOrigin)}" 
+      src="https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0&vq=hd1080&origin=${encodeURIComponent(currentOrigin)}" 
       title="YouTube video player" 
       frameborder="0" 
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
       allowfullscreen>
-    ></iframe>
+    </iframe>
   `;
 }
 
