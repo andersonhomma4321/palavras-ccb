@@ -132,11 +132,9 @@ export function tocarVideo(index) {
 
 
   if (iframe) {
-
     iframe.src =
       `https://www.youtube.com/embed/${video.youtubeId}` +
-      `?enablejsapi=1&vq=hd1080&rel=0`;
-
+      `?enablejsapi=1&vq=hd2160&highres=1&rel=0`;
   }
 
 
