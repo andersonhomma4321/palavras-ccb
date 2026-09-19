@@ -106,68 +106,47 @@ export function renderizarLista(lista) {
 
 
 export function tocarVideo(index) {
-
-  if (
-    index < 0 ||
-    index >= listaVideos.length
-  ) {
-
+  if (index < 0 || index >= listaVideos.length) {
     return;
-
   }
 
+  state.currentVideoIndex = index;
+  const video = listaVideos[index];
 
-  state.currentVideoIndex =
-    index;
-
-
-  const video =
-    listaVideos[index];
-
-
-  const iframe =
-    document.getElementById(
-      "main-iframe"
-    );
-
+  const container = document.getElementById("video-container"); // ou o elemento pai do iframe
+  const iframe = document.getElementById("main-iframe");
 
   if (iframe) {
-    iframe.src =
-      `https://www.youtube.com/embed/${video.youtubeId}` +
-      `?enablejsapi=1&vq=hd2160&highres=1&rel=0`;
+    // Mantemos os parâmetros e adicionamos o ID do player se necessário
+    iframe.src = `https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&vq=hd2160&rel=0`;
+    
+    // Se estiver a usar a API do YouTube, podemos garantir a qualidade máxima após o carregamento
+    iframe.onload = () => {
+      try {
+        iframe.contentWindow.postMessage(
+          JSON.stringify({
+            event: "command",
+            func: "setPlaybackQuality",
+            args: ["hd2160"] // ou "hd1080"
+          }),
+          "*"
+        );
+      } catch (e) {
+        console.error("Erro ao forçar qualidade via postMessage:", e);
+      }
+    };
   }
 
+  atualizarTextoElemento("current-title", video.title);
 
-  atualizarTextoElemento(
-    "current-title",
-    video.title
-  );
-
-
-  const searchBox =
-    document.getElementById(
-      "search-input"
-    );
-
-
-  const termo =
-    searchBox
-      ? searchBox.value.toLowerCase()
-      : "";
-
+  const searchBox = document.getElementById("search-input");
+  const termo = searchBox ? searchBox.value.toLowerCase() : "";
 
   if (termo) {
-
     filtrarVideos();
-
   } else {
-
-    renderizarLista(
-      listaVideos
-    );
-
+    renderizarLista(listaVideos);
   }
-
 }
 
 
