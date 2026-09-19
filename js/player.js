@@ -41,7 +41,7 @@ function inicializarPlayer(videoId) {
   if (!host) return;
 
   if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
-    ytPlayer.loadVideoById({
+    ytPlayer.cueVideoById({
       videoId: videoId,
       suggestedQuality: 'hd1080'
     });
@@ -62,13 +62,39 @@ function inicializarPlayer(videoId) {
           event.target.setPlaybackQuality('hd1080');
         },
         'onStateChange': (event) => {
-          // Garante a qualidade 1080p assim que o vídeo começa a reproduzir
           if (event.data === YT.PlayerState.PLAYING) {
             event.target.setPlaybackQuality('hd1080');
           }
         }
       }
     });
+  }
+}
+
+export function tocarVideo(index) {
+  if (index < 0 || index >= listaVideos.length) return;
+
+  state.currentVideoIndex = index;
+  const video = listaVideos[index];
+
+  atualizarTextoElemento("current-title", video.title);
+
+  if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+    ytPlayer.loadVideoById({
+      videoId: video.youtubeId,
+      suggestedQuality: 'hd1080'
+    });
+  } else {
+    inicializarPlayer(video.youtubeId);
+  }
+
+  const searchBox = document.getElementById("search-input");
+  const termo = searchBox ? searchBox.value.toLowerCase() : "";
+
+  if (termo) {
+    filtrarVideos();
+  } else {
+    renderizarLista(listaVideos);
   }
 }
 
