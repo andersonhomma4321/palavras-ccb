@@ -2,50 +2,49 @@ import { listaVideos } from "../data/videos.js";
 import { state } from "./state.js";
 
 let ytPlayer = null;
-let apiLoaded = false;
 
-// Garante que o script da API do YouTube está carregado globalmente
+// Garante que o script da API do YouTube é injetado no documento
 if (!window.YT) {
   const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
   document.head.appendChild(tag);
 }
 
-// Callback global exigido pela API do YouTube Iframe
+// Callback global acionado automaticamente pela API do YouTube
 window.onYouTubeIframeAPIReady = function() {
-  apiLoaded = true;
-  // Se já houver um vídeo selecionado pendente, inicializa o player
-  if (listaVideos.length > 0 && state.currentVideoIndex >= 0) {
-    inicializarPlayer(listaVideos[state.currentVideoIndex].youtubeId);
+  // Se a playlist já estiver visível, inicializa com o primeiro vídeo
+  if (listaVideos.length > 0) {
+    if (state.currentVideoIndex < 0) state.currentVideoIndex = 0;
+    criarOuCarregarPlayer(listaVideos[state.currentVideoIndex].youtubeId);
   }
 };
 
 export function carregarPlaylist() {
   renderizarLista(listaVideos);
   if (listaVideos.length > 0) {
-    // Se nenhum vídeo foi tocado ainda, carrega o primeiro por padrão na tela principal
     if (state.currentVideoIndex < 0) state.currentVideoIndex = 0;
     const videoInicial = listaVideos[state.currentVideoIndex];
     atualizarTextoElemento("current-title", videoInicial.title);
     
-    if (apiLoaded) {
-      inicializarPlayer(videoInicial.youtubeId);
+    // Se a API já estiver pronta, carrega o player imediatamente
+    if (window.YT && window.YT.Player) {
+      criarOuCarregarPlayer(videoInicial.youtubeId);
     }
   } else {
     atualizarTextoElemento("current-title", "Nenhum vídeo disponível");
   }
 }
 
-function inicializarPlayer(videoId) {
+function criarOuCarregarPlayer(videoId) {
   const host = document.getElementById("youtube-player-host");
   if (!host) return;
 
   if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
-    ytPlayer.cueVideoById({
+    ytPlayer.loadVideoById({
       videoId: videoId,
       suggestedQuality: 'hd1080'
     });
-  } else if (window.YT && window.YT.Player) {
+  } else {
     ytPlayer = new YT.Player('youtube-player-host', {
       height: '100%',
       width: '100%',
@@ -68,33 +67,6 @@ function inicializarPlayer(videoId) {
         }
       }
     });
-  }
-}
-
-export function tocarVideo(index) {
-  if (index < 0 || index >= listaVideos.length) return;
-
-  state.currentVideoIndex = index;
-  const video = listaVideos[index];
-
-  atualizarTextoElemento("current-title", video.title);
-
-  if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
-    ytPlayer.loadVideoById({
-      videoId: video.youtubeId,
-      suggestedQuality: 'hd1080'
-    });
-  } else {
-    inicializarPlayer(video.youtubeId);
-  }
-
-  const searchBox = document.getElementById("search-input");
-  const termo = searchBox ? searchBox.value.toLowerCase() : "";
-
-  if (termo) {
-    filtrarVideos();
-  } else {
-    renderizarLista(listaVideos);
   }
 }
 
@@ -133,16 +105,7 @@ export function tocarVideo(index) {
   const video = listaVideos[index];
 
   atualizarTextoElemento("current-title", video.title);
-
-  if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
-    ytPlayer.loadVideoById({
-      videoId: video.youtubeId,
-      suggestedQuality: 'hd1080'
-    });
-    ytPlayer.playVideo();
-  } else {
-    inicializarPlayer(video.youtubeId);
-  }
+  criarOuCarregarPlayer(video.youtubeId);
 
   const searchBox = document.getElementById("search-input");
   const termo = searchBox ? searchBox.value.toLowerCase() : "";
