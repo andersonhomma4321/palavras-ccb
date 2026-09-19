@@ -1,109 +1,54 @@
 import { listaVideos } from "../data/videos.js";
 import { state } from "./state.js";
 
-
 export function carregarPlaylist() {
-
   renderizarLista(listaVideos);
 
   if (listaVideos.length > 0) {
-
-    tocarVideo(
-      state.currentVideoIndex
-    );
-
+    tocarVideo(state.currentVideoIndex);
   } else {
-
-    atualizarTextoElemento(
-      "current-title",
-      "Nenhum vídeo disponível"
-    );
-
-    document.getElementById(
-      "main-iframe"
-    ).src = "";
-
+    atualizarTextoElemento("current-title", "Nenhum vídeo disponível");
+    const iframe = document.getElementById("main-iframe");
+    if (iframe) {
+      iframe.src = "";
+    }
   }
-
 }
 
-
 export function renderizarLista(lista) {
-
-  const playlistElement =
-    document.getElementById(
-      "playlist"
-    );
-
+  const playlistElement = document.getElementById("playlist");
   if (!playlistElement) {
     return;
   }
 
-
   playlistElement.innerHTML = "";
 
-
   lista.forEach((vid, idx) => {
-
-    const indexOriginal =
-      listaVideos.findIndex(
-        v => v.youtubeId === vid.youtubeId
-      );
-
-
-    const li =
-      document.createElement("li");
-
-
-    li.className =
-      "video-item";
-
-
-    if (
-      indexOriginal ===
-      state.currentVideoIndex
-    ) {
-
-      li.classList.add("active");
-
-    }
-
-
-    if (
-      idx ===
-      state.kbPlaylistIndex
-    ) {
-
-      li.classList.add("kb-focus");
-
-    }
-
-
-    li.innerText =
-      vid.title;
-
-
-    li.addEventListener(
-      "click",
-      () => {
-
-        state.kbPlaylistIndex =
-          idx;
-
-        tocarVideo(
-          indexOriginal
-        );
-
-      }
+    const indexOriginal = listaVideos.findIndex(
+      v => v.youtubeId === vid.youtubeId
     );
 
+    const li = document.createElement("li");
+    li.className = "video-item";
+
+    if (indexOriginal === state.currentVideoIndex) {
+      li.classList.add("active");
+    }
+
+    if (idx === state.kbPlaylistIndex) {
+      li.classList.add("kb-focus");
+    }
+
+    li.innerText = vid.title;
+
+    li.addEventListener("click", () => {
+      state.kbPlaylistIndex = idx;
+      tocarVideo(indexOriginal);
+    });
 
     playlistElement.appendChild(li);
-
   });
-
 }
-
 
 export function tocarVideo(index) {
   if (index < 0 || index >= listaVideos.length) {
@@ -112,27 +57,24 @@ export function tocarVideo(index) {
 
   state.currentVideoIndex = index;
   const video = listaVideos[index];
-
-  const container = document.getElementById("video-container"); // ou o elemento pai do iframe
   const iframe = document.getElementById("main-iframe");
 
   if (iframe) {
-    // Mantemos os parâmetros e adicionamos o ID do player se necessário
-    iframe.src = `https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&vq=hd2160&rel=0`;
-    
-    // Se estiver a usar a API do YouTube, podemos garantir a qualidade máxima após o carregamento
+    // URL otimizada para forçar resolução mais alta no iframe
+    iframe.src = `https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&vq=hd1080&rel=0`;
+
     iframe.onload = () => {
       try {
         iframe.contentWindow.postMessage(
           JSON.stringify({
             event: "command",
             func: "setPlaybackQuality",
-            args: ["hd2160"] // ou "hd1080"
+            args: ["hd1080"]
           }),
           "*"
         );
       } catch (e) {
-        console.error("Erro ao forçar qualidade via postMessage:", e);
+        console.error("Erro ao enviar comando de qualidade:", e);
       }
     };
   }
@@ -149,54 +91,21 @@ export function tocarVideo(index) {
   }
 }
 
-
 export function filtrarVideos() {
+  const searchBox = document.getElementById("search-input");
+  const termo = searchBox ? searchBox.value.toLowerCase() : "";
 
-  const searchBox =
-    document.getElementById(
-      "search-input"
-    );
-
-
-  const termo =
-    searchBox
-      ? searchBox.value.toLowerCase()
-      : "";
-
-
-  const filtrados =
-    listaVideos.filter(
-      video =>
-        video.title
-          .toLowerCase()
-          .includes(termo)
-    );
-
-
-  state.kbPlaylistIndex = 0;
-
-
-  renderizarLista(
-    filtrados
+  const filtrados = listaVideos.filter(video =>
+    video.title.toLowerCase().includes(termo)
   );
 
+  state.kbPlaylistIndex = 0;
+  renderizarLista(filtrados);
 }
 
-
-export function atualizarTextoElemento(
-  id,
-  texto
-) {
-
-  const elemento =
-    document.getElementById(id);
-
-
+export function atualizarTextoElemento(id, texto) {
+  const elemento = document.getElementById(id);
   if (elemento) {
-
-    elemento.textContent =
-      texto;
-
+    elemento.textContent = texto;
   }
-
 }
