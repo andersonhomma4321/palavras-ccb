@@ -12,7 +12,6 @@ if (!window.YT) {
 
 // Callback global acionado automaticamente pela API do YouTube
 window.onYouTubeIframeAPIReady = function() {
-  // Se a playlist já estiver visível, inicializa com o primeiro vídeo
   if (listaVideos.length > 0) {
     if (state.currentVideoIndex < 0) state.currentVideoIndex = 0;
     criarOuCarregarPlayer(listaVideos[state.currentVideoIndex].youtubeId);
@@ -26,7 +25,6 @@ export function carregarPlaylist() {
     const videoInicial = listaVideos[state.currentVideoIndex];
     atualizarTextoElemento("current-title", videoInicial.title);
     
-    // Se a API já estiver pronta, carrega o player imediatamente
     if (window.YT && window.YT.Player) {
       criarOuCarregarPlayer(videoInicial.youtubeId);
     }
