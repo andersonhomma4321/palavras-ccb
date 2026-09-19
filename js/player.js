@@ -1,22 +1,74 @@
 import { listaVideos } from "../data/videos.js";
 import { state } from "./state.js";
 
-let ytModalPlayer = null;
+let ytPlayer = null;
+let apiLoaded = false;
 
-// Garante que o script da API do YouTube está carregado
+// Garante que o script da API do YouTube está carregado globalmente
 if (!window.YT) {
   const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
   document.head.appendChild(tag);
 }
 
+// Callback global exigido pela API do YouTube Iframe
+window.onYouTubeIframeAPIReady = function() {
+  apiLoaded = true;
+  // Se já houver um vídeo selecionado pendente, inicializa o player
+  if (listaVideos.length > 0 && state.currentVideoIndex >= 0) {
+    inicializarPlayer(listaVideos[state.currentVideoIndex].youtubeId);
+  }
+};
+
 export function carregarPlaylist() {
   renderizarLista(listaVideos);
   if (listaVideos.length > 0) {
-    // Apenas renderiza a lista, o vídeo agora abre no modal ao interagir
-    atualizarTextoElemento("current-title", "Selecione um vídeo");
+    // Se nenhum vídeo foi tocado ainda, carrega o primeiro por padrão na tela principal
+    if (state.currentVideoIndex < 0) state.currentVideoIndex = 0;
+    const videoInicial = listaVideos[state.currentVideoIndex];
+    atualizarTextoElemento("current-title", videoInicial.title);
+    
+    if (apiLoaded) {
+      inicializarPlayer(videoInicial.youtubeId);
+    }
   } else {
     atualizarTextoElemento("current-title", "Nenhum vídeo disponível");
+  }
+}
+
+function inicializarPlayer(videoId) {
+  const host = document.getElementById("youtube-player-host");
+  if (!host) return;
+
+  if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+    ytPlayer.loadVideoById({
+      videoId: videoId,
+      suggestedQuality: 'hd1080'
+    });
+  } else if (window.YT && window.YT.Player) {
+    ytPlayer = new YT.Player('youtube-player-host', {
+      height: '100%',
+      width: '100%',
+      videoId: videoId,
+      playerVars: {
+        'autoplay': 0,
+        'controls': 1,
+        'rel': 0,
+        'enablejsapi': 1,
+        'vq': 'hd1080'
+      },
+      events: {
+        'onReady': (event) => {
+          event.target.setPlaybackQuality('hd1080');
+        },
+        'onStateChange': (event) => {
+          // Garante a qualidade 1080p assim que o vídeo começa a reproduzir
+          if (event.data === YT.PlayerState.PLAYING) {
+            event.target.setPlaybackQuality('hd1080');
+          }
+        }
+      }
+    });
   }
 }
 
@@ -54,42 +106,17 @@ export function tocarVideo(index) {
   state.currentVideoIndex = index;
   const video = listaVideos[index];
 
-  // Mostra o modal de vídeo em tela cheia
-  const modal = document.getElementById("video-modal");
-  if (modal) modal.style.display = "flex";
+  atualizarTextoElemento("current-title", video.title);
 
-  // Cria ou carrega o vídeo no player do modal com qualidade máxima forçada
-  if (ytModalPlayer && typeof ytModalPlayer.loadVideoById === 'function') {
-    ytModalPlayer.loadVideoById({
+  if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
+    ytPlayer.loadVideoById({
       videoId: video.youtubeId,
       suggestedQuality: 'hd1080'
     });
+    ytPlayer.playVideo();
   } else {
-    window.onYouTubeIframeAPIReady = function() {
-      ytModalPlayer = new YT.Player('player-container-modal', {
-        videoId: video.youtubeId,
-        playerVars: {
-          'autoplay': 1,
-          'controls': 1,
-          'rel': 0,
-          'enablejsapi': 1,
-          'vq': 'hd1080'
-        },
-        events: {
-          'onReady': (event) => {
-            event.target.setPlaybackQuality('hd1080');
-            event.target.playVideo();
-          }
-        }
-      });
-    };
-
-    if (window.YT && window.YT.Player) {
-      window.onYouTubeIframeAPIReady();
-    }
+    inicializarPlayer(video.youtubeId);
   }
-
-  atualizarTextoElemento("current-title", video.title);
 
   const searchBox = document.getElementById("search-input");
   const termo = searchBox ? searchBox.value.toLowerCase() : "";
@@ -100,16 +127,6 @@ export function tocarVideo(index) {
     renderizarLista(listaVideos);
   }
 }
-
-// Função global para fechar o modal e parar o vídeo
-window.fecharModalVideo = function() {
-  const modal = document.getElementById("video-modal");
-  if (modal) modal.style.display = "none";
-
-  if (ytModalPlayer && typeof ytModalPlayer.stopVideo === 'function') {
-    ytModalPlayer.stopVideo();
-  }
-};
 
 export function filtrarVideos() {
   const searchBox = document.getElementById("search-input");
