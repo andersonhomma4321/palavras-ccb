@@ -57,27 +57,10 @@ export function tocarVideo(index) {
 
   state.currentVideoIndex = index;
   const video = listaVideos[index];
-  const iframe = document.getElementById("main-iframe");
 
-  if (iframe) {
-    // URL otimizada para forçar resolução mais alta no iframe
-    iframe.src = `https://www.youtube.com/embed/${video.youtubeId}?enablejsapi=1&vq=hd1080&rel=0`;
-
-    iframe.onload = () => {
-      try {
-        iframe.contentWindow.postMessage(
-          JSON.stringify({
-            event: "command",
-            func: "setPlaybackQuality",
-            args: ["hd1080"]
-          }),
-          "*"
-        );
-      } catch (e) {
-        console.error("Erro ao enviar comando de qualidade:", e);
-      }
-    };
-  }
+  // Abre o vídeo direto no YouTube na resolução máxima real
+  const urlYouTube = `https://www.youtube.com/watch?v=${video.youtubeId}`;
+  window.open(urlYouTube, "_blank");
 
   atualizarTextoElemento("current-title", video.title);
 
