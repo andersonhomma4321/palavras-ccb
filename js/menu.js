@@ -94,13 +94,8 @@ export function voltarParaMenu() {
 
 
 export function voltarParaAdminMenu() {
-
   fecharModais();
-
-  document.getElementById(
-    "admin-menu-overlay"
-  ).style.display = "flex";
-
+  document.getElementById("admin-menu-overlay").style.display = "flex";
 }
 
 
