@@ -25,7 +25,6 @@ export function carregarPlaylist() {
     const videoInicial = listaVideos[state.currentVideoIndex];
     atualizarTextoElemento("current-title", videoInicial.title);
     
-    // Se a API já estiver pronta, carrega o player imediatamente
     if (window.YT && window.YT.Player) {
       criarOuCarregarPlayer(videoInicial.youtubeId);
     }
@@ -37,9 +36,6 @@ export function carregarPlaylist() {
 function criarOuCarregarPlayer(videoId) {
   const host = document.getElementById("youtube-player-host");
   if (!host) return;
-
-  // Pega a origem atual da página (funciona tanto local quanto no GitHub Pages)
-  const currentOrigin = window.location.origin;
 
   if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
     ytPlayer.loadVideoById({
@@ -56,8 +52,7 @@ function criarOuCarregarPlayer(videoId) {
         'controls': 1,
         'rel': 0,
         'enablejsapi': 1,
-        'origin': currentOrigin, // Resolve o bloqueio de origem cruzada no GitHub Pages
-        'vq': 'hd1080'
+        'modestbranding': 1
       },
       events: {
         'onReady': (event) => {
