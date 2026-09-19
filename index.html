@@ -467,47 +467,33 @@
      
         <!-- PLAYER -->
         <div class="player-section">
-        <div class="controls-extra" style="margin-top: 20px;">
-        <span id="current-title" style="font-size: 1.2rem; font-weight: bold;">
-        Selecione um vídeo
-        </span>
+        <div class="video-container">
+            <!-- Div que a API do YouTube vai transformar no player nativo de TV -->
+            <div id="youtube-player-host"></div>
+        </div>
+        <div class="controls-extra" style="margin-top: 15px;">
+            <span id="current-title" style="font-size: 1.2rem; font-weight: bold;">
+            Selecione um vídeo
+            </span>
         </div>
         </div>
 
-      <!-- PLAYLIST -->
-
-      <div class="playlist-section">
-
-        <div class="search-box">
-
-          <input
-            type="text"
-            id="search-input"
-            placeholder="🔍 Localizar vídeo (Use Setas ↑ ↓ e Enter)"
-          >
-
-        </div>
-
-
-        <ul
-          class="video-list"
-          id="playlist"
-          tabindex="0"
-        ></ul>
-
-      </div>
-
-    </div>
-
-  </div>
-
-    <!-- Modal de Vídeo em Tela Cheia -->
-<div id="video-modal" class="modal-player" style="display: none;">
-  <div class="modal-conteudo">
-    <button id="fechar-modal" type="button" onclick="fecharModalVideo()">✖ Voltar (ESC)</button>
-    <!-- Aqui entra o container limpo para o player -->
-    <div id="player-container-modal"></div>
-  </div>
+<!-- PLAYLIST -->
+<div class="playlist-section">
+<div class="search-box">
+<input
+type="text"
+id="search-input"
+placeholder=" Localizar vídeo (Use Setas ↑↓ e Enter)"
+>
+</div>
+<ul
+class="video-list"
+id="playlist"
+tabindex="0"
+></ul>
+</div>
+</div>
 </div>
 
 <!-- ==============================
