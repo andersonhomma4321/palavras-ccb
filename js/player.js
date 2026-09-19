@@ -1,71 +1,38 @@
 import { listaVideos } from "../data/videos.js";
 import { state } from "./state.js";
 
-let ytPlayer = null;
-
-// Garante que o script da API do YouTube é injetado no documento
-if (!window.YT) {
-  const tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  document.head.appendChild(tag);
-}
-
-// Callback global acionado automaticamente pela API do YouTube
-window.onYouTubeIframeAPIReady = function() {
-  if (listaVideos.length > 0) {
-    if (state.currentVideoIndex < 0) state.currentVideoIndex = 0;
-    criarOuCarregarPlayer(listaVideos[state.currentVideoIndex].youtubeId);
-  }
-};
-
 export function carregarPlaylist() {
   renderizarLista(listaVideos);
   if (listaVideos.length > 0) {
     if (state.currentVideoIndex < 0) state.currentVideoIndex = 0;
     const videoInicial = listaVideos[state.currentVideoIndex];
     atualizarTextoElemento("current-title", videoInicial.title);
-    
-    if (window.YT && window.YT.Player) {
-      criarOuCarregarPlayer(videoInicial.youtubeId);
-    }
+    renderizarIframePlayer(videoInicial.youtubeId);
   } else {
     atualizarTextoElemento("current-title", "Nenhum vídeo disponível");
   }
 }
 
-function criarOuCarregarPlayer(videoId) {
+function renderizarIframePlayer(videoId) {
   const host = document.getElementById("youtube-player-host");
   if (!host) return;
 
-  if (ytPlayer && typeof ytPlayer.loadVideoById === 'function') {
-    ytPlayer.loadVideoById({
-      videoId: videoId,
-      suggestedQuality: 'hd1080'
-    });
-  } else {
-    ytPlayer = new YT.Player('youtube-player-host', {
-      height: '100%',
-      width: '100%',
-      videoId: videoId,
-      playerVars: {
-        'autoplay': 0,
-        'controls': 1,
-        'rel': 0,
-        'enablejsapi': 1,
-        'modestbranding': 1
-      },
-      events: {
-        'onReady': (event) => {
-          event.target.setPlaybackQuality('hd1080');
-        },
-        'onStateChange': (event) => {
-          if (event.data === YT.PlayerState.PLAYING) {
-            event.target.setPlaybackQuality('hd1080');
-          }
-        }
-      }
-    });
-  }
+  // Pega a origem atual da página (funciona perfeitamente no GitHub Pages)
+  const currentOrigin = window.location.origin;
+
+  // Limpa o container e injeta o iframe diretamente, garantindo 1080p, controlos e sem erros de postMessage
+  host.innerHTML = `
+    <iframe 
+      id="yt-iframe-engine"
+      width="100%" 
+      height="100%" 
+      src="https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0&enablejsapi=1&vq=hd1080&origin=${encodeURIComponent(currentOrigin)}" 
+      title="YouTube video player" 
+      frameborder="0" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+      allowfullscreen>
+    ></iframe>
+  `;
 }
 
 export function renderizarLista(lista) {
@@ -103,7 +70,7 @@ export function tocarVideo(index) {
   const video = listaVideos[index];
 
   atualizarTextoElemento("current-title", video.title);
-  criarOuCarregarPlayer(video.youtubeId);
+  renderizarIframePlayer(video.youtubeId);
 
   const searchBox = document.getElementById("search-input");
   const termo = searchBox ? searchBox.value.toLowerCase() : "";
