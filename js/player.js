@@ -26,9 +26,9 @@ export function renderizarLista(lista) {
     }
 
     lista.forEach((vid, idx) => {
-        // Suporta tanto youtubeld como youtubeId para evitar falhas de leitura
-        const videoId = vid.youtubeld || vid.youtubeId;
-        const indexOriginal = listaVideos.findIndex(v => (v.youtubeld || v.youtubeId) === videoId);
+        // Compatibilidade total com youtubeId (maiúsculo) ou youtubeld (minúsculo)
+        const videoId = vid.youtubeId || vid.youtubeld;
+        const indexOriginal = listaVideos.findIndex(v => (v.youtubeId || v.youtubeld) === videoId);
         
         const card = document.createElement("div");
         card.className = "video-card-item";
@@ -36,7 +36,7 @@ export function renderizarLista(lista) {
             card.classList.add("kb-focus");
         }
 
-        // Miniatura oficial do YouTube com alternativa automática de segurança
+        // Miniatura oficial do YouTube em alta resolução
         const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
         card.innerHTML = `
@@ -59,9 +59,9 @@ export function tocarVideo(index) {
     if (index < 0 || index >= listaVideos.length) return;
     state.currentVideoIndex = index;
     const video = listaVideos[index];
-    const videoId = video.youtubeld || video.youtubeId;
+    const videoId = video.youtubeId || video.youtubeld;
 
-    // Abre o vídeo diretamente no YouTube em nova aba/ecrã para contornar restrições de incorporação de vídeos não listados
+    // Abre o vídeo do YouTube corretamente numa nova aba
     const urlYoutube = `https://www.youtube.com/watch?v=${videoId}&autoplay=1`;
     window.open(urlYoutube, "_blank");
 }
