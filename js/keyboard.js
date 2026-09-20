@@ -62,19 +62,6 @@ export function inicializarTeclado() {
 
         // TELA "PALAVRAS" (YOUTUBE TV)
         if (appVisivel) {
-            const searchInput = document.getElementById("search-input");
-            const searchFocado = document.activeElement === searchInput;
-            const btnRandom = document.getElementById("btn-random-videos");
-            const randomFocado = document.activeElement === btnRandom;
-
-            if (searchFocado) {
-                if (e.key === "ArrowDown") {
-                    e.preventDefault();
-                    btnRandom.focus();
-                }
-                return;
-            }
-
             const searchBox = document.getElementById("search-input");
             const termoBruto = searchBox ? searchBox.value : "";
             const termos = termoBruto ? termoBruto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/\s+/) : [];
@@ -85,7 +72,7 @@ export function inicializarTeclado() {
                   })
                 : listaVideos;
 
-            // Calcula quantidade de colunas na grelha dinamicamente
+            // Quantidade de colunas na grelha
             const gridContainer = document.getElementById("playlist");
             let colunas = 4;
             if (gridContainer) {
@@ -93,18 +80,11 @@ export function inicializarTeclado() {
                 colunas = computedStyle.getPropertyValue("grid-template-columns").split(" ").length || 4;
             }
 
-            if (randomFocado) {
+            // Se o foco estiver no campo de pesquisa e carregar para baixo, vai para os cartões
+            if (document.activeElement === searchBox) {
                 if (e.key === "ArrowDown") {
                     e.preventDefault();
-                    state.kbPlaylistIndex = 0;
-                    renderizarLista(listaExibida);
-                    focarCartaoVideo(0);
-                } else if (e.key === "ArrowUp") {
-                    e.preventDefault();
-                    searchInput.focus();
-                } else if (e.key === "Enter") {
-                    e.preventDefault();
-                    iniciarVideosAleatorios();
+                    focarCartaoVideo(state.kbPlaylistIndex);
                 }
                 return;
             }
@@ -113,14 +93,12 @@ export function inicializarTeclado() {
                 e.preventDefault();
                 if (listaExibida.length > 0) {
                     state.kbPlaylistIndex = (state.kbPlaylistIndex + 1) % listaExibida.length;
-                    renderizarLista(listaExibida);
                     focarCartaoVideo(state.kbPlaylistIndex);
                 }
             } else if (e.key === "ArrowLeft") {
                 e.preventDefault();
                 if (listaExibida.length > 0) {
                     state.kbPlaylistIndex = (state.kbPlaylistIndex - 1 + listaExibida.length) % listaExibida.length;
-                    renderizarLista(listaExibida);
                     focarCartaoVideo(state.kbPlaylistIndex);
                 }
             } else if (e.key === "ArrowDown") {
@@ -129,17 +107,15 @@ export function inicializarTeclado() {
                     let novoIndex = state.kbPlaylistIndex + colunas;
                     if (novoIndex >= listaExibida.length) novoIndex = listaExibida.length - 1;
                     state.kbPlaylistIndex = novoIndex;
-                    renderizarLista(listaExibida);
                     focarCartaoVideo(state.kbPlaylistIndex);
                 }
             } else if (e.key === "ArrowUp") {
                 e.preventDefault();
                 let novoIndex = state.kbPlaylistIndex - colunas;
                 if (novoIndex < 0) {
-                    btnRandom.focus();
+                    if (searchBox) searchBox.focus();
                 } else {
                     state.kbPlaylistIndex = novoIndex;
-                    renderizarLista(listaExibida);
                     focarCartaoVideo(state.kbPlaylistIndex);
                 }
             } else if (e.key === "Enter") {
@@ -150,6 +126,7 @@ export function inicializarTeclado() {
                     tocarVideo(indexOriginal);
                 }
             }
+            return;
         }
     });
 }
