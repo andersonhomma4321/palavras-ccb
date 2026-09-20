@@ -56,7 +56,9 @@ export function renderizarLista(lista) {
 export function tocarVideo(index) {
     if (index < 0 || index >= listaVideos.length) return;
     state.currentVideoIndex = index;
-    const video = listaVideos[index];    
+    const video = listaVideos[index];
+
+    // Utiliza o link padrão do YouTube para garantir que reproduz perfeitamente vídeos não listados
     const urlYoutube = `https://www.youtube.com/watch?v=${video.youtubeld}&autoplay=1`;
     window.location.href = urlYoutube;
 }
