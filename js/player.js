@@ -26,7 +26,9 @@ export function renderizarLista(lista) {
     }
 
     lista.forEach((vid, idx) => {
-        const indexOriginal = listaVideos.findIndex(v => v.youtubeld === vid.youtubeld);
+        // Suporta tanto youtubeld como youtubeId para evitar falhas de leitura
+        const videoId = vid.youtubeld || vid.youtubeId;
+        const indexOriginal = listaVideos.findIndex(v => (v.youtubeld || v.youtubeId) === videoId);
         
         const card = document.createElement("div");
         card.className = "video-card-item";
@@ -34,12 +36,12 @@ export function renderizarLista(lista) {
             card.classList.add("kb-focus");
         }
 
-        // Miniatura oficial do YouTube
-        const thumbnailUrl = `https://img.youtube.com/vi/${vid.youtubeld}/hqdefault.jpg`;
+        // Miniatura oficial do YouTube com alternativa automática de segurança
+        const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
         card.innerHTML = `
             <div class="video-thumbnail-wrapper">
-                <img src="${thumbnailUrl}" alt="${vid.title}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${vid.youtubeld}/mqdefault.jpg'">
+                <img src="${thumbnailUrl}" alt="${vid.title}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${videoId}/default.jpg'">
             </div>
             <div class="video-card-title">${vid.title}</div>
         `;
@@ -57,15 +59,15 @@ export function tocarVideo(index) {
     if (index < 0 || index >= listaVideos.length) return;
     state.currentVideoIndex = index;
     const video = listaVideos[index];
+    const videoId = video.youtubeld || video.youtubeId;
 
-    // Utiliza o link padrão do YouTube para garantir que reproduz perfeitamente vídeos não listados
-    const urlYoutube = `https://www.youtube.com/watch?v=${video.youtubeld}&autoplay=1`;
-    window.location.href = urlYoutube;
+    // Abre o vídeo diretamente no YouTube em nova aba/ecrã para contornar restrições de incorporação de vídeos não listados
+    const urlYoutube = `https://www.youtube.com/watch?v=${videoId}&autoplay=1`;
+    window.open(urlYoutube, "_blank");
 }
 
 export function iniciarVideosAleatorios() {
     if (!listaVideos.length) return;
-    // Sorteia um vídeo aleatório da biblioteca e abre
     const randomIndex = Math.floor(Math.random() * listaVideos.length);
     tocarVideo(randomIndex);
 }
@@ -77,7 +79,6 @@ export function filtrarVideos() {
 
     const filtrados = listaVideos.filter(video => {
         const tituloNorm = normalizarTexto(video.title);
-        // Garante que todas as palavras digitadas apareçam no título (independentemente da ordem)
         return termos.every(termo => tituloNorm.includes(termo));
     });
 
