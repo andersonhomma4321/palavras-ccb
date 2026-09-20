@@ -34,12 +34,12 @@ export function renderizarLista(lista) {
             card.classList.add("kb-focus");
         }
 
-        // Miniatura oficial do YouTube em alta resolução
+        // Miniatura oficial do YouTube
         const thumbnailUrl = `https://img.youtube.com/vi/${vid.youtubeld}/hqdefault.jpg`;
 
         card.innerHTML = `
             <div class="video-thumbnail-wrapper">
-                <img src="${thumbnailUrl}" alt="${vid.title}" loading="lazy">
+                <img src="${thumbnailUrl}" alt="${vid.title}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${vid.youtubeld}/mqdefault.jpg'">
             </div>
             <div class="video-card-title">${vid.title}</div>
         `;
