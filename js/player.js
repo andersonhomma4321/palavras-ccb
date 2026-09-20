@@ -61,8 +61,8 @@ export function tocarVideo(index) {
     const video = listaVideos[index];
     const videoId = video.youtubeId || video.youtubeld;
 
-    // Abre o vídeo do YouTube corretamente numa nova aba
-    const urlYoutube = `https://www.youtube.com/watch?v=${videoId}&autoplay=1`;
+    // Adiciona parâmetros para reprodução automática e forçar a melhor qualidade disponível
+    const urlYoutube = `https://www.youtube.com/watch?v=${videoId}&autoplay=1&vq=hd1080`;
     window.open(urlYoutube, "_blank");
 }
 
