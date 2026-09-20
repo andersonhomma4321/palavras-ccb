@@ -1,436 +1,247 @@
-/* =========================================================
-   APP CCB - STYLE.CSS
-   =========================================================
-
-   ESTRUTURA:
-   01. Variáveis
-   02. Reset
-   03. Corpo
-   04. Overlays e modais
-   05. Cards
-   06. Inputs
-   07. Botões de formulário
-   08. Botões do menu
-   09. Fechar modal
-   10. Administração
-   11. Aplicação principal
-   12. Header
-   13. Conteúdo / Player
-   14. Playlist
-   15. Responsividade
-
-   ========================================================= */
-
-
-/* =========================================================
-   01. VARIÁVEIS
-   ========================================================= */
-
 :root {
-
-    /* Cores originais do sistema */
     --ccb-blue: #0b2545;
     --ccb-dark-blue: #06172e;
     --ccb-gold: #c5a059;
     --ccb-white: #f8f9fa;
     --ccb-gray: #e9ecef;
     --ccb-red: #d9534f;
-
-    /* =====================================================
-       CORES DOS BOTÕES DE MADEIRA
-       ===================================================== */
-
-    --wood-dark: #32160b;
-    --wood-dark-2: #3a1b0e;
-    --wood-medium: #49220f;
-    --wood-medium-2: #5a2c18;
-    --wood-light: #69351c;
-
-    /* =====================================================
-       CORES DO OURO
-       ===================================================== */
-
-    --gold-border: #c09a47;
-    --gold-light: #fffbd0;
-    --gold-text: #f4d76b;
-    --gold-bright: #ffe98a;
-    --gold-dark: #704b0d;
-    --gold-shadow: #8d6416;
 }
-
-
-/* =========================================================
-   02. RESET
-   ========================================================= */
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-
-    font-family:
-        'Segoe UI',
-        Tahoma,
-        Geneva,
-        Verdana,
-        sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-
-/* =========================================================
-   03. CORPO
-   ========================================================= */
-
 body {
-
     background-color: var(--ccb-dark-blue);
-
     color: #333;
-
     display: flex;
-
     justify-content: center;
-
     align-items: center;
-
     min-height: 100vh;
 }
 
 
-/* =========================================================
-   04. OVERLAYS E MODAIS
-   ========================================================= */
+/* =========================================
+   OVERLAYS
+   ========================================= */
 
 #login-overlay,
 #menu-overlay,
 .modal-overlay {
-
     position: fixed;
-
     top: 0;
     left: 0;
-
     width: 100%;
     height: 100%;
-
     background: rgba(6, 23, 46, 0.95);
-
     display: flex;
-
     justify-content: center;
     align-items: center;
-
     z-index: 2000;
 }
 
-
-/* Escondidos inicialmente */
-
 #menu-overlay,
 .modal-overlay {
-
     display: none;
 }
 
 
-/* =========================================================
-   05. CARDS
-   ========================================================= */
+/* =========================================
+   CARDS
+   ========================================= */
 
 .login-card,
 .admin-card,
 .menu-card {
-
     background: #fff;
-
-    padding:
-        2.5rem
-        2rem
-        2rem
-        2rem;
-
+    padding: 2.5rem 2rem 2rem 2rem;
     border-radius: 8px;
-
-    border-top:
-        5px solid
-        var(--ccb-gold);
-
+    border-top: 5px solid var(--ccb-gold);
     text-align: center;
-
-    box-shadow:
-        0 10px 25px rgba(0, 0, 0, 0.5);
-
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     max-width: 500px;
-
     width: 92%;
-
     position: relative;
-
     max-height: 90vh;
-
     overflow-y: auto;
 }
-
-
-/* Títulos dos cards */
 
 .login-card h2,
 .admin-card h2,
 .menu-card h2 {
-
     color: var(--ccb-blue);
-
     margin-bottom: 0.5rem;
-
     font-size: 1.5rem;
 }
-
-
-/* Textos dos cards */
 
 .login-card p,
 .admin-card p,
 .menu-card p {
-
     font-size: 0.9rem;
-
     color: #666;
-
     margin-bottom: 1.5rem;
 }
 
 
-/* =========================================================
-   06. INPUTS
-   ========================================================= */
+/* =========================================
+   INPUTS
+   ========================================= */
 
 .login-card input,
 .admin-card input {
-
     width: 100%;
-
     padding: 0.75rem;
-
-    border:
-        1px solid
-        #ccc;
-
+    border: 1px solid #ccc;
     border-radius: 4px;
-
     margin-bottom: 0.75rem;
-
     font-size: 0.95rem;
-
     outline: none;
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
 }
-
 
 .login-card input:focus,
 .admin-card input:focus {
-
-    border-color:
-        var(--ccb-blue);
-
+    border-color: var(--ccb-blue);
     box-shadow:
-        0 0 5px
-        rgba(11, 37, 69, 0.3);
+        0 0 5px rgba(11, 37, 69, 0.3);
 }
 
 
-/* =========================================================
-   07. BOTÕES DE FORMULÁRIO
-   ========================================================= */
+/* =========================================
+   BOTÕES
+   ========================================= */
 
 .login-card button[type="submit"],
 .admin-card button[type="submit"],
 .admin-card button.btn-action {
-
     width: 100%;
-
     padding: 0.75rem;
-
-    background:
-        var(--ccb-blue);
-
+    background: var(--ccb-blue);
     color: #fff;
-
     border: none;
-
     border-radius: 4px;
-
     font-size: 1rem;
-
     cursor: pointer;
-
     font-weight: bold;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        transform 0.2s ease;
-
+    transition: background 0.2s;
     margin-top: 0.25rem;
 }
-
 
 .login-card button[type="submit"]:hover,
 .admin-card button[type="submit"]:hover,
 .admin-card button.btn-action:hover {
-
-    background:
-        var(--ccb-gold);
-
-    color:
-        var(--ccb-dark-blue);
-
-    transform:
-        translateY(-1px);
+    background: var(--ccb-gold);
+    color: var(--ccb-dark-blue);
 }
 
 
-/* =========================================================
-   08. MENU
-   ========================================================= */
+/* =========================================
+   MENU
+   ========================================= */
 
 .menu-grid {
-
     display: flex;
-
     flex-direction: column;
-
     gap: 12px;
 }
 
 
-/* =========================================================
-   BOTÃO PRINCIPAL DO MENU
-   ========================================================= */
+/* =========================================
+   BOTÕES DO MENU
+   MADEIRA + VERNIZ + OURO
+   ========================================= */
 
 .btn-menu {
-
     position: relative;
 
     width: 100%;
-
     min-height: 82px;
+    padding: 1rem;
 
-    padding:
-        1rem
-        1.5rem;
-
-    border:
-        1px solid
-        var(--gold-border);
-
+    /*
+     * Borda dourada
+     */
+    border: 1px solid #c09a47;
     border-radius: 16px;
 
-    color:
-        var(--gold-text);
+    /*
+     * Texto dourado
+     */
+    color: #f4d76b;
 
     font-size: 1.1rem;
-
     font-weight: bold;
 
     cursor: pointer;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
     gap: 10px;
 
     /*
-     * Importante:
-     * não usamos isolation aqui.
-     * Isso evita que o brilho externo fique
-     * escondido atrás do próprio botão.
+     * Madeira escura
      */
-
-    overflow: visible;
-
-    /*
-     * MADEIRA
-     */
-
     background:
-
-        /* iluminação superior */
         linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.15) 0%,
-            rgba(255, 255, 255, 0.04) 18%,
-            rgba(0, 0, 0, 0.08) 55%,
-            rgba(40, 15, 10, 0.60) 100%
+            rgba(255,255,255,.15) 0%,
+            rgba(255,255,255,.04) 18%,
+            rgba(0,0,0,.08) 55%,
+            rgba(40,15,10,.60) 100%
         ),
 
-        /* fibras da madeira */
+        /*
+         * Fibras da madeira
+         */
         repeating-linear-gradient(
             0deg,
             transparent 0px,
-            rgba(30, 13, 7, 0.18) 3px,
+            rgba(30,13,7,.18) 3px,
             transparent 7px,
-            rgba(20, 8, 4, 0.25) 12px,
+            rgba(20,8,4,.25) 12px,
             transparent 18px,
-            rgba(80, 38, 20, 0.16) 24px,
+            rgba(80,38,20,.16) 24px,
             transparent 30px
         ),
 
-        /* base da madeira */
+        /*
+         * Cor da madeira
+         */
         linear-gradient(
             92deg,
-            var(--wood-dark-2) 0%,
-            var(--wood-medium-2) 18%,
+            #3a1b0e 0%,
+            #5a2c18 18%,
             #43200f 35%,
-            var(--wood-light) 52%,
-            var(--wood-medium) 70%,
-            var(--wood-dark) 100%
+            #69351c 52%,
+            #49220f 70%,
+            #32160b 100%
         );
 
     /*
-     * SOMBRAS INTERNAS
-     * + BRILHO DOURADO
+     * Brilho e sombra da madeira
      */
-
     box-shadow:
-
-        inset
-        0 1px 2px
-        rgba(255, 255, 255, 0.40),
-
-        inset
-        0 -3px 7px
-        rgba(0, 0, 0, 0.60),
-
-        0 0 5px
-        rgba(245, 210, 90, 0.50),
-
-        0 0 18px
-        rgba(235, 195, 65, 0.15);
+        inset 0 1px 2px rgba(255,255,255,.40),
+        inset 0 -3px 7px rgba(0,0,0,.60),
+        0 0 5px rgba(245,210,90,.50),
+        0 0 18px rgba(235,195,65,.15);
 
     transition:
-
-        transform 0.25s ease,
-
-        box-shadow 0.25s ease,
-
-        background 0.25s ease,
-
-        color 0.25s ease;
+        transform .25s ease,
+        box-shadow .25s ease,
+        background .25s ease;
 }
 
 
-/* =========================================================
-   BORDA EXTERNA DOURADA
-   ========================================================= */
+/* =========================================
+   BORDA / BRILHO DOURADO EXTERNO
+   ========================================= */
 
 .btn-menu::before {
-
     content: "";
 
     position: absolute;
@@ -439,176 +250,106 @@ body {
 
     border-radius: 20px;
 
-    border:
-        1px solid
-        rgba(255, 221, 100, 0.40);
+    border: 1px solid rgba(255,221,100,.30);
 
     box-shadow:
-
-        0 0 8px
-        rgba(255, 220, 90, 0.30),
-
-        0 0 20px
-        rgba(255, 210, 70, 0.10);
+        0 0 8px rgba(255,220,90,.25),
+        0 0 20px rgba(255,210,70,.08);
 
     pointer-events: none;
 
     /*
-     * Fica atrás da madeira, mas sem usar
-     * z-index negativo.
+     * Fica atrás da camada de verniz,
+     * mas não usa z-index negativo.
      */
-
     z-index: 0;
 }
 
 
-/* =========================================================
-   CAMADA DE VERNIZ TRANSPARENTE
-   ========================================================= */
+/* =========================================
+   VERNIZ TRANSPARENTE
+   ========================================= */
 
 .btn-menu::after {
-
     content: "";
 
     position: absolute;
 
-    left: 1px;
-    right: 1px;
-
-    top: 1px;
-    bottom: 1px;
+    inset: 1px;
 
     border-radius: 15px;
 
     pointer-events: none;
 
     /*
-     * A camada fica acima da madeira.
+     * Verniz transparente por cima
      */
-
     z-index: 1;
 
-    /*
-     * VERNIZ / VIDRO
-     *
-     * Transparente para permitir que
-     * a textura da madeira continue visível.
-     */
-
     background:
-
         linear-gradient(
             180deg,
-
-            rgba(255, 255, 255, 0.25) 0%,
-
-            rgba(255, 255, 255, 0.12) 10%,
-
-            rgba(255, 255, 255, 0.04) 25%,
-
-            rgba(255, 255, 255, 0) 50%,
-
-            rgba(0, 0, 0, 0.05) 100%
+            rgba(255,255,255,.25) 0%,
+            rgba(255,255,255,.12) 10%,
+            rgba(255,255,255,.04) 25%,
+            rgba(255,255,255,0) 50%,
+            rgba(0,0,0,.05) 100%
         );
 
     box-shadow:
-
-        inset
-        0 1px 1px
-        rgba(255, 255, 255, 0.55),
-
-        inset
-        0 0 8px
-        rgba(255, 255, 255, 0.08);
+        inset 0 1px 1px rgba(255,255,255,.55),
+        inset 0 0 8px rgba(255,255,255,.08);
 }
 
 
-/* =========================================================
-   TEXTO DO BOTÃO
-   ALTO-RELEVO
-   ========================================================= */
+/* =========================================
+   TEXTO EM ALTO-RELEVO
+   ========================================= */
 
 .btn-menu {
-
     text-shadow:
+        0 -1px 0 rgba(255,250,190,.95),
+        0 1px 0 #8d6416,
+        0 2px 0 #704b0d,
+        0 3px 3px rgba(0,0,0,.60),
+        0 0 5px rgba(255,220,100,.30);
 
-        /* brilho na parte superior */
-        0 -1px 0
-        rgba(255, 250, 190, 0.95),
-
-        /* primeira borda */
-        0 1px 0
-        var(--gold-shadow),
-
-        /* profundidade */
-        0 2px 0
-        var(--gold-dark),
-
-        /* sombra inferior */
-        0 3px 3px
-        rgba(0, 0, 0, 0.60),
-
-        /* brilho dourado */
-        0 0 5px
-        rgba(255, 220, 100, 0.30);
-}
-
-
-/* =========================================================
-   GARANTE QUE O TEXTO FIQUE ACIMA DO VERNIZ
-   ========================================================= */
-
-/*
- * Como atualmente o HTML possui o texto diretamente
- * dentro do <button>, não podemos selecionar apenas
- * o texto com um span.
- *
- * O z-index do botão mantém o conteúdo textual
- * acima das camadas visuais.
- */
-
-.btn-menu {
-
+    /*
+     * Mantém o texto acima do verniz
+     */
     z-index: 2;
 }
 
 
-/* =========================================================
-   HOVER / FOCO / CONTROLE REMOTO
-   ========================================================= */
+/* =========================================
+   HOVER / FOCO / KB-FOCUS
+   ========================================= */
 
 .btn-menu:hover,
 .btn-menu:focus,
 .btn-menu.kb-focus {
+    color: #ffe98a;
 
-    color:
-        var(--gold-bright);
-
-    transform:
-        translateY(-3px);
+    transform: translateY(-2px);
 
     background:
-
-        /* iluminação */
         linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.20) 0%,
-            rgba(255, 255, 255, 0.05) 20%,
-            rgba(0, 0, 0, 0.10) 55%,
-            rgba(40, 15, 10, 0.65) 100%
+            rgba(255,255,255,.20) 0%,
+            rgba(255,255,255,.05) 20%,
+            rgba(0,0,0,.10) 55%,
+            rgba(40,15,10,.65) 100%
         ),
 
-        /* fibras */
         repeating-linear-gradient(
             0deg,
             transparent 0px,
-            rgba(30, 13, 7, 0.18) 3px,
+            rgba(30,13,7,.18) 3px,
             transparent 7px,
-            rgba(20, 8, 4, 0.25) 12px,
+            rgba(20,8,4,.25) 12px,
             transparent 18px
         ),
 
-        /* madeira iluminada */
         linear-gradient(
             92deg,
             #45200f 0%,
@@ -620,904 +361,433 @@ body {
         );
 
     box-shadow:
-
-        inset
-        0 1px 2px
-        rgba(255, 255, 255, 0.55),
-
-        inset
-        0 -3px 8px
-        rgba(0, 0, 0, 0.70),
-
-        0 0 8px
-        rgba(255, 220, 80, 0.90),
-
-        0 0 25px
-        rgba(255, 210, 70, 0.22);
+        inset 0 1px 2px rgba(255,255,255,.55),
+        inset 0 -3px 8px rgba(0,0,0,.70),
+        0 0 8px rgba(255,220,80,.90),
+        0 0 25px rgba(255,210,70,.22);
 
     outline:
-        2px solid
-        rgba(255, 220, 100, 0.35);
+        2px solid rgba(255,220,100,.35);
 
     outline-offset: 2px;
-}
-
-
-/* =========================================================
-   TEXTO DO BOTÃO SELECIONADO
-   ========================================================= */
-
-.btn-menu:hover,
-.btn-menu:focus,
-.btn-menu.kb-focus {
 
     text-shadow:
-
-        /* brilho superior */
-        0 -1px 0
-        var(--gold-light),
-
-        /* borda superior */
-        0 1px 0
-        #a97819,
-
-        /* profundidade */
-        0 2px 0
-        var(--gold-dark),
-
-        /* sombra */
-        0 3px 3px
-        rgba(0, 0, 0, 0.65),
-
-        /* brilho */
-        0 0 8px
-        rgba(255, 220, 100, 0.50);
+        0 -1px 0 #fffbd0,
+        0 1px 0 #a97819,
+        0 2px 0 #704b0d,
+        0 3px 3px rgba(0,0,0,.65),
+        0 0 8px rgba(255,220,100,.50);
 }
 
 
-/* =========================================================
+/* =========================================
    BOTÃO PRESSIONADO
-   ========================================================= */
+   ========================================= */
 
 .btn-menu:active {
-
-    transform:
-        translateY(1px);
+    transform: translateY(1px);
 
     box-shadow:
-
-        inset
-        0 3px 5px
-        rgba(0, 0, 0, 0.55),
-
-        inset
-        0 -1px 2px
-        rgba(255, 255, 255, 0.20),
-
-        0 2px 5px
-        rgba(0, 0, 0, 0.50);
+        inset 0 3px 5px rgba(0,0,0,.55),
+        inset 0 -1px 2px rgba(255,255,255,.20),
+        0 2px 5px rgba(0,0,0,.50);
 }
 
 
-/* =========================================================
+/* =========================================
    BOTÕES ESPECIAIS DO MENU
-   ========================================================= */
-
-/*
- * Antes eles tinham:
- *
- * .menu-config {
- *     background: var(--ccb-gold) !important;
- * }
- *
- * .admin-password-button {
- *     background: #2b4c7e !important;
- * }
- *
- * .admin-back-button {
- *     background: #888 !important;
- * }
- *
- * Essas regras impediam o visual de madeira.
- *
- * Agora todos seguem o mesmo padrão.
- */
+   TODOS COM MADEIRA
+   ========================================= */
 
 .btn-menu.menu-config,
 .btn-menu.admin-password-button,
 .btn-menu.admin-back-button {
-
     background:
-
         linear-gradient(
             180deg,
-            rgba(255, 255, 255, 0.15) 0%,
-            rgba(255, 255, 255, 0.04) 18%,
-            rgba(0, 0, 0, 0.08) 55%,
-            rgba(40, 15, 10, 0.60) 100%
+            rgba(255,255,255,.15) 0%,
+            rgba(255,255,255,.04) 18%,
+            rgba(0,0,0,.08) 55%,
+            rgba(40,15,10,.60) 100%
         ),
 
         repeating-linear-gradient(
             0deg,
             transparent 0px,
-            rgba(30, 13, 7, 0.18) 3px,
+            rgba(30,13,7,.18) 3px,
             transparent 7px,
-            rgba(20, 8, 4, 0.25) 12px,
-            transparent 18px,
-            rgba(80, 38, 20, 0.16) 24px,
-            transparent 30px
+            rgba(20,8,4,.25) 12px,
+            transparent 18px
         ),
 
         linear-gradient(
             92deg,
-            var(--wood-dark-2) 0%,
-            var(--wood-medium-2) 18%,
+            #3a1b0e 0%,
+            #5a2c18 18%,
             #43200f 35%,
-            var(--wood-light) 52%,
-            var(--wood-medium) 70%,
-            var(--wood-dark) 100%
+            #69351c 52%,
+            #49220f 70%,
+            #32160b 100%
         );
 
-    color:
-        var(--gold-text);
+    color: #f4d76b;
 }
 
 
-/* =========================================================
+/* =========================================
    FOCO DO CONTROLE REMOTO
-   ========================================================= */
+   ========================================= */
 
 .btn-menu.kb-focus {
-
     outline:
-        2px solid
-        rgba(255, 220, 100, 0.55);
+        2px solid rgba(255,220,100,.55);
 
-    outline-offset:
-        2px;
+    outline-offset: 2px;
 }
 
 
-/* =========================================================
-   FOCO VISÍVEL DO TECLADO
-   ========================================================= */
+/* =========================================
+   FOCO VISÍVEL
+   ========================================= */
 
 .btn-menu:focus-visible {
-
     outline:
-        2px solid
-        var(--gold-bright);
+        2px solid #ffe98a;
 
-    outline-offset:
-        3px;
+    outline-offset: 3px;
 }
 
 
-/* =========================================================
-   DESATIVADO
-   ========================================================= */
+/* =========================================
+   DESABILITADO
+   ========================================= */
 
 .btn-menu:disabled {
-
-    opacity:
-        0.55;
-
-    cursor:
-        not-allowed;
-
-    transform:
-        none;
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
 
     box-shadow:
-
-        inset
-        0 2px 5px
-        rgba(0, 0, 0, 0.40);
+        inset 0 2px 5px rgba(0,0,0,.40);
 }
 
 
-/* =========================================================
-   09. BOTÃO FECHAR MODAL
-   ========================================================= */
+/* =========================================
+   FECHAR MODAL
+   ========================================= */
 
 button.btn-close {
-
     position: absolute;
-
     top: 10px;
     right: 12px;
-
     width: 30px;
     height: 30px;
-
-    background:
-        transparent;
-
+    background: transparent;
     border: none;
-
     font-size: 1.5rem;
-
     font-weight: bold;
-
     color: #888;
-
     cursor: pointer;
-
     display: flex;
-
     align-items: center;
     justify-content: center;
-
     z-index: 10;
 }
 
-
 button.btn-close:hover,
 button.btn-close:focus {
-
-    color:
-        var(--ccb-blue);
-
-    outline:
-        none;
+    color: var(--ccb-blue);
+    outline: none;
 }
 
 
-/* =========================================================
-   10. ADMINISTRAÇÃO
-   ========================================================= */
+/* =========================================
+   ADMIN
+   ========================================= */
 
 .admin-manage-section {
-
     text-align: left;
-
     margin-top: 15px;
-
-    border-top:
-        1px solid
-        #ddd;
-
+    border-top: 1px solid #ddd;
     padding-top: 15px;
 }
 
-
 .admin-manage-section h3 {
-
     font-size: 1rem;
-
-    color:
-        var(--ccb-blue);
-
+    color: var(--ccb-blue);
     margin-bottom: 10px;
 }
 
-
 .admin-video-list {
-
     list-style: none;
-
     max-height: 180px;
-
     overflow-y: auto;
-
-    border:
-        1px solid
-        #ccc;
-
+    border: 1px solid #ccc;
     border-radius: 4px;
-
     padding: 5px;
 }
 
-
 .admin-video-item {
-
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
-
-    padding:
-        6px
-        8px;
-
-    border-bottom:
-        1px solid
-        #eee;
-
+    padding: 6px 8px;
+    border-bottom: 1px solid #eee;
     font-size: 0.85rem;
 }
 
-
 .admin-video-item:last-child {
-
-    border-bottom:
-        none;
+    border-bottom: none;
 }
 
-
 .admin-video-item span {
-
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
-
     max-width: 75%;
 }
 
-
-/* =========================================================
-   BOTÃO EXCLUIR
-   ========================================================= */
-
 .btn-delete-item {
-
-    background:
-        var(--ccb-red);
-
-    color:
-        #fff;
-
+    background: var(--ccb-red);
+    color: #fff;
     border: none;
-
     border-radius: 3px;
-
-    padding:
-        4px 8px;
-
+    padding: 4px 8px;
     cursor: pointer;
-
     font-size: 0.75rem;
-
     font-weight: bold;
 }
 
-
 .btn-delete-item:hover {
-
-    background:
-        #c9302c;
+    background: #c9302c;
 }
 
-
-/* =========================================================
-   TOKEN
-   ========================================================= */
-
 .token-area {
-
     text-align: left;
-
     margin-bottom: 15px;
 }
 
-
 .token-area label {
-
     font-size: 0.85rem;
-
     font-weight: bold;
-
-    color:
-        var(--ccb-blue);
-
+    color: var(--ccb-blue);
     display: block;
-
     margin-top: 10px;
-
     margin-bottom: 4px;
 }
 
-
-/* =========================================================
-   MENSAGENS
-   ========================================================= */
-
 .admin-message {
-
     margin-top: 10px;
-
     font-size: 0.85rem;
-
     font-weight: bold;
 }
-
 
 .error-message {
-
-    color:
-        red !important;
-
+    color: red !important;
     margin-top: 10px;
-
     display: none;
-
     font-weight: bold;
 }
 
-
-/* =========================================================
-   BOTÕES AUXILIARES
-   ========================================================= */
-
 .gray-button {
-
-    background:
-        #888 !important;
+    background: #888 !important;
 }
 
-
 .save-password-button {
-
-    background:
-        var(--ccb-gold) !important;
-
-    color:
-        #000 !important;
-
+    background: var(--ccb-gold) !important;
+    color: #000 !important;
     margin-bottom: 10px;
 }
 
-
 .placeholder-description {
-
     margin-top: 20px;
-
     font-size: 1rem !important;
-
     color: #555 !important;
 }
 
 
-/* =========================================================
-   11. APLICAÇÃO PRINCIPAL
-   ========================================================= */
+/* =========================================
+   APLICAÇÃO
+   ========================================= */
 
 #app-container {
-
     display: none;
-
     width: 95%;
-
     max-width: 1650px;
-
-    background:
-        #fff;
-
+    background: #fff;
     border-radius: 8px;
-
     overflow: hidden;
-
     box-shadow:
-        0 10px 30px
-        rgba(0, 0, 0, 0.4);
-
+        0 10px 30px rgba(0,0,0,0.4);
     margin: 20px 0;
 }
 
 
-/* =========================================================
-   12. HEADER
-   ========================================================= */
+/* =========================================
+   HEADER
+   ========================================= */
 
 header {
-
-    background:
-        var(--ccb-blue);
-
-    color:
-        var(--ccb-white);
-
-    padding:
-        1.2rem;
-
+    background: var(--ccb-blue);
+    color: var(--ccb-white);
+    padding: 1.2rem;
     text-align: center;
-
-    border-bottom:
-        3px solid
-        var(--ccb-gold);
-
+    border-bottom: 3px solid var(--ccb-gold);
     position: relative;
 }
 
-
 header h1 {
-
     font-weight: 600;
-
     letter-spacing: 1px;
-
     font-size: 1.8rem;
 }
 
-
-/* =========================================================
-   BOTÃO VOLTAR AO MENU
-   ========================================================= */
-
 .btn-back-menu {
-
     position: absolute;
-
     left: 20px;
-
     top: 50%;
-
-    transform:
-        translateY(-50%);
-
-    background:
-        transparent;
-
-    border:
-        1px solid
-        var(--ccb-gold);
-
-    color:
-        var(--ccb-gold);
-
+    transform: translateY(-50%);
+    background: transparent;
+    border: 1px solid var(--ccb-gold);
+    color: var(--ccb-gold);
     font-size: 0.9rem;
-
     font-weight: bold;
-
     cursor: pointer;
-
-    padding:
-        6px 12px;
-
+    padding: 6px 12px;
     border-radius: 4px;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease;
 }
-
 
 .btn-back-menu:hover {
-
-    background:
-        var(--ccb-gold);
-
-    color:
-        var(--ccb-dark-blue);
+    background: var(--ccb-gold);
+    color: var(--ccb-dark-blue);
 }
 
 
-/* =========================================================
-   13. CONTEÚDO
-   ========================================================= */
+/* =========================================
+   CONTEÚDO
+   ========================================= */
 
 .main-content {
-
     display: flex;
-
     flex-direction: column;
 }
 
-
-/* =========================================================
-   PLAYER
-   ========================================================= */
-
 .player-section {
-
     flex: 3;
-
     padding: 1.5rem;
-
-    background:
-        #111;
-
+    background: #111;
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
 }
 
-
-/* =========================================================
-   CONTAINER DO VÍDEO
-   ========================================================= */
-
 .video-container {
-
     position: relative;
-
     width: 100%;
-
     padding-bottom: 56.25%;
-
     height: 0;
-
-    background:
-        #000;
-
+    background: #000;
     border-radius: 4px;
-
     overflow: hidden;
 }
 
-
-/* =========================================================
-   PLAYER DO YOUTUBE
-   ========================================================= */
-
-#youtube-player-host {
-
+.video-container iframe {
     position: absolute;
-
     top: 0;
     left: 0;
-
     width: 100%;
     height: 100%;
-
     border: 0;
 }
 
-
-/* =========================================================
-   CONTROLES EXTRAS
-   ========================================================= */
-
 .controls-extra {
-
     display: flex;
-
     justify-content: space-between;
-
     width: 100%;
-
     margin-top: 1rem;
-
-    color:
-        #fff;
-
+    color: #fff;
     align-items: center;
 }
 
-
-/* =========================================================
-   TÍTULO ATUAL
-   ========================================================= */
-
 #current-title {
-
     font-size: 1.1rem;
-
     font-weight: 600;
-
-    color:
-        var(--ccb-gold);
-
+    color: var(--ccb-gold);
     word-break: break-word;
-
     display: block;
-
     width: 100%;
 }
 
 
-/* =========================================================
-   14. PLAYLIST
-   ========================================================= */
+/* =========================================
+   PLAYLIST
+   ========================================= */
 
 .playlist-section {
-
     flex: 1;
-
-    background:
-        var(--ccb-white);
-
+    background: var(--ccb-white);
     padding: 1.5rem;
-
-    border-left:
-        1px solid
-        var(--ccb-gray);
-
+    border-left: 1px solid var(--ccb-gray);
     min-width: 300px;
 }
 
-
-/* =========================================================
-   CAMPO DE PESQUISA
-   ========================================================= */
-
 .search-box {
-
     margin-bottom: 1rem;
 }
 
-
 .search-box input {
-
     width: 100%;
-
     padding: 0.6rem;
-
-    border:
-        1px solid
-        #ccc;
-
+    border: 1px solid #ccc;
     border-radius: 4px;
-
     outline: none;
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
 }
-
-
-.search-box input:focus {
-
-    border-color:
-        var(--ccb-blue);
-
-    box-shadow:
-        0 0 5px
-        rgba(11, 37, 69, 0.25);
-}
-
-
-/* =========================================================
-   LISTA DE VÍDEOS
-   ========================================================= */
 
 .video-list {
-
     list-style: none;
-
     max-height: 500px;
-
     overflow-y: auto;
-
     outline: none;
+}
 
+.video-list:focus {
+    border: 1px solid var(--ccb-blue);
     border-radius: 4px;
 }
 
-
-.video-list:focus {
-
-    border:
-        1px solid
-        var(--ccb-blue);
-}
-
-
-/* =========================================================
-   ITEM DA PLAYLIST
-   ========================================================= */
-
 .video-item {
-
     padding: 0.75rem;
-
-    border-bottom:
-        1px solid
-        var(--ccb-gray);
-
+    border-bottom: 1px solid var(--ccb-gray);
     cursor: pointer;
-
     font-size: 0.95rem;
-
     display: flex;
-
     align-items: center;
-
-    transition:
-        background 0.2s ease,
-        color 0.2s ease;
+    transition: background 0.2s;
 }
-
 
 .video-item:hover,
 .video-item.kb-focus {
-
-    background:
-        #e0e7ff;
+    background: #e0e7ff;
 }
 
-
 .video-item.active {
-
-    background:
-        var(--ccb-blue);
-
-    color:
-        #fff;
-
+    background: var(--ccb-blue);
+    color: #fff;
     font-weight: bold;
 }
 
-
 .video-item.active.kb-focus {
-
-    background:
-        var(--ccb-gold);
-
-    color:
-        var(--ccb-dark-blue);
+    background: var(--ccb-gold);
+    color: var(--ccb-dark-blue);
 }
 
 
-/* =========================================================
-   15. RESPONSIVIDADE
-   TELA GRANDE / TV
-   ========================================================= */
+/* =========================================
+   RESPONSIVIDADE
+   ========================================= */
 
 @media (min-width: 900px) {
-
     .main-content {
-
         flex-direction: row;
     }
 }
-
-
-/* =========================================================
-   RESPONSIVIDADE PARA TELAS MENORES
-   ========================================================= */
-
-@media (max-width: 899px) {
-
-    .login-card,
-    .admin-card,
-    .menu-card {
-
-        width: 94%;
-
-        padding:
-            2rem
-            1.25rem;
-    }
-
-
-    .btn-menu {
-
-        min-height: 72px;
-
-        font-size: 1rem;
-    }
-
-
-    .playlist-section {
-
-        min-width: 0;
-
-        border-left: none;
-
-        border-top:
-            1px solid
-            var(--ccb-gray);
-    }
-
-
-    .btn-back-menu {
-
-        left: 10px;
-
-        padding:
-            5px 8px;
-
-        font-size:
-            0.8rem;
-    }
-
-
-    header h1 {
-
-        font-size:
-            1.4rem;
-    }
-}
-
-
-/* =========================================================
-   FIM DO STYLE.CSS
-   ========================================================= */
