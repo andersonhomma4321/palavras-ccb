@@ -56,10 +56,8 @@ export function renderizarLista(lista) {
 export function tocarVideo(index) {
     if (index < 0 || index >= listaVideos.length) return;
     state.currentVideoIndex = index;
-    const video = listaVideos[index];
-
-    // Usa o link de incorporação direta do YouTube, que reproduz perfeitamente vídeos não listados em tela cheia
-    const urlYoutube = `https://www.youtube.com/embed/${video.youtubeld}?autoplay=1`;
+    const video = listaVideos[index];    
+    const urlYoutube = `https://www.youtube.com/watch?v=${video.youtubeld}&autoplay=1`;
     window.location.href = urlYoutube;
 }
 
