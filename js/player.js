@@ -58,9 +58,9 @@ export function tocarVideo(index) {
     state.currentVideoIndex = index;
     const video = listaVideos[index];
 
-    // Abre o vídeo em tela cheia/aba externa usando o player oficial do YouTube na maior resolução
+    // Redireciona a página atual diretamente para o vídeo do YouTube em tela cheia/reprodução
     const urlYoutube = `https://www.youtube.com/watch?v=${video.youtubeld}&autoplay=1`;
-    window.open(urlYoutube, "_blank");
+    window.location.href = urlYoutube;
 }
 
 export function iniciarVideosAleatorios() {
