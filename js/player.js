@@ -6,6 +6,12 @@ export function carregarPlaylist() {
     if (listaVideos.length > 0) {
         if (state.currentVideoIndex < 0) state.currentVideoIndex = 0;
     }
+    // Força o foco a ir para a grelha para as setas funcionarem de imediato
+    const playlistElement = document.getElementById("playlist");
+    if (playlistElement) {
+        playlistElement.setAttribute("tabindex", "0");
+        playlistElement.focus();
+    }
 }
 
 // Função para remover acentos e padronizar termos de busca
