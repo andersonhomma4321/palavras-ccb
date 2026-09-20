@@ -12,7 +12,7 @@ export function inicializarTeclado() {
         const videoFormVisivel = document.getElementById("admin-form-overlay").style.display === "flex";
         const senhaFormVisivel = document.getElementById("admin-passwords-overlay").style.display === "flex";
 
-        // ESC ou Botão Voltar
+        // ESC para voltar ao menu
         if (e.key === "Escape") {
             if (appVisivel) {
                 voltarParaMenu();
@@ -85,7 +85,7 @@ export function inicializarTeclado() {
                   })
                 : listaVideos;
 
-            // Cálculo dinâmico de colunas com base na largura da grelha
+            // Calcula quantidade de colunas na grelha dinamicamente
             const gridContainer = document.getElementById("playlist");
             let colunas = 4;
             if (gridContainer) {
@@ -145,7 +145,8 @@ export function inicializarTeclado() {
             } else if (e.key === "Enter") {
                 e.preventDefault();
                 if (listaExibida[state.kbPlaylistIndex]) {
-                    const indexOriginal = listaVideos.findIndex(v => v.youtubeld === listaExibida[state.kbPlaylistIndex].youtubeld);
+                    const videoAlvo = listaExibida[state.kbPlaylistIndex];
+                    const indexOriginal = listaVideos.findIndex(v => (v.youtubeId || v.youtubeld) === (videoAlvo.youtubeId || videoAlvo.youtubeld));
                     tocarVideo(indexOriginal);
                 }
             }
