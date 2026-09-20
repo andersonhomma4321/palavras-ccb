@@ -58,8 +58,8 @@ export function tocarVideo(index) {
     state.currentVideoIndex = index;
     const video = listaVideos[index];
 
-    // Redireciona a página atual diretamente para o vídeo do YouTube em tela cheia/reprodução
-    const urlYoutube = `https://www.youtube.com/watch?v=${video.youtubeld}&autoplay=1`;
+    // Usa o link de incorporação direta do YouTube, que reproduz perfeitamente vídeos não listados em tela cheia
+    const urlYoutube = `https://www.youtube.com/embed/${video.youtubeld}?autoplay=1`;
     window.location.href = urlYoutube;
 }
 
