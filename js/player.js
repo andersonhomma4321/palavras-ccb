@@ -2,7 +2,7 @@
    GESTOR DO PLAYER E DA LISTA DE VÍDEOS
    ========================================== */
 
-import { state } from './state.js';
+import { state } from '../js/state.js';
 import { listaVideos } from '../data/videos.js';
 
 let player = null;
