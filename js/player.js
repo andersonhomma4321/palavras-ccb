@@ -3,7 +3,7 @@
    ========================================== */
 
 import { state } from './state.js';
-import { listaVideos } from './videos.js';
+import { listaVideos } from '../data/videos.js';
 
 let player = null;
 let modoAleatorioContinuoAtivo = false;
