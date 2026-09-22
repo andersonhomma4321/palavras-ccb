@@ -2,16 +2,20 @@ import { listaVideos } from "../data/videos.js";
 import { state } from "./state.js";
 
 export function carregarPlaylist() {
-    renderizarLista(listaVideos);
-    if (listaVideos.length > 0) {
-        if (state.currentVideoIndex < 0) state.currentVideoIndex = 0;
-    }
-    // Força o foco a ir para a grelha para as setas funcionarem de imediato
-    const playlistElement = document.getElementById("playlist");
-    if (playlistElement) {
-        playlistElement.setAttribute("tabindex", "0");
-        playlistElement.focus();
-    }
+ renderizarLista(listaVideos);
+ if (listaVideos.length > 0) {
+  if (state.currentVideoIndex < 0) state.currentVideoIndex = 0;
+  // Garante que o índice de navegação por teclado começa no primeiro vídeo válido
+  state.kbPlaylistIndex = 0;
+  focarCartaoVideo(state.kbPlaylistIndex);
+ }
+ 
+ // Força o foco a ir para a grelha para as setas funcionarem de imediato
+ const playlistElement = document.getElementById("playlist");
+ if (playlistElement) {
+  playlistElement.setAttribute("tabindex", "0");
+  playlistElement.focus();
+ }
 }
 
 // Função para remover acentos e padronizar termos de busca
