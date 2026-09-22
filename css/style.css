@@ -82,7 +82,7 @@ body {
   display: block;
 }
 
-.search-container {
+.search-container, .tv-search-container {
   width: 100%;
 }
 
@@ -105,7 +105,7 @@ body {
 /* ==========================================
    GRELHA DE VÍDEOS (PLAYLIST)
    ========================================== */
-.playlist-grid {
+.playlist-grid, .tv-grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1.2rem;
