@@ -80,12 +80,36 @@ export function tocarVideo(index) {
   const video = listaVideos[index];
   const videoId = video.youtubeId || video.youtubeld;
   
+  // Procura se existe um iframe de player na página, ou cria um se não existir
   let iframePlayer = document.getElementById("youtube-player");
-  if (iframePlayer) {
-    iframePlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
+  
+  if (!iframePlayer) {
+    // Se não existir um player no HTML, vamos criá-lo dinamicamente dentro do container principal
+    const mainContent = document.querySelector(".tv-main-content");
+    if (mainContent) {
+      const playerWrapper = document.createElement("div");
+      playerWrapper.id = "active-player-wrapper";
+      playerWrapper.style.cssText = "position: relative; width: 100%; padding-bottom: 56.25%; background: #000; margin-bottom: 1.5rem; border-radius: 8px; overflow: hidden;";
+      playerWrapper.innerHTML = `
+        <iframe id="youtube-player" src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen>
+        </iframe>
+      `;
+      // Insere o player no topo da secção de conteúdo
+      mainContent.prepend(playerWrapper);
+    }
   } else {
-    console.log("A reproduzir vídeo:", video.title);
+    // Se já existir, apenas atualiza o link com o autoplay ativo
+    iframePlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
+    // Garante que o container visível do player está no topo e visível
+    const wrapper = iframePlayer.closest("#active-player-wrapper") || iframePlayer.parentElement;
+    if (wrapper) wrapper.style.display = "block";
   }
+
+  // Faz scroll suave para o topo para ver o vídeo a reproduzir
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Função para iniciar o modo de vídeos aleatórios contínuos
