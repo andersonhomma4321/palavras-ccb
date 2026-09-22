@@ -26,11 +26,14 @@ import {
 
 document.addEventListener("DOMContentLoaded", () => {
   /* ==========================================
-     LOGIN
+     LOGIN (Corrigido e Direto)
      ========================================== */
   const loginForm = document.getElementById("login-form");
   if (loginForm) {
-    loginForm.addEventListener("submit", autenticar);
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault(); // Impede a página de recarregar em branco
+      autenticar(e);      // Executa a função de validação de senha
+    });
   }
 
   /* ==========================================
