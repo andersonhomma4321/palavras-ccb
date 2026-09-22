@@ -65,11 +65,12 @@ export function inicializarTeclado() {
             const searchBox = document.getElementById("search-input");
             const termoBruto = searchBox ? searchBox.value : "";
             const termos = termoBruto ? termoBruto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/\s+/) : [];
+            
             const listaExibida = termos.length > 0
                 ? listaVideos.filter(video => {
                     const tit = video.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
                     return termos.every(t => tit.includes(t));
-                  })
+                })
                 : listaVideos;
 
             // Quantidade de colunas na grelha
@@ -77,7 +78,8 @@ export function inicializarTeclado() {
             let colunas = 4;
             if (gridContainer) {
                 const computedStyle = window.getComputedStyle(gridContainer);
-                colunas = computedStyle.getPropertyValue("grid-template-columns").split(" ").length || 4;
+                const colTemplate = computedStyle.getPropertyValue("grid-template-columns");
+                colunas = colTemplate ? colTemplate.split(" ").length : 4;
             }
 
             // Se o foco estiver no campo de pesquisa e carregar para baixo, vai para os cartões
