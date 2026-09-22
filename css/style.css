@@ -134,48 +134,46 @@ body {
    MENU PRINCIPAL E ADMIN
    ========================================== */
 .menu-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .btn-menu {
-    width: 100%;
-    padding: 1rem;
-    background: var(--ccb-blue);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+  width: 100%;
+  padding: 1rem;
+  /* Todos os botões do menu principal seguem o mesmo estilo do botão da Bíblia/Configuração */
+  background: var(--ccb-gold) !important;
+  color: var(--ccb-dark-blue) !important;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 .btn-menu:hover,
 .btn-menu:focus,
 .btn-menu.kb-focus {
-    background: var(--ccb-gold) !important;
-    color: var(--ccb-dark-blue) !important;
-    transform: translateY(-2px);
-    outline: 2px solid var(--ccb-dark-blue);
-}
-
-.menu-config {
-    background: var(--ccb-gold) !important;
-    color: var(--ccb-dark-blue) !important;
+  background: var(--ccb-blue) !important;
+  color: var(--ccb-white) !important;
+  transform: translateY(-2px);
+  outline: 2px solid var(--ccb-dark-blue);
 }
 
 .admin-password-button {
-    background: #2b4c7e !important;
+  background: #2b4c7e !important;
+  color: #fff !important;
 }
 
 .admin-back-button {
-    background: #888 !important;
+  background: #888 !important;
+  color: #fff !important;
 }
 
 /* ==========================================
