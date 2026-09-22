@@ -72,7 +72,7 @@ export function focarCartaoVideo(index) {
   });
 }
 
-// Reproduz o vídeo em modo de ecrã inteiro (Overlay dedicado)
+// Reproduz o vídeo em modo de ecrã inteiro (Overlay dedicado) com alta qualidade forçada
 export function tocarVideo(index) {
   if (!listaVideos || listaVideos.length === 0) return;
   state.currentVideoIndex = index;
@@ -129,15 +129,15 @@ export function tocarVideo(index) {
     });
   }
 
-  // Atualiza o link do iframe com o ID correto e autoplay ativo
+  // Parâmetros para incentivar o player a carregar em alta definição (HD)
   const iframe = document.getElementById("youtube-fullscreen-iframe");
   if (iframe) {
-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&vq=hd1080&hd=1`;
   }
 
   playerOverlay.style.display = "flex";
 
-  // Tenta ativar o Fullscreen nativo do navegador para uma experiência imersiva total
+  // Ativa o Fullscreen nativo do navegador para maximizar os píxeis
   if (playerOverlay.requestFullscreen) {
     playerOverlay.requestFullscreen().catch(err => console.log("Fullscreen nativo recusado:", err));
   }
@@ -149,7 +149,7 @@ export function fecharPlayerFullscreen() {
   if (playerOverlay) {
     playerOverlay.style.display = "none";
     const iframe = document.getElementById("youtube-fullscreen-iframe");
-    if (iframe) iframe.src = ""; // Para o áudio do vídeo do YouTube
+    if (iframe) iframe.src = ""; // Para a reprodução do vídeo
   }
   
   if (document.fullscreenElement && document.exitFullscreen) {
