@@ -122,7 +122,9 @@ export function inicializarTeclado() {
   });
 }
 
-// Funções auxiliares de foco esperadas pelo app.js
+// Exporta com ambos os nomes para evitar erros de incompatibilidade no app.js
+export const initKeyboard = inicializarTeclado;
+
 export function focarMenuPrincipal() {
   const menuOverlay = document.getElementById("menu-overlay");
   if (menuOverlay) {
