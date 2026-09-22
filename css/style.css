@@ -303,9 +303,9 @@ button.btn-close:focus {
    ========================================== */
 #app-container {
   display: none;
-  width: 96vw;
+  width: 98vw;
   max-width: 1700px;
-  height: 92vh;
+  height: 95vh;
   background: var(--ccb-dark-blue);
   border-radius: 10px;
   border: 2px solid var(--ccb-gold);
@@ -315,25 +315,29 @@ button.btn-close:focus {
   flex-direction: column;
 }
 
-/* Cabeçalho Responsivo para Celular e Telas Maiores */
+/* Cabeçalho Responsivo Otimizado (Visível em Celular e Desktop) */
 .tv-header {
   background: var(--ccb-blue);
   color: var(--ccb-white);
-  padding: 1rem;
+  padding: 10px 15px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
   border-bottom: 3px solid var(--ccb-gold);
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .tv-header h1 {
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   color: var(--ccb-gold);
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   font-weight: 600;
   order: 2;
+  margin: 0;
 }
 
 /* Botão Menu sem faixinha (Estilo Original) */
@@ -341,13 +345,16 @@ button.btn-close:focus {
   background: transparent;
   border: 1px solid var(--ccb-gold);
   color: var(--ccb-gold);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: bold;
   cursor: pointer;
-  padding: 6px 10px;
+  padding: 5px 10px;
   border-radius: 4px;
-  transition: all 0.2s;
   order: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
 }
 
 .btn-back-menu:hover {
@@ -358,17 +365,17 @@ button.btn-close:focus {
 .tv-search-container {
   width: 100%;
   order: 3;
-  margin-top: 5px;
+  margin-top: 2px;
 }
 
 .tv-search-container input {
   width: 100%;
-  padding: 0.6rem 1rem;
+  padding: 0.5rem 0.8rem;
   border-radius: 6px;
   border: 2px solid var(--ccb-gold);
   background: #fff;
   color: var(--ccb-dark-blue);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   outline: none;
   transition: all 0.2s;
 }
@@ -379,7 +386,7 @@ button.btn-close:focus {
 
 .tv-main-content {
   flex: 1;
-  padding: 1.5rem 2rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -468,7 +475,7 @@ button.btn-close:focus {
   overflow: hidden;
 }
 
-/* MEDIA QUERY PARA TELAS MAIORES (COMPUTADORES / TVS) */
+/* MEDIA QUERY PARA COMPUTADORES / TELAS MAIORES */
 @media (min-width: 768px) {
   .tv-header {
     flex-wrap: nowrap;
@@ -494,5 +501,9 @@ button.btn-close:focus {
 
   .tv-search-container input {
     width: 320px;
+  }
+
+  .tv-main-content {
+    padding: 1.5rem 2rem;
   }
 }
