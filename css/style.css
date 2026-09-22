@@ -131,7 +131,7 @@ body {
 }
 
 /* ==========================================
-    MENU PRINCIPAL E ADMIN
+   MENU PRINCIPAL E ADMIN
    ========================================== */
 .menu-grid {
   display: flex;
@@ -142,11 +142,12 @@ body {
 .btn-menu {
   width: 100%;
   padding: 1rem;
-  /* Fundo azul padrão com uma faixa bege grossa à esquerda (borda) */
+  /* Fundo azul padrão */
   background: var(--ccb-blue) !important;
   color: var(--ccb-white) !important;
   border: none;
-  border-left: 8px solid var(--ccb-gold) !important; /* Faixinha bege inicial */
+  /* Faixinha bege acima/no topo do botão (borda superior grossa) */
+  border-top: 6px solid var(--ccb-gold) !important;
   border-radius: 6px;
   font-size: 1.1rem;
   font-weight: bold;
@@ -156,16 +157,15 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  text-align: left;
 }
 
 .btn-menu:hover,
 .btn-menu:focus,
 .btn-menu.kb-focus {
-  /* Ao passar o mouse: Botão fica bege e a faixinha lateral vira azul */
+  /* Ao passar o mouse: o botão fica bege e a faixinha superior vira azul */
   background: var(--ccb-gold) !important;
   color: var(--ccb-dark-blue) !important;
-  border-left: 8px solid var(--ccb-blue) !important; /* Faixinha muda para azul */
+  border-top: 6px solid var(--ccb-blue) !important;
   transform: translateY(-2px);
   outline: 2px solid var(--ccb-dark-blue);
 }
@@ -173,13 +173,13 @@ body {
 .admin-password-button {
   background: #2b4c7e !important;
   color: #fff !important;
-  border-left: 8px solid var(--ccb-gold) !important;
+  border-top: 6px solid var(--ccb-gold) !important;
 }
 
 .admin-back-button {
   background: #888 !important;
   color: #fff !important;
-  border-left: 8px solid #555 !important;
+  border-top: 6px solid #555 !important;
 }
 
 /* ==========================================
