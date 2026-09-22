@@ -142,12 +142,11 @@ body {
 .btn-menu {
   width: 100%;
   padding: 1rem;
-  /* Fundo azul padrão */
+  /* Fundo azul padrão e faixinha superior bege fixa */
   background: var(--ccb-blue) !important;
   color: var(--ccb-white) !important;
   border: none;
-  /* Faixinha bege acima/no topo do botão (borda superior grossa) */
-  border-top: 6px solid var(--ccb-gold) !important;
+  border-top: 6px solid var(--ccb-gold) !important; /* Faixinha bege no topo */
   border-radius: 6px;
   font-size: 1.1rem;
   font-weight: bold;
@@ -162,10 +161,10 @@ body {
 .btn-menu:hover,
 .btn-menu:focus,
 .btn-menu.kb-focus {
-  /* Ao passar o mouse: o botão fica bege e a faixinha superior vira azul */
+  /* Ao passar o mouse: o corpo do botão fica bege, mas a faixinha do topo continua bege (sem virar azul) */
   background: var(--ccb-gold) !important;
   color: var(--ccb-dark-blue) !important;
-  border-top: 6px solid var(--ccb-blue) !important;
+  border-top: 6px solid var(--ccb-gold) !important; /* Mantém a faixinha bege */
   transform: translateY(-2px);
   outline: 2px solid var(--ccb-dark-blue);
 }
@@ -179,7 +178,7 @@ body {
 .admin-back-button {
   background: #888 !important;
   color: #fff !important;
-  border-top: 6px solid #555 !important;
+  border-top: 6px solid var(--ccb-gold) !important;
 }
 
 /* ==========================================
