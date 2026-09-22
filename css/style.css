@@ -103,20 +103,8 @@ body {
 }
 
 /* ==========================================
-   ESTILO GERAL PARA TODOS OS BOTÕES (FAIXINHA BEGE NO TOPO)
+   BOTÕES DE AÇÃO E FORMULÁRIOS (FAIXINHA BEGE NO TOPO)
    ========================================== */
-button,
-.btn-menu,
-.btn-action,
-.btn-random-tv,
-.btn-back-menu,
-.btn-delete-item,
-.save-password-button,
-.gray-button {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
 .login-card button[type="submit"],
 .admin-card button[type="submit"],
 .admin-card button.btn-action,
@@ -134,6 +122,8 @@ button,
   border-radius: 4px;
   font-size: 1rem;
   font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
   margin-top: 0.25rem;
 }
 
@@ -169,6 +159,8 @@ button,
   border-radius: 6px;
   font-size: 1.1rem;
   font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -196,7 +188,6 @@ button.btn-close {
   height: 30px;
   background: transparent;
   border: none;
-  border-top: none;
   font-size: 1.5rem;
   font-weight: bold;
   color: #888;
@@ -265,13 +256,13 @@ button.btn-close:focus {
   border-top: 3px solid var(--ccb-gold) !important;
   border-radius: 3px;
   padding: 4px 8px;
+  cursor: pointer;
   font-size: 0.75rem;
   font-weight: bold;
 }
 
 .btn-delete-item:hover {
   background: #c9302c !important;
-  border-top: 3px solid var(--ccb-gold) !important;
 }
 
 .token-area {
@@ -341,21 +332,22 @@ button.btn-close:focus {
   font-weight: 600;
 }
 
+/* Botão Menu sem faixinha (Estilo Original) */
 .btn-back-menu {
-  background: var(--ccb-blue) !important;
-  border: none !important;
-  border-top: 4px solid var(--ccb-gold) !important;
-  color: var(--ccb-white) !important;
+  background: transparent;
+  border: 1px solid var(--ccb-gold);
+  color: var(--ccb-gold);
   font-size: 0.9rem;
   font-weight: bold;
+  cursor: pointer;
   padding: 6px 12px;
   border-radius: 4px;
+  transition: all 0.2s;
 }
 
 .btn-back-menu:hover {
-  background: var(--ccb-gold) !important;
-  color: var(--ccb-dark-blue) !important;
-  border-top: 4px solid var(--ccb-gold) !important;
+  background: var(--ccb-gold);
+  color: var(--ccb-dark-blue);
 }
 
 .tv-search-container input {
@@ -386,25 +378,26 @@ button.btn-close:focus {
   margin-bottom: 1.5rem;
 }
 
+/* Botão Vídeos Aleatórios com Estilo Original (Gradiente) */
 .btn-random-tv {
   width: 100%;
   padding: 1rem;
-  background: var(--ccb-blue) !important;
-  color: var(--ccb-white) !important;
+  background: linear-gradient(135deg, var(--ccb-gold), #b38f45);
+  color: var(--ccb-dark-blue);
   font-size: 1.1rem;
   font-weight: bold;
   border: none;
-  border-top: 6px solid var(--ccb-gold) !important;
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
+  transition: transform 0.2s, background 0.2s;
 }
 
 .btn-random-tv:hover,
 .btn-random-tv.kb-focus {
   transform: scale(1.01);
-  background: var(--ccb-gold) !important;
-  color: var(--ccb-dark-blue) !important;
-  border-top: 6px solid var(--ccb-gold) !important;
+  background: #fff;
+  color: var(--ccb-blue);
   outline: 3px solid var(--ccb-gold);
 }
 
@@ -463,3 +456,4 @@ button.btn-close:focus {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+```[cite: 1]
