@@ -315,21 +315,25 @@ button.btn-close:focus {
   flex-direction: column;
 }
 
+/* Cabeçalho Responsivo para Celular e Telas Maiores */
 .tv-header {
   background: var(--ccb-blue);
   color: var(--ccb-white);
-  padding: 1rem 2rem;
+  padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
   border-bottom: 3px solid var(--ccb-gold);
 }
 
 .tv-header h1 {
-  font-size: 1.6rem;
+  font-size: 1.3rem;
   color: var(--ccb-gold);
   letter-spacing: 1px;
   font-weight: 600;
+  order: 2;
 }
 
 /* Botão Menu sem faixinha (Estilo Original) */
@@ -337,12 +341,13 @@ button.btn-close:focus {
   background: transparent;
   border: 1px solid var(--ccb-gold);
   color: var(--ccb-gold);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: bold;
   cursor: pointer;
-  padding: 6px 12px;
+  padding: 6px 10px;
   border-radius: 4px;
   transition: all 0.2s;
+  order: 1;
 }
 
 .btn-back-menu:hover {
@@ -350,8 +355,14 @@ button.btn-close:focus {
   color: var(--ccb-dark-blue);
 }
 
+.tv-search-container {
+  width: 100%;
+  order: 3;
+  margin-top: 5px;
+}
+
 .tv-search-container input {
-  width: 320px;
+  width: 100%;
   padding: 0.6rem 1rem;
   border-radius: 6px;
   border: 2px solid var(--ccb-gold);
@@ -456,4 +467,32 @@ button.btn-close:focus {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
-```[cite: 1]
+
+/* MEDIA QUERY PARA TELAS MAIORES (COMPUTADORES / TVS) */
+@media (min-width: 768px) {
+  .tv-header {
+    flex-wrap: nowrap;
+    padding: 1rem 2rem;
+  }
+  
+  .tv-header h1 {
+    font-size: 1.6rem;
+    order: unset;
+  }
+  
+  .btn-back-menu {
+    order: unset;
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+
+  .tv-search-container {
+    width: auto;
+    order: unset;
+    margin-top: 0;
+  }
+
+  .tv-search-container input {
+    width: 320px;
+  }
+}
