@@ -1,220 +1,206 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>CCB</title>
-<link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>CCB</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-<!-- ==========================================
-TELA DE LOGIN
-========================================== -->
-<div id="login-overlay">
-  <div class="login-card">
-    <h2>CCB</h2>
-    <p>Acesso Restrito</p>
-    <form id="login-form">
-      <input 
-        type="password" 
-        id="password-input" 
-        placeholder="Digite a senha de acesso" 
-        required 
-        autocomplete="current-password" 
-        autofocus 
-      >
-      <button type="submit" id="btn-login-submit">
-        Entrar
-      </button>
-    </form>
-    <p id="login-error" class="error-message">
-      Senha incorreta!
-    </p>
-  </div>
-</div>
-
-<!-- ==========================================
-MENU PRINCIPAL
-========================================== -->
-<div id="menu-overlay">
-  <div class="menu-card">
-    <h2>Menu Principal</h2>
-    <p>Selecione a opção desejada</p>
-    <div class="menu-grid" id="main-menu-grid"> 
-      <button class="btn-menu" id="btn-menu-palavras" type="button">
-        Palavras
-      </button>
-      <button class="btn-menu" id="btn-menu-biblia" type="button">
-        Bíblia
-      </button>
-      <button class="btn-menu" id="btn-menu-hinos" type="button">
-        Hinos
-      </button> 
-      <button class="btn-menu" id="btn-menu-configuracao" type="button">
-        Configuração
-      </button>
+    <!-- ==========================================
+         TELA DE LOGIN
+         ========================================== -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>CCB</h2>
+            <p>Acesso Restrito</p>
+            <form id="login-form">
+                <input 
+                    type="password" 
+                    id="password-input" 
+                    placeholder="Digite a senha de acesso" 
+                    required 
+                    autocomplete="current-password" 
+                    autofocus
+                >
+                <button type="submit" id="btn-login-submit">
+                    Entrar
+                </button>
+            </form>
+            <p id="login-error" class="error-message">
+                Senha incorreta!
+            </p>
+        </div>
     </div>
-  </div>
-</div>
 
-<!-- ==========================================
-AUTENTICAÇÃO DO ADMINISTRADOR
-========================================== -->
-<div id="admin-auth-overlay" class="modal-overlay">
-  <div class="admin-card">
-    <button class="btn-close" id="btn-close-admin-auth" type="button">&times;</button>
-    <h2>Autenticação do Administrador</h2>
-    <p>Digite a senha para gerenciar o sistema</p>
-    <form id="admin-auth-form">
-      <input 
-        type="password" 
-        id="admin-password-input" 
-        placeholder="Digite a senha mestra" 
-        required
-      >
-      <button type="submit">Acessar</button>
-    </form>
-    <p id="admin-auth-error" class="error-message">
-      Senha incorreta!
-    </p>
-  </div>
-</div>
+    <!-- ==========================================
+     MENU PRINCIPAL
+     ========================================== -->
+    <div id="menu-overlay">
+    <div class="menu-card">
+        <h2>Menu Principal</h2>
+        <p>Selecione a opção desejada</p>
+        <div class="menu-grid" id="main-menu-grid"> 
+        <button class="btn-menu" id="btn-menu-palavras" type="button">
+            Palavras
+        </button>
+        <button class="btn-menu" id="btn-menu-biblia" type="button">
+            Bíblia
+        </button>
+        <button class="btn-menu" id="btn-menu-hinos" type="button">
+            Hinos
+        </button>
+        <button class="btn-menu" id="btn-menu-configuracao" type="button">
+            Configuração
+        </button>
+        </div>
+    </div>
+    </div>
 
-<!-- ==========================================
-MENU DO ADMINISTRADOR
-========================================== -->
-<div id="admin-menu-overlay" class="modal-overlay">
-  <div class="admin-card">
-    <button class="btn-close" id="btn-close-admin-menu" type="button">&times;</button>
-    <h2>Painel de Gerenciamento</h2>
-    <p>Escolha o que deseja configurar</p>
-    <div class="menu-grid" id="admin-menu-grid">
-      <button class="btn-menu" id="btn-gerenciar-videos" type="button">
-        Gerenciar Vídeos
-      </button>
-      <button class="btn-menu admin-password-button" id="btn-alterar-senhas" type="button">
-        Alterar Senhas
-      </button>
-      <button class="btn-menu admin-back-button" id="btn-admin-voltar" type="button">
-        Voltar ao Menu Principal
-      </button>
+    <!-- ==========================================
+         AUTENTICAÇÃO DO ADMINISTRADOR
+         ========================================== -->
+    <div id="admin-auth-overlay" class="modal-overlay">
+        <div class="admin-card">
+            <button class="btn-close" id="btn-close-admin-auth" type="button">&times;</button>
+            <h2>Autenticação do Administrador</h2>
+            <p>Digite a senha para gerenciar o sistema</p>
+            <form id="admin-auth-form">
+                <input 
+                    type="password" 
+                    id="admin-password-input" 
+                    placeholder="Digite a senha mestra" 
+                    required
+                >
+                <button type="submit">Acessar</button>
+            </form>
+            <p id="admin-auth-error" class="error-message">
+                Senha incorreta!
+            </p>
+        </div>
     </div>
-  </div>
-</div>
 
-<!-- ==========================================
-GERENCIAMENTO DE VÍDEOS
-========================================== -->
-<div id="admin-form-overlay" class="modal-overlay">
-  <div class="admin-card">
-    <button class="btn-close" id="btn-close-video-manager" type="button">&times;</button>
-    <h2>Gerenciar Vídeos</h2>
-    <p>Adicione ou remova vídeos do repositório</p>
-    <div class="token-area">
-      <label>Token do GitHub (PAT):</label>
-      <input 
-        type="password" 
-        id="gh-token-videos" 
-        placeholder="Digite apenas o seu token aqui"
-      >
+    <!-- ==========================================
+         MENU DO ADMINISTRADOR
+         ========================================== -->
+    <div id="admin-menu-overlay" class="modal-overlay">
+        <div class="admin-card">
+            <button class="btn-close" id="btn-close-admin-menu" type="button">&times;</button>
+            <h2>Painel de Gerenciamento</h2>
+            <p>Escolha o que deseja configurar</p>
+            <div class="menu-grid" id="admin-menu-grid">
+                <button class="btn-menu" id="btn-gerenciar-videos" type="button">
+                    Gerenciar Vídeos
+                </button>
+                <button class="btn-menu admin-password-button" id="btn-alterar-senhas" type="button">
+                    Alterar Senhas
+                </button>
+                <button class="btn-menu admin-back-button" id="btn-admin-voltar" type="button">
+                    Voltar ao Menu Principal
+                </button>
+            </div>
+        </div>
     </div>
-    <div class="admin-manage-section">
-      <h3>Adicionar Novo Vídeo</h3>
-      <input 
-        type="text" 
-        id="new-video-title" 
-        placeholder="Título do Vídeo Novo"
-      >
-      <input 
-        type="text" 
-        id="new-video-url" 
-        placeholder="ID ou URL do YouTube"
-      > 
-      <button id="btn-save-gh" class="btn-action" type="button">
-        Salvar Novo Vídeo
-      </button>
-    </div>
-    <div class="admin-manage-section">
-      <h3>Vídeos Cadastrados (Excluir)</h3>
-      <ul id="admin-video-list" class="admin-video-list"></ul>
-    </div>
-    <p id="admin-msg" class="admin-message"></p>
-    <button type="button" id="btn-video-manager-back" class="btn-action gray-button">
-      Voltar ao Painel
-    </button>
-  </div>
-</div>
 
-<!-- ==========================================
-ALTERAÇÃO DE SENHAS
-========================================== -->
-<div id="admin-passwords-overlay" class="modal-overlay">
-  <div class="admin-card">
-    <button class="btn-close" id="btn-close-passwords" type="button">&times;</button>
-    <h2>Alterar Senhas</h2>
-    <p>Altere as senhas de acesso do sistema</p>
-    <div class="token-area">
-      <label>Token do GitHub (PAT):</label>
-      <input type="password" id="gh-token-pass" placeholder="Digite apenas o seu token aqui">
-      
-      <label>Nova Senha de Usuário (Acesso Geral):</label>
-      <input type="password" id="new-user-pass" placeholder="Deixe em branco se não desejar alterar">
-      
-      <label>Nova Senha de Administrador:</label>
-      <input type="password" id="new-admin-pass" placeholder="Deixe em branco se não desejar alterar">
+    <!-- ==========================================
+         GERENCIAMENTO DE VÍDEOS
+         ========================================== -->
+    <div id="admin-form-overlay" class="modal-overlay">
+        <div class="admin-card">
+            <button class="btn-close" id="btn-close-video-manager" type="button">&times;</button>
+            <h2>Gerenciar Vídeos</h2>
+            <p>Adicione ou remova vídeos do repositório</p>
+            <div class="token-area">
+                <label>Token do GitHub (PAT):</label>
+                <input 
+                    type="password" 
+                    id="gh-token-videos" 
+                    placeholder="Digite apenas o seu token aqui"
+                >
+            </div>
+            <div class="admin-manage-section">
+                <h3>Adicionar Novo Vídeo</h3>
+                <input 
+                    type="text" 
+                    id="new-video-title" 
+                    placeholder="Título do Vídeo Novo"
+                >
+                <input 
+                    type="text" 
+                    id="new-video-url" 
+                    placeholder="ID ou URL do YouTube"
+                >
+                <button id="btn-save-gh" class="btn-action" type="button">
+                    Salvar Novo Vídeo
+                </button>
+            </div>
+            <div class="admin-manage-section">
+                <h3>Vídeos Cadastrados (Excluir)</h3>
+                <ul id="admin-video-list" class="admin-video-list"></ul>
+            </div>
+            <p id="admin-msg" class="admin-message"></p>
+            <button type="button" id="btn-video-manager-back" class="btn-action gray-button">
+                Voltar ao Painel
+            </button>
+        </div>
     </div>
-    <button id="btn-save-pass" type="button" class="btn-action save-password-button">
-      Salvar Novas Senhas
-    </button>
-    <button type="button" id="btn-password-back" class="btn-action gray-button">
-      Voltar ao Painel
-    </button>
-    <p id="pass-msg" class="admin-message"></p>
-  </div>
-</div>
 
-<!-- ========================================== 
-PLACEHOLDER
-========================================== -->
-<div id="placeholder-overlay" class="modal-overlay">
-  <div class="admin-card">
-    <button class="btn-close" id="btn-close-placeholder" type="button">&times;</button>
-    <h2 id="placeholder-title">Recurso</h2>
-    <p id="placeholder-desc" class="placeholder-description">
-      Esta seção estará disponível em breve.
-    </p>
-    <button type="button" id="btn-placeholder-back" class="btn-action">
-      Voltar ao Menu Principal
-    </button>
-  </div>
-</div>
+    <!-- ==========================================
+         ALTERAÇÃO DE SENHAS
+         ========================================== -->
+    <div id="admin-passwords-overlay" class="modal-overlay">
+        <div class="admin-card">
+            <button class="btn-close" id="btn-close-passwords" type="button">&times;</button>
+            <h2>Alterar Senhas</h2>
+            <p>Altere as senhas de acesso do sistema</p>
+            <div class="token-area">
+                <label>Token do GitHub (PAT):</label>
+                <input 
+                    type="password" 
+                    id="gh-token-pass" 
+                    placeholder="Digite apenas o seu token aqui"
+                >
+                <label>Nova Senha de Usuário (Acesso Geral):</label>
+                <input 
+                    type="password" 
+                    id="new-user-pass" 
+                    placeholder="Deixe em branco se não desejar alterar"
+                >
+                <label>Nova Senha de Administrador:</label>
+                <input 
+                    type="password" 
+                    id="new-admin-pass" 
+                    placeholder="Deixe em branco se não desejar alterar"
+                >
+            </div>
+            <button id="btn-save-pass" type="button" class="btn-action save-password-button">
+                Salvar Novas Senhas
+            </button>
+            <button type="button" id="btn-password-back" class="btn-action gray-button">
+                Voltar ao Painel
+            </button>
+            <p id="pass-msg" class="admin-message"></p>
+        </div>
+    </div>
 
-<!-- ==========================================
-APLICAÇÃO DE VÍDEOS (ESTILO YOUTUBE TV)
-========================================== -->
-<div id="app-container">
-  <header class="tv-header">
-    <button class="btn-back-menu" id="btn-app-back" type="button" title="Voltar ao Menu">
-      ← Menu
-    </button>
-    <h1>Palavras CCB</h1>
-    <div class="tv-search-container">
-      <input type="text" id="search-input" placeholder=" Buscar vídeo (digite qualquer palavra)...">
+    <!-- ==========================================
+         PLACEHOLDER
+         ========================================== -->
+    <div id="placeholder-overlay" class="modal-overlay">
+        <div class="admin-card">
+            <button class="btn-close" id="btn-close-placeholder" type="button">&times;</button>
+            <h2 id="placeholder-title">Recurso</h2>
+            <p id="placeholder-desc" class="placeholder-description">
+                Esta seção estará disponível em breve.
+            </p>
+            <button type="button" id="btn-placeholder-back" class="btn-action">
+                Voltar ao Menu Principal
+            </button>
+        </div>
     </div>
-  </header>
-  
-  <div class="tv-main-content">
-    <!-- BOTÃO VÍDEOS ALEATÓRIOS -->
-    <div class="tv-random-section">
-      <button id="btn-random-videos" class="btn-random-tv" type="button">
-        ▶ VÍDEOS ALEATÓRIOS (REPRODUÇÃO CONTÍNUA)
-      </button>
-    </div>
-<<<<<<< HEAD
 
     <!-- ==========================================
          APLICAÇÃO DE VÍDEOS (ESTILO YOUTUBE TV)
@@ -234,7 +220,7 @@ APLICAÇÃO DE VÍDEOS (ESTILO YOUTUBE TV)
             <!-- BOTÃO VÍDEOS ALEATÓRIOS -->
             <div class="tv-random-section">
                 <button id="btn-random-videos" class="btn-random-tv" type="button">
-                    REPRODUÇÃO ALEATÓRIA
+                    🎲 VÍDEOS ALEATÓRIOS (REPRODUÇÃO CONTÍNUA)
                 </button>
             </div>
 
@@ -243,21 +229,11 @@ APLICAÇÃO DE VÍDEOS (ESTILO YOUTUBE TV)
                 <!-- Os cartões dos vídeos serão injetados dinamicamente via JS -->
             </div>
         </div>
-=======
-    <!-- GRADE DE VÍDEOS ESTILO SMART TV -->
-    <div class="tv-grid-container" id="playlist" tabindex="0">
-      <!-- Os cartões dos vídeos serão injetados dinamicamente via JS -->
->>>>>>> f88f1895bb6ae2ef10412422b79f01c7657504d3
     </div>
-  </div>
-</div>
 
-<!-- BOTÃO FLUTUANTE DE CONFIGURAÇÃO (ENGRENAGEM) -->
-<button id="btn-config-settings" class="floating-gear-btn" title="Configurações">⚙️</button>
-
-<!-- ==========================================
-JAVASCRIPT PRINCIPAL
-========================================== -->
-<script type="module" src="js/app.js"></script>
+    <!-- ==========================================
+         JAVASCRIPT PRINCIPAL
+         ========================================== -->
+    <script type="module" src="js/app.js"></script>
 </body>
 </html>
