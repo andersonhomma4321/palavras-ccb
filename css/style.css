@@ -142,9 +142,9 @@ body {
 .btn-menu {
   width: 100%;
   padding: 1rem;
-  /* Todos os botões do menu principal seguem o mesmo estilo do botão da Bíblia/Configuração */
-  background: var(--ccb-gold) !important;
-  color: var(--ccb-dark-blue) !important;
+  /* Padrão: Botões azuis com texto branco */
+  background: var(--ccb-blue) !important;
+  color: var(--ccb-white) !important;
   border: none;
   border-radius: 6px;
   font-size: 1.1rem;
@@ -160,8 +160,9 @@ body {
 .btn-menu:hover,
 .btn-menu:focus,
 .btn-menu.kb-focus {
-  background: var(--ccb-blue) !important;
-  color: var(--ccb-white) !important;
+  /* Ao passar o mouse ou focar: Ficam bege/dourados com texto escuro */
+  background: var(--ccb-gold) !important;
+  color: var(--ccb-dark-blue) !important;
   transform: translateY(-2px);
   outline: 2px solid var(--ccb-dark-blue);
 }
