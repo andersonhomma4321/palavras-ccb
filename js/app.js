@@ -26,69 +26,104 @@ import {
 
 document.addEventListener("DOMContentLoaded", () => {
   /* ==========================================
-     LOGIN (Corrigido e Direto)
+     LOGIN
      ========================================== */
   const loginForm = document.getElementById("login-form");
   if (loginForm) {
     loginForm.addEventListener("submit", (e) => {
-      e.preventDefault(); // Impede a página de recarregar em branco
-      autenticar(e);      // Executa a função de validação de senha
+      e.preventDefault();
+      autenticar(e);
     });
   }
 
   /* ==========================================
      MENU PRINCIPAL
      ========================================== */
-  document.getElementById("btn-menu-palavras").addEventListener("click", () => navegarPara("palavras"));
-  document.getElementById("btn-menu-biblia").addEventListener("click", () => navegarPara("biblia"));
-  document.getElementById("btn-menu-hinos").addEventListener("click", () => navegarPara("hinos"));
-  document.getElementById("btn-menu-configuracao").addEventListener("click", () => navegarPara("configuracao"));
+  const btnPalavras = document.getElementById("btn-menu-palavras");
+  if (btnPalavras) btnPalavras.addEventListener("click", () => navegarPara("palavras"));
+
+  const btnBiblia = document.getElementById("btn-menu-biblia");
+  if (btnBiblia) btnBiblia.addEventListener("click", () => navegarPara("biblia"));
+
+  const btnHinos = document.getElementById("btn-menu-hinos");
+  if (btnHinos) btnHinos.addEventListener("click", () => navegarPara("hinos"));
+
+  const btnConfig = document.getElementById("btn-menu-configuracao");
+  if (btnConfig) btnConfig.addEventListener("click", () => navegarPara("configuracao"));
 
   /* ==========================================
      AUTENTICAÇÃO ADMIN
      ========================================== */
-  document.getElementById("admin-auth-form").addEventListener("submit", verificarSenhaAdmin);
-  document.getElementById("btn-close-admin-auth").addEventListener("click", voltarParaMenu);
+  const adminAuthForm = document.getElementById("admin-auth-form");
+  if (adminAuthForm) {
+    adminAuthForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      verificarSenhaAdmin(e);
+    });
+  }
+
+  const btnCloseAdminAuth = document.getElementById("btn-close-admin-auth");
+  if (btnCloseAdminAuth) btnCloseAdminAuth.addEventListener("click", voltarParaMenu);
 
   /* ==========================================
      MENU ADMIN
      ========================================== */
-  document.getElementById("btn-gerenciar-videos").addEventListener("click", abrirGerenciadorVideos);
-  document.getElementById("btn-alterar-senhas").addEventListener("click", abrirModalSenhas);
-  document.getElementById("btn-admin-voltar").addEventListener("click", voltarParaMenu);
-  document.getElementById("btn-close-admin-menu").addEventListener("click", voltarParaMenu);
+  const btnGerenciarVideos = document.getElementById("btn-gerenciar-videos");
+  if (btnGerenciarVideos) btnGerenciarVideos.addEventListener("click", abrirGerenciadorVideos);
+
+  const btnAlterarSenhas = document.getElementById("btn-alterar-senhas");
+  if (btnAlterarSenhas) btnAlterarSenhas.addEventListener("click", abrirModalSenhas);
+
+  const btnAdminVoltar = document.getElementById("btn-admin-voltar");
+  if (btnAdminVoltar) btnAdminVoltar.addEventListener("click", voltarParaMenu);
+
+  const btnCloseAdminMenu = document.getElementById("btn-close-admin-menu");
+  if (btnCloseAdminMenu) btnCloseAdminMenu.addEventListener("click", voltarParaMenu);
 
   /* ==========================================
      ADMIN - VÍDEOS
      ========================================== */
-  document.getElementById("btn-save-gh").addEventListener("click", adicionarVideoNoGitHub);
-  document.getElementById("btn-video-manager-back").addEventListener("click", voltarParaAdminMenu);
-  document.getElementById("btn-close-video-manager").addEventListener("click", voltarParaAdminMenu);
+  const btnSaveGh = document.getElementById("btn-save-gh");
+  if (btnSaveGh) btnSaveGh.addEventListener("click", adicionarVideoNoGitHub);
+
+  const btnVideoManagerBack = document.getElementById("btn-video-manager-back");
+  if (btnVideoManagerBack) btnVideoManagerBack.addEventListener("click", voltarParaAdminMenu);
+
+  const btnCloseVideoManager = document.getElementById("btn-close-video-manager");
+  if (btnCloseVideoManager) btnCloseVideoManager.addEventListener("click", voltarParaAdminMenu);
 
   /* ==========================================
      ADMIN - SENHAS
      ========================================== */
-  document.getElementById("btn-save-pass").addEventListener("click", atualizarSenhas);
-  document.getElementById("btn-password-back").addEventListener("click", voltarParaAdminMenu);
-  document.getElementById("btn-close-passwords").addEventListener("click", voltarParaAdminMenu);
+  const btnSavePass = document.getElementById("btn-save-pass");
+  if (btnSavePass) btnSavePass.addEventListener("click", atualizarSenhas);
+
+  const btnPasswordBack = document.getElementById("btn-password-back");
+  if (btnPasswordBack) btnPasswordBack.addEventListener("click", voltarParaAdminMenu);
+
+  const btnClosePasswords = document.getElementById("btn-close-passwords");
+  if (btnClosePasswords) btnClosePasswords.addEventListener("click", voltarParaAdminMenu);
 
   /* ==========================================
      PLACEHOLDER
      ========================================== */
-  document.getElementById("btn-placeholder-back").addEventListener("click", voltarParaMenu);
-  document.getElementById("btn-close-placeholder").addEventListener("click", voltarParaMenu);
+  const btnPlaceholderBack = document.getElementById("btn-placeholder-back");
+  if (btnPlaceholderBack) btnPlaceholderBack.addEventListener("click", voltarParaMenu);
+
+  const btnClosePlaceholder = document.getElementById("btn-close-placeholder");
+  if (btnClosePlaceholder) btnClosePlaceholder.addEventListener("click", voltarParaMenu);
 
   /* ==========================================
      PLAYER E SECÇÃO DE VÍDEOS
      ========================================== */
-  document.getElementById("btn-app-back").addEventListener("click", voltarParaMenu);
-  
+  const btnAppBack = document.getElementById("btn-app-back");
+  if (btnAppBack) btnAppBack.addEventListener("click", voltarParaMenu);
+
   const searchInput = document.getElementById("search-input");
   if (searchInput) {
     searchInput.addEventListener("input", filtrarVideos);
   }
 
-  // Inicializa o player e o botão de vídeos aleatórios contínuos
   initPlayer();
 
   const btnRandomVideos = document.getElementById("btn-random-videos");
