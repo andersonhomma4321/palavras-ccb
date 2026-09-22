@@ -1,6 +1,58 @@
-import { listaVideos } from "../data/videos.js";
-import { state } from "./state.js";
+/* ==========================================
+   GESTOR DO PLAYER E DA LISTA DE VÍDEOS
+   ========================================== */
 
+import { state } from './state.js';
+import { listaVideos } from './videos.js';
+
+let player = null;
+let modoAleatorioContinuoAtivo = false;
+
+// Inicializa a API do YouTube se necessário ou gere o player
+export function initPlayer() {
+    // Liga o evento do botão de vídeos aleatórios contínuos
+    const btnRandom = document.querySelector(".btn-random-tv");
+    if (btnRandom) {
+        // Remove eventuais listeners duplicados e adiciona o novo comportamento
+        btnRandom.replaceWith(btnRandom.cloneNode(true));
+        const novoBtnRandom = document.querySelector(".btn-random-tv");
+        novoBtnRandom.addEventListener("click", () => {
+            iniciarVideosAleatoriosContinuos();
+        });
+    }
+}
+
+// Renderiza a grelha de vídeos no HTML
+export function renderizarLista(videos) {
+    const playlistEl = document.getElementById("playlist");
+    if (!playlistEl) return;
+
+    playlistEl.innerHTML = "";
+
+    videos.forEach((video, index) => {
+        const videoId = video.youtubeId || video.youtubeld;
+        const card = document.createElement("div");
+        card.className = "video-card-item";
+        card.setAttribute("tabindex", "-1");
+        card.setAttribute("data-index", index);
+
+        card.innerHTML = `
+            <div class="video-thumbnail-wrapper">
+                <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="${video.title}">
+            </div>
+            <div class="video-card-title">${video.title}</div>
+        `;
+
+        card.addEventListener("click", () => {
+            pararModoAleatorio();
+            tocarVideo(index);
+        });
+
+        playlistEl.appendChild(card);
+    });
+}
+
+// Carrega a playlist e foca o primeiro elemento
 export function carregarPlaylist() {
     renderizarLista(listaVideos);
     if (listaVideos.length > 0) {
@@ -8,7 +60,6 @@ export function carregarPlaylist() {
         state.kbPlaylistIndex = 0;
     }
     
-    // Força o foco a ir para a grelha para as setas funcionarem de imediato
     const playlistElement = document.getElementById("playlist");
     if (playlistElement) {
         playlistElement.setAttribute("tabindex", "0");
@@ -17,87 +68,67 @@ export function carregarPlaylist() {
     }
 }
 
-// Função para remover acentos e padronizar termos de busca
-function normalizarTexto(texto) {
-    return texto
-        ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
-        : "";
-}
-
-export function renderizarLista(lista) {
-    const playlistElement = document.getElementById("playlist");
-    if (!playlistElement) return;
-    playlistElement.innerHTML = "";
-
-    if (lista.length === 0) {
-        playlistElement.innerHTML = `<p style="color: #aaa; grid-column: 1/-1; text-align: center; padding: 2rem;">Nenhum vídeo encontrado.</p>`;
-        return;
-    }
-
-    lista.forEach((vid, idx) => {
-        // Compatibilidade total com youtubeId (maiúsculo) ou youtubeld (minúsculo)
-        const videoId = vid.youtubeId || vid.youtubeld;
-        const indexOriginal = listaVideos.findIndex(v => (v.youtubeId || v.youtubeld) === videoId);
-        
-        const card = document.createElement("div");
-        card.className = "video-card-item";
-        if (idx === state.kbPlaylistIndex) {
+// Foca visualmente um cartão específico na grelha por teclado
+export function focarCartaoVideo(index) {
+    const cards = document.querySelectorAll(".video-card-item");
+    cards.forEach((card, i) => {
+        if (i === index) {
             card.classList.add("kb-focus");
+            card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        } else {
+            card.classList.remove("kb-focus");
         }
-
-        // Miniatura oficial do YouTube em alta resolução
-        const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-
-        card.innerHTML = `
-            <div class="video-thumbnail-wrapper">
-                <img src="${thumbnailUrl}" alt="${vid.title}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${videoId}/default.jpg'">
-            </div>
-            <div class="video-card-title">${vid.title}</div>
-        `;
-
-        card.addEventListener("click", () => {
-            state.kbPlaylistIndex = idx;
-            tocarVideo(indexOriginal);
-        });
-
-        playlistElement.appendChild(card);
     });
 }
 
+// Reproduz um vídeo específico com base no índice original da lista
 export function tocarVideo(index) {
-    if (index < 0 || index >= listaVideos.length) return;
+    if (!listaVideos || listaVideos.length === 0) return;
+    
     state.currentVideoIndex = index;
     const video = listaVideos[index];
     const videoId = video.youtubeId || video.youtubeld;
 
-    // Adiciona parâmetros para reprodução automática e forçar a melhor qualidade disponível
-    const urlYoutube = `https://www.youtube.com/watch?v=${videoId}&autoplay=1&vq=hd1080`;
-    window.open(urlYoutube, "_blank");
+    // Procura o contentor do player ou iframe na tela
+    const containerPlayer = document.getElementById("video-player-container") || document.getElementById("player-modal");
+    
+    // Se houver um elemento iframe dedicado ao player
+    let iframePlayer = document.getElementById("youtube-player");
+    
+    if (iframePlayer) {
+        iframePlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
+    } else {
+        // Caso a aplicação abra um modal/ecrã próprio para o player, gerencie aqui
+        console.log("A reproduzir vídeo:", video.title);
+    }
 }
 
-export function iniciarVideosAleatorios() {
-    if (!listaVideos.length) return;
+// Função para iniciar o modo de vídeos aleatórios contínuos e em tela cheia
+export function iniciarVideosAleatoriosContinuos() {
+    if (!listaVideos || listaVideos.length === 0) return;
+    
+    modoAleatorioContinuoAtivo = true;
+    
+    // Escolhe um índice aleatório e reproduz
     const randomIndex = Math.floor(Math.random() * listaVideos.length);
     tocarVideo(randomIndex);
+    
+    // Tenta colocar o player/ecrã em tela cheia de forma segura
+    const appContainer = document.getElementById("app-container");
+    if (appContainer && appContainer.requestFullscreen) {
+        appContainer.requestFullscreen().catch(err => console.log("Fullscreen negado ou indisponível:", err));
+    }
 }
 
-export function filtrarVideos() {
-    const searchBox = document.getElementById("search-input");
-    const termoBruto = searchBox ? searchBox.value : "";
-    const termos = normalizarTexto(termoBruto).split(/\s+/).filter(Boolean);
-
-    const filtrados = listaVideos.filter(video => {
-        const tituloNorm = normalizarTexto(video.title);
-        return termos.every(termo => tituloNorm.includes(termo));
-    });
-
-    state.kbPlaylistIndex = 0;
-    renderizarLista(filtrados);
+// Interrompe o modo contínuo aleatório (chamado ao voltar ao menu ou fechar)
+export function pararModoAleatorio() {
+    modoAleatorioContinuoAtivo = false;
 }
 
-export function atualizarTextoElemento(id, texto) {
-    const elemento = document.getElementById(id);
-    if (elemento) {
-        elemento.textContent = texto;
+// Deve ser acionado pelo evento de fim de vídeo da API do YouTube (ex: onStateChange com data === 0)
+export function verificarFimDeVideoNoModoContinuo() {
+    if (modoAleatorioContinuoAtivo) {
+        const proximoAleatorio = Math.floor(Math.random() * listaVideos.length);
+        tocarVideo(proximoAleatorio);
     }
 }

@@ -14,7 +14,9 @@ import {
   atualizarSenhas
 } from "./admin.js";
 import {
-  filtrarVideos
+  filtrarVideos,
+  initPlayer,
+  iniciarVideosAleatoriosContinuos
 } from "./player.js";
 import {
   inicializarTeclado,
@@ -22,171 +24,78 @@ import {
   focarAdminMenu
 } from "./keyboard.js";
 
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-    /* ==========================
+document.addEventListener("DOMContentLoaded", () => {
+  /* ==========================================
      LOGIN
-     ========================== */
-    document
-      .getElementById("login-form")
-      .addEventListener(
-        "submit",
-        autenticar
-      );
-
-    /* ==========================
-     MENU PRINCIPAL
-     ========================== */
-    document
-      .getElementById("btn-menu-palavras")
-      .addEventListener(
-        "click",
-        () => navegarPara("palavras")
-      );
-    document
-      .getElementById("btn-menu-biblia")
-      .addEventListener(
-        "click",
-        () => navegarPara("biblia")
-      );
-    document
-      .getElementById("btn-menu-hinos")
-      .addEventListener(
-        "click",
-        () => navegarPara("hinos")
-      );
-    document
-      .getElementById("btn-menu-configuracao")
-      .addEventListener(
-        "click",
-        () => navegarPara("configuracao")
-      );
-
-    /* ==========================
-     AUTENTICAÇÃO ADMIN
-     ========================== */
-    document
-      .getElementById("admin-auth-form")
-      .addEventListener(
-        "submit",
-        verificarSenhaAdmin
-      );
-    document
-      .getElementById("btn-close-admin-auth")
-      .addEventListener(
-        "click",
-        voltarParaMenu
-      );
-
-    /* ==========================
-     MENU ADMIN
-     ========================== */
-    document
-      .getElementById("btn-gerenciar-videos")
-      .addEventListener(
-        "click",
-        abrirGerenciadorVideos
-      );
-    document
-      .getElementById("btn-alterar-senhas")
-      .addEventListener(
-        "click",
-        abrirModalSenhas
-      );
-    document
-      .getElementById("btn-admin-voltar")
-      .addEventListener(
-        "click",
-        voltarParaMenu
-      );
-    document
-      .getElementById("btn-close-admin-menu")
-      .addEventListener(
-        "click",
-        voltarParaMenu
-      );
-
-    /* ==========================
-     ADMIN - VÍDEOS
-     ========================== */
-    document
-      .getElementById("btn-save-gh")
-      .addEventListener(
-        "click",
-        adicionarVideoNoGitHub
-      );
-    document
-      .getElementById("btn-video-manager-back")
-      .addEventListener(
-        "click",
-        voltarParaAdminMenu
-      );
-    document
-      .getElementById("btn-close-video-manager")
-      .addEventListener(
-        "click",
-        voltarParaAdminMenu
-      );
-
-    /* ==========================
-     ADMIN - SENHAS
-     ========================== */
-    document
-      .getElementById("btn-save-pass")
-      .addEventListener(
-        "click",
-        atualizarSenhas
-      );
-    document
-      .getElementById("btn-password-back")
-      .addEventListener(
-        "click",
-        voltarParaAdminMenu
-      );
-    document
-      .getElementById("btn-close-passwords")
-      .addEventListener(
-        "click",
-        voltarParaAdminMenu
-      );
-
-    /* ==========================
-     PLACEHOLDER
-     ========================== */
-    document
-      .getElementById("btn-placeholder-back")
-      .addEventListener(
-        "click",
-        voltarParaMenu
-      );
-    document
-      .getElementById("btn-close-placeholder")
-      .addEventListener(
-        "click",
-        voltarParaMenu
-      );
-
-    /* ==========================
-     PLAYER
-     ========================== */
-    document
-      .getElementById("btn-app-back")
-      .addEventListener(
-        "click",
-        voltarParaMenu
-      );
-    document
-      .getElementById("search-input")
-      .addEventListener(
-        "input",
-        filtrarVideos
-      );
-
-    /* ==========================
-     TECLADO
-     ========================== */
-    inicializarTeclado();
-    focarMenuPrincipal(0);
+     ========================================== */
+  const loginForm = document.getElementById("login-form");
+  if (loginForm) {
+    loginForm.addEventListener("submit", autenticar);
   }
-);
+
+  /* ==========================================
+     MENU PRINCIPAL
+     ========================================== */
+  document.getElementById("btn-menu-palavras").addEventListener("click", () => navegarPara("palavras"));
+  document.getElementById("btn-menu-biblia").addEventListener("click", () => navegarPara("biblia"));
+  document.getElementById("btn-menu-hinos").addEventListener("click", () => navegarPara("hinos"));
+  document.getElementById("btn-menu-configuracao").addEventListener("click", () => navegarPara("configuracao"));
+
+  /* ==========================================
+     AUTENTICAÇÃO ADMIN
+     ========================================== */
+  document.getElementById("admin-auth-form").addEventListener("submit", verificarSenhaAdmin);
+  document.getElementById("btn-close-admin-auth").addEventListener("click", voltarParaMenu);
+
+  /* ==========================================
+     MENU ADMIN
+     ========================================== */
+  document.getElementById("btn-gerenciar-videos").addEventListener("click", abrirGerenciadorVideos);
+  document.getElementById("btn-alterar-senhas").addEventListener("click", abrirModalSenhas);
+  document.getElementById("btn-admin-voltar").addEventListener("click", voltarParaMenu);
+  document.getElementById("btn-close-admin-menu").addEventListener("click", voltarParaMenu);
+
+  /* ==========================================
+     ADMIN - VÍDEOS
+     ========================================== */
+  document.getElementById("btn-save-gh").addEventListener("click", adicionarVideoNoGitHub);
+  document.getElementById("btn-video-manager-back").addEventListener("click", voltarParaAdminMenu);
+  document.getElementById("btn-close-video-manager").addEventListener("click", voltarParaAdminMenu);
+
+  /* ==========================================
+     ADMIN - SENHAS
+     ========================================== */
+  document.getElementById("btn-save-pass").addEventListener("click", atualizarSenhas);
+  document.getElementById("btn-password-back").addEventListener("click", voltarParaAdminMenu);
+  document.getElementById("btn-close-passwords").addEventListener("click", voltarParaAdminMenu);
+
+  /* ==========================================
+     PLACEHOLDER
+     ========================================== */
+  document.getElementById("btn-placeholder-back").addEventListener("click", voltarParaMenu);
+  document.getElementById("btn-close-placeholder").addEventListener("click", voltarParaMenu);
+
+  /* ==========================================
+     PLAYER E SECÇÃO DE VÍDEOS
+     ========================================== */
+  document.getElementById("btn-app-back").addEventListener("click", voltarParaMenu);
+  
+  const searchInput = document.getElementById("search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", filtrarVideos);
+  }
+
+  // Inicializa o player e o botão de vídeos aleatórios contínuos
+  initPlayer();
+
+  const btnRandomVideos = document.getElementById("btn-random-videos");
+  if (btnRandomVideos) {
+    btnRandomVideos.addEventListener("click", iniciarVideosAleatoriosContinuos);
+  }
+
+  /* ==========================================
+     TECLADO E NAVEGAÇÃO GLOBAL
+     ========================================== */
+  inicializarTeclado();
+  focarMenuPrincipal();
+});
