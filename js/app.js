@@ -19,7 +19,7 @@ import {
   iniciarVideosAleatoriosContinuos
 } from "./player.js";
 import {
-  inicializarTeclado,
+  initKeyboard,
   focarMenuPrincipal,
   focarAdminMenu
 } from "./keyboard.js";
@@ -134,6 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ==========================================
      TECLADO E NAVEGAÇÃO GLOBAL
      ========================================== */
-  inicializarTeclado();
+  initKeyboard();
   focarMenuPrincipal();
 });
