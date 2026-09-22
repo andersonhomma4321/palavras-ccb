@@ -3,7 +3,7 @@
    ========================================== */
 
 import { state } from './state.js';
-import { listaVideos } from './videos.js';
+import { listaVideos } from '../data/videos.js';
 import { tocarVideo, focarCartaoVideo } from './player.js';
 
 export function initKeyboard() {
