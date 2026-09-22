@@ -4,7 +4,6 @@
 import { state } from './state.js';
 import { listaVideos } from '../data/videos.js';
 
-let player = null;
 let modoAleatorioContinuoAtivo = false;
 
 // Inicializa a API do YouTube se necessário ou gere o player
@@ -73,43 +72,95 @@ export function focarCartaoVideo(index) {
   });
 }
 
-// Reproduz um vídeo específico com base no índice original da lista
+// Reproduz o vídeo em modo de ecrã inteiro (Overlay dedicado)
 export function tocarVideo(index) {
   if (!listaVideos || listaVideos.length === 0) return;
   state.currentVideoIndex = index;
   const video = listaVideos[index];
   const videoId = video.youtubeId || video.youtubeld;
+
+  // Procura ou cria o overlay de ecrã inteiro para o player
+  let playerOverlay = document.getElementById("fullscreen-player-overlay");
   
-  // Procura se existe um iframe de player na página, ou cria um se não existir
-  let iframePlayer = document.getElementById("youtube-player");
-  
-  if (!iframePlayer) {
-    // Se não existir um player no HTML, vamos criá-lo dinamicamente dentro do container principal
-    const mainContent = document.querySelector(".tv-main-content");
-    if (mainContent) {
-      const playerWrapper = document.createElement("div");
-      playerWrapper.id = "active-player-wrapper";
-      playerWrapper.style.cssText = "position: relative; width: 100%; padding-bottom: 56.25%; background: #000; margin-bottom: 1.5rem; border-radius: 8px; overflow: hidden;";
-      playerWrapper.innerHTML = `
-        <iframe id="youtube-player" src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1" 
-          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" 
+  if (!playerOverlay) {
+    playerOverlay = document.createElement("div");
+    playerOverlay.id = "fullscreen-player-overlay";
+    playerOverlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    `;
+    
+    playerOverlay.innerHTML = `
+      <button id="close-fullscreen-player" style="
+        position: absolute;
+        top: 20px;
+        right: 25px;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        border: 2px solid #c5a059;
+        font-size: 1.5rem;
+        padding: 5px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        z-index: 10000;
+      ">✕ Fechar</button>
+      <div style="position: relative; width: 100%; height: 100%;">
+        <iframe id="youtube-fullscreen-iframe" src="" style="width: 100%; height: 100%; border: none;" 
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
           allowfullscreen>
         </iframe>
-      `;
-      // Insere o player no topo da secção de conteúdo
-      mainContent.prepend(playerWrapper);
-    }
-  } else {
-    // Se já existir, apenas atualiza o link com o autoplay ativo
-    iframePlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
-    // Garante que o container visível do player está no topo e visível
-    const wrapper = iframePlayer.closest("#active-player-wrapper") || iframePlayer.parentElement;
-    if (wrapper) wrapper.style.display = "block";
+      </div>
+    `;
+    
+    document.body.appendChild(playerOverlay);
+
+    // Evento para fechar o player de ecrã inteiro e voltar à lista
+    document.getElementById("close-fullscreen-player").addEventListener("click", () => {
+      fecharPlayerFullscreen();
+    });
   }
 
-  // Faz scroll suave para o topo para ver o vídeo a reproduzir
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  // Atualiza o link do iframe com o ID correto e autoplay ativo
+  const iframe = document.getElementById("youtube-fullscreen-iframe");
+  if (iframe) {
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1`;
+  }
+
+  playerOverlay.style.display = "flex";
+
+  // Tenta ativar o Fullscreen nativo do navegador para uma experiência imersiva total
+  if (playerOverlay.requestFullscreen) {
+    playerOverlay.requestFullscreen().catch(err => console.log("Fullscreen nativo recusado:", err));
+  }
+}
+
+// Fecha o player em ecrã inteiro e para o vídeo
+export function fecharPlayerFullscreen() {
+  const playerOverlay = document.getElementById("fullscreen-player-overlay");
+  if (playerOverlay) {
+    playerOverlay.style.display = "none";
+    const iframe = document.getElementById("youtube-fullscreen-iframe");
+    if (iframe) iframe.src = ""; // Para o áudio do vídeo do YouTube
+  }
+  
+  if (document.fullscreenElement && document.exitFullscreen) {
+    document.exitFullscreen().catch(err => console.log(err));
+  }
+  
+  pararModoAleatorio();
+  
+  // Devolve o foco à grelha de vídeos
+  const playlistElement = document.getElementById("playlist");
+  if (playlistElement) playlistElement.focus();
 }
 
 // Função para iniciar o modo de vídeos aleatórios contínuos
@@ -118,11 +169,6 @@ export function iniciarVideosAleatoriosContinuos() {
   modoAleatorioContinuoAtivo = true;
   const randomIndex = Math.floor(Math.random() * listaVideos.length);
   tocarVideo(randomIndex);
-  
-  const appContainer = document.getElementById("app-container");
-  if (appContainer && appContainer.requestFullscreen) {
-    appContainer.requestFullscreen().catch(err => console.log("Fullscreen negado:", err));
-  }
 }
 
 // Interrompe o modo contínuo aleatório
