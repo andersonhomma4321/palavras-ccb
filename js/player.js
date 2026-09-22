@@ -5,6 +5,7 @@ import { state } from './state.js';
 import { listaVideos } from '../data/videos.js';
 
 let modoAleatorioContinuoAtivo = false;
+let ytPlayerInstance = null;
 
 // Inicializa a API do YouTube se necessário ou gere o player
 export function initPlayer() {
@@ -16,7 +17,20 @@ export function initPlayer() {
       iniciarVideosAleatoriosContinuos();
     });
   }
+
+  // Carrega o script da API do YouTube IFrame se ainda não existir
+  if (!window.YT) {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  }
 }
+
+// Global callback exigido pela API do YouTube
+window.onYouTubeIframeAPIReady = function() {
+  // A API está pronta, o player será criado sob demanda no overlay
+};
 
 // Renderiza a grelha de vídeos no HTML
 export function renderizarLista(videos) {
@@ -72,14 +86,13 @@ export function focarCartaoVideo(index) {
   });
 }
 
-// Reproduz o vídeo em modo de ecrã inteiro (Overlay dedicado) com alta qualidade forçada
+// Reproduz o vídeo em modo de ecrã inteiro usando a API do YouTube para detetar o fim
 export function tocarVideo(index) {
   if (!listaVideos || listaVideos.length === 0) return;
   state.currentVideoIndex = index;
   const video = listaVideos[index];
   const videoId = video.youtubeId || video.youtubeld;
 
-  // Procura ou cria o overlay de ecrã inteiro para o player
   let playerOverlay = document.getElementById("fullscreen-player-overlay");
   
   if (!playerOverlay) {
@@ -114,56 +127,80 @@ export function tocarVideo(index) {
         z-index: 10000;
       ">✕ Fechar</button>
       <div style="position: relative; width: 100%; height: 100%;">
-        <iframe id="youtube-fullscreen-iframe" src="" style="width: 100%; height: 100%; border: none;" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-          allowfullscreen>
-        </iframe>
+        <div id="youtube-player-div" style="width: 100%; height: 100%;"></div>
       </div>
     `;
     
     document.body.appendChild(playerOverlay);
 
-    // Evento para fechar o player de ecrã inteiro e voltar à lista
     document.getElementById("close-fullscreen-player").addEventListener("click", () => {
       fecharPlayerFullscreen();
     });
   }
 
-  // Parâmetros para incentivar o player a carregar em alta definição (HD)
-  const iframe = document.getElementById("youtube-fullscreen-iframe");
-  if (iframe) {
-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&vq=hd1080&hd=1`;
-  }
-
   playerOverlay.style.display = "flex";
 
-  // Ativa o Fullscreen nativo do navegador para maximizar os píxeis
+  // Se a API do YT estiver carregada, usamos a instância para controlar os eventos de fim de vídeo
+  if (window.YT && window.YT.Player) {
+    if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
+      ytPlayerInstance.loadVideoById(videoId);
+    } else {
+      ytPlayerInstance = new YT.Player('youtube-player-div', {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        playerVars: {
+          'autoplay': 1,
+          'enablejsapi': 1,
+          'vq': 'hd1080',
+          'hd': 1
+        },
+        events: {
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+  } else {
+    // Fallback caso a API demore a carregar
+    const container = document.getElementById("youtube-player-div");
+    if (container) {
+      container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&vq=hd1080&hd=1" style="width:100%; height:100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    }
+  }
+
   if (playerOverlay.requestFullscreen) {
-    playerOverlay.requestFullscreen().catch(err => console.log("Fullscreen nativo recusado:", err));
+    playerOverlay.requestFullscreen().catch(err => console.log("Fullscreen recusado:", err));
+  }
+}
+
+// Monitoriza o estado do player (deteta quando o vídeo termina: estado 0)
+function onPlayerStateChange(event) {
+  // 0 significa que o vídeo terminou a reprodução
+  if (event.data === YT.PlayerState.ENDED) {
+    verificarFimDeVideoNoModoContinuo();
   }
 }
 
 // Fecha o player em ecrã inteiro e para o vídeo
 export function fecharPlayerFullscreen() {
+  modoAleatorioContinuoAtivo = false;
   const playerOverlay = document.getElementById("fullscreen-player-overlay");
   if (playerOverlay) {
     playerOverlay.style.display = "none";
-    const iframe = document.getElementById("youtube-fullscreen-iframe");
-    if (iframe) iframe.src = ""; // Para a reprodução do vídeo
+    if (ytPlayerInstance && typeof ytPlayerInstance.stopVideo === 'function') {
+      ytPlayerInstance.stopVideo();
+    }
   }
   
   if (document.fullscreenElement && document.exitFullscreen) {
     document.exitFullscreen().catch(err => console.log(err));
   }
   
-  pararModoAleatorio();
-  
-  // Devolve o foco à grelha de vídeos
   const playlistElement = document.getElementById("playlist");
   if (playlistElement) playlistElement.focus();
 }
 
-// Função para iniciar o modo de vídeos aleatórios contínuos
+// Inicia o modo de vídeos aleatórios contínuos
 export function iniciarVideosAleatoriosContinuos() {
   if (!listaVideos || listaVideos.length === 0) return;
   modoAleatorioContinuoAtivo = true;
@@ -171,14 +208,9 @@ export function iniciarVideosAleatoriosContinuos() {
   tocarVideo(randomIndex);
 }
 
-// Interrompe o modo contínuo aleatório
-export function pararModoAleatorio() {
-  modoAleatorioContinuoAtivo = false;
-}
-
-// Verifica fim de vídeo no modo contínuo
+// Avança para o próximo vídeo aleatório quando o atual termina
 export function verificarFimDeVideoNoModoContinuo() {
-  if (modoAleatorioContinuoAtivo) {
+  if (modoAleatorioContinuoAtivo && listaVideos.length > 0) {
     const proximoAleatorio = Math.floor(Math.random() * listaVideos.length);
     tocarVideo(proximoAleatorio);
   }
