@@ -486,7 +486,9 @@ button.btn-close:focus {
     background-color: var(--ccb-dark-blue);
   }
 
-  #app-container {
+  /* Só aplica dimensões móveis se o contentor NÃO estiver oculto (ou seja, quando o JavaScript o coloca visível) */
+  #app-container[style*="display: flex"],
+  #app-container:not([style*="display: none"]) {
     display: flex !important;
     width: 100% !important;
     max-width: 100% !important;
