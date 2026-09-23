@@ -32,11 +32,12 @@ window.onYouTubeIframeAPIReady = function() {
   // A API está pronta, o player será criado sob demanda no overlay
 };
 
-// Renderiza a grelha de vídeos no HTML
+// Renderiza a grelha de vídeos no HTML com eventos de clique diretos e seguros
 export function renderizarLista(videos) {
   const playlistEl = document.getElementById("playlist");
   if (!playlistEl) return;
   playlistEl.innerHTML = "";
+  
   videos.forEach((video, index) => {
     const videold = video.youtubeld || video.youtubeId;
     const card = document.createElement("div");
@@ -44,30 +45,37 @@ export function renderizarLista(videos) {
     card.setAttribute("tabindex", "0");
     card.setAttribute("data-index", index);
     
-    // URL seguro para a miniatura do YouTube compatível com telemóvel e PC
     const thumbUrl = `https://img.youtube.com/vi/${videold}/hqdefault.jpg`;
 
     card.innerHTML = `
-      <div class="video-thumbnail-wrapper">
+      <div class="video-thumbnail-wrapper" style="pointer-events: none;">
         <img src="${thumbUrl}" alt="${video.title}" onerror="this.src='https://img.youtube.com/vi/${videold}/default.jpg'">
       </div>
-      <div class="video-card-title">${video.title}</div>
+      <div class="video-card-title" style="pointer-events: none;">${video.title}</div>
     `;
     
-    // Evento de clique unificado para toque no telemóvel e rato no PC
-    card.addEventListener("click", (e) => {
+    // Disparador universal de clique e toque para PC e telemóvel
+    const acionarPlay = (e) => {
+      e.stopPropagation();
       e.preventDefault();
-      state.kbPlaylistIndex = index;
-      pararModoAleatorio();
+      
+      // Atualiza o estado global se ele existir
+      if (typeof state !== 'undefined') {
+        state.kbPlaylistIndex = index;
+        state.currentVideoIndex = index;
+      }
+      
+      if (typeof pararModoAleatorio === 'function') {
+        pararModoAleatorio();
+      }
+      
+      // Executa diretamente a abertura do vídeo
       tocarVideo(index);
-    });
+    };
 
-    card.addEventListener("dblclick", (e) => {
-      e.preventDefault();
-      state.kbPlaylistIndex = index;
-      pararModoAleatorio();
-      tocarVideo(index);
-    });
+    // Adiciona tanto no mousedown/touchstart quanto no click para garantir resposta instantânea
+    card.addEventListener("click", acionarPlay);
+    card.addEventListener("touchend", acionarPlay);
 
     playlistEl.appendChild(card);
   });
@@ -171,23 +179,32 @@ function onPlayerStateChange(event) {
   }
 }
 
-// Fecha o player em ecrã inteiro e para o vídeo
 export function fecharPlayerFullscreen() {
-  modoAleatorioContinuoAtivo = false;
   const playerOverlay = document.getElementById("fullscreen-player-overlay");
   if (playerOverlay) {
     playerOverlay.style.display = "none";
-    if (ytPlayerInstance && typeof ytPlayerInstance.stopVideo === 'function') {
-      ytPlayerInstance.stopVideo();
+    
+    // Limpa completamente o conteúdo HTML do player (destrói o iframe e corta o áudio imediatamente)
+    const container = document.getElementById("youtube-player-div");
+    if (container) {
+      container.innerHTML = "";
     }
   }
-  
-  if (document.fullscreenElement && document.exitFullscreen) {
-    document.exitFullscreen().catch(err => console.log(err));
+
+  // Se estiver a usar a API oficial do YouTube (YT.Player), destrói a instância se existir
+  if (typeof player !== 'undefined' && player && typeof player.stopVideo === 'function') {
+    try {
+      player.stopVideo();
+      player.destroy();
+    } catch (e) {
+      console.log("Erro ao parar o player do YouTube:", e);
+    }
   }
-  
-  const playlistElement = document.getElementById("playlist");
-  if (playlistElement) playlistElement.focus();
+
+  // Sai do modo de ecrã inteiro do navegador, se estiver ativo
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(err => console.log("Erro ao sair do fullscreen:", err));
+  }
 }
 
 // Inicia o modo de vídeos aleatórios contínuos
