@@ -507,3 +507,54 @@ button.btn-close:focus {
     padding: 1.5rem 2rem;
   }
 }
+
+/* Correção exclusiva para telemóveis / telas pequenas (não afeta o PC) */
+@media (max-width: 767px) {
+    #app-container {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        margin: 0;
+    }
+
+    .tv-header {
+        flex-wrap: wrap;
+        padding: 8px 12px;
+        gap: 6px;
+    }
+
+    .tv-header h1 {
+        font-size: 1rem;
+        order: 2;
+    }
+
+    .btn-back-menu {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        order: 1;
+    }
+
+    .tv-search-container {
+        width: 100%;
+        order: 3;
+        margin-top: 4px;
+        display: block !important;
+    }
+
+    .tv-search-container input {
+        width: 100%;
+        font-size: 0.85rem;
+    }
+
+    .tv-random-section {
+        display: block !important;
+        margin-bottom: 1rem;
+    }
+
+    .tv-main-content {
+        padding: 0.75rem;
+    }
+}
