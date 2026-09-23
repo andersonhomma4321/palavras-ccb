@@ -22,6 +22,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* ==========================================
@@ -340,7 +341,7 @@ button.btn-close:focus {
   margin: 0;
 }
 
-/* Botão Menu com visibilidade garantida no telemóvel */
+/* Botão Menu com visibilidade garantida */
 .btn-back-menu {
   background: transparent;
   border: 1px solid var(--ccb-gold);
@@ -362,7 +363,7 @@ button.btn-close:focus {
   color: var(--ccb-dark-blue);
 }
 
-/* Barra de pesquisa forçada a aparecer no telemóvel */
+/* Barra de pesquisa forçada a aparecer */
 .tv-search-container {
   width: 100% !important;
   order: 3;
@@ -391,7 +392,8 @@ button.btn-close:focus {
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Secção e Botão de Vídeos Aleatórios com visualização garantida */
@@ -399,6 +401,7 @@ button.btn-close:focus {
   margin-bottom: 1.5rem;
   display: block !important;
   width: 100%;
+  flex-shrink: 0;
 }
 
 .btn-random-tv {
@@ -478,6 +481,32 @@ button.btn-close:focus {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* ==========================================
+   MEDIA QUERY EXCLUSIVA PARA TELEMÓVEIS / TELAS PEQUENAS
+========================================== */
+@media (max-width: 767px) {
+  body {
+    align-items: flex-start;
+    padding: 0;
+  }
+
+  #app-container {
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    max-width: none;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+  }
+
+  .tv-main-content {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* ==========================================
