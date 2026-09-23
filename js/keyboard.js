@@ -48,21 +48,16 @@ export function inicializarTeclado() {
         colunas = colTemplate ? colTemplate.split(" ").length : 4;
       }
 
-      // SE O FOCO ESTIVER NO CAMPO DE PESQUISA
+      // Se o foco estiver no campo de pesquisa e carregar para baixo, vai para os cartões
       if (document.activeElement === searchBox) {
-        if (e.key === "ArrowDown" || e.key === "Enter") {
+        if (e.key === "ArrowDown") {
           e.preventDefault();
-          // Sai da busca e vai para o primeiro cartão da grelha
-          state.kbPlaylistIndex = 0;
           focarCartaoVideo(state.kbPlaylistIndex);
-        } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-          // Permite mover livremente o cursor dentro do texto da caixa de pesquisa
-          return;
         }
         return;
       }
 
-      // NAVEGAÇÃO POR SETAS NOS CARTÕES DE VÍDEO
+      // Navegação por setas nos cartões de vídeo
       if (e.key === "ArrowRight") {
         e.preventDefault();
         if (listaExibida.length > 0) {
@@ -87,7 +82,6 @@ export function inicializarTeclado() {
         e.preventDefault();
         let novoIndex = state.kbPlaylistIndex - colunas;
         if (novoIndex < 0) {
-          // Se estiver na primeira linha e carregar para cima, volta para o campo de pesquisa
           if (searchBox) searchBox.focus();
         } else {
           state.kbPlaylistIndex = novoIndex;
