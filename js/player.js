@@ -37,23 +37,38 @@ export function renderizarLista(videos) {
   const playlistEl = document.getElementById("playlist");
   if (!playlistEl) return;
   playlistEl.innerHTML = "";
-  
   videos.forEach((video, index) => {
-    const videoId = video.youtubeId || video.youtubeld;
+    const videold = video.youtubeld || video.youtubeId;
     const card = document.createElement("div");
     card.className = "video-card-item";
-    card.setAttribute("tabindex", "-1");
+    card.setAttribute("tabindex", "0");
     card.setAttribute("data-index", index);
+    
+    // URL seguro para a miniatura do YouTube compatível com telemóvel e PC
+    const thumbUrl = `https://img.youtube.com/vi/${videold}/hqdefault.jpg`;
+
     card.innerHTML = `
       <div class="video-thumbnail-wrapper">
-        <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="${video.title}">
+        <img src="${thumbUrl}" alt="${video.title}" onerror="this.src='https://img.youtube.com/vi/${videold}/default.jpg'">
       </div>
       <div class="video-card-title">${video.title}</div>
     `;
-    card.addEventListener("click", () => {
+    
+    // Evento de clique unificado para toque no telemóvel e rato no PC
+    card.addEventListener("click", (e) => {
+      e.preventDefault();
+      state.kbPlaylistIndex = index;
       pararModoAleatorio();
       tocarVideo(index);
     });
+
+    card.addEventListener("dblclick", (e) => {
+      e.preventDefault();
+      state.kbPlaylistIndex = index;
+      pararModoAleatorio();
+      tocarVideo(index);
+    });
+
     playlistEl.appendChild(card);
   });
 }
