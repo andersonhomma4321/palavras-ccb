@@ -507,3 +507,88 @@ button.btn-close:focus {
     padding: 1.5rem 2rem;
   }
 }
+/* ==========================================
+   CORREÇÃO DEFINITIVA PARA TELEMÓVEIS (MOBILE)
+========================================== */
+@media (max-width: 767px) {
+  body {
+    display: block !important;
+    min-height: 100vh;
+    overflow-y: auto !important;
+    background-color: var(--ccb-dark-blue);
+  }
+
+  #app-container {
+    display: flex !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+
+  .tv-header {
+    position: sticky !important;
+    top: 0;
+    z-index: 1000;
+    flex-wrap: wrap !important;
+    padding: 10px 12px !important;
+  }
+
+  .tv-header h1 {
+    font-size: 1.1rem !important;
+    order: 2 !important;
+  }
+
+  .btn-back-menu {
+    display: inline-flex !important;
+    order: 1 !important;
+    font-size: 0.8rem !important;
+    padding: 6px 10px !important;
+  }
+
+  .tv-search-container {
+    display: block !important;
+    width: 100% !important;
+    order: 3 !important;
+    margin-top: 8px !important;
+  }
+
+  .tv-search-container input {
+    width: 100% !important;
+    font-size: 0.9rem !important;
+  }
+
+  .tv-main-content {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 10px !important;
+  }
+
+  .tv-random-section {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 15px !important;
+  }
+
+  .btn-random-tv {
+    display: block !important;
+    width: 100% !important;
+    padding: 12px !important;
+    font-size: 1rem !important;
+  }
+
+  .tv-grid-container {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+}
