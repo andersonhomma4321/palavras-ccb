@@ -480,15 +480,13 @@ button.btn-close:focus {
 ========================================== */
 @media (max-width: 767px) {
   body {
-    display: block !important;
     min-height: 100vh;
     overflow-y: auto !important;
     background-color: var(--ccb-dark-blue);
   }
 
-  /* Só aplica dimensões móveis se o contentor NÃO estiver oculto (ou seja, quando o JavaScript o coloca visível) */
-  #app-container[style*="display: flex"],
-  #app-container:not([style*="display: none"]) {
+  /* Ocupa a tela inteira APENAS quando estiver visível (display: block) */
+  #app-container[style*="display: block"] {
     display: flex !important;
     width: 100% !important;
     max-width: 100% !important;
