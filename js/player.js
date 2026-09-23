@@ -37,23 +37,35 @@ export function renderizarLista(videos) {
   const playlistEl = document.getElementById("playlist");
   if (!playlistEl) return;
   playlistEl.innerHTML = "";
-  
   videos.forEach((video, index) => {
-    const videoId = video.youtubeId || video.youtubeld;
+    const videold = video.youtubeld || video.youtubeld;
     const card = document.createElement("div");
     card.className = "video-card-item";
-    card.setAttribute("tabindex", "-1");
+    card.setAttribute("tabindex", "0");
     card.setAttribute("data-index", index);
     card.innerHTML = `
       <div class="video-thumbnail-wrapper">
-        <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="${video.title}">
+        <img src="https://img.youtube.com/vi/${videold}/hqdefault.jpg" alt="${video.title}">
       </div>
       <div class="video-card-title">${video.title}</div>
     `;
-    card.addEventListener("click", () => {
+    
+    // Adiciona o evento de clique robusto para telemóvel (toque) e PC (rato)
+    card.addEventListener("click", (e) => {
+      e.preventDefault();
+      state.kbPlaylistIndex = index;
       pararModoAleatorio();
       tocarVideo(index);
     });
+
+    // Garante suporte também para duplo clique no PC
+    card.addEventListener("dblclick", (e) => {
+      e.preventDefault();
+      state.kbPlaylistIndex = index;
+      pararModoAleatorio();
+      tocarVideo(index);
+    });
+
     playlistEl.appendChild(card);
   });
 }
