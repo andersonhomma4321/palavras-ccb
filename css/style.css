@@ -22,6 +22,7 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  overflow: auto; /* Garante scroll geral no body se necessário */
 }
 
 /* ==========================================
@@ -340,7 +341,7 @@ button.btn-close:focus {
   margin: 0;
 }
 
-/* Botão Menu com visibilidade garantida no telemóvel */
+/* Botão Menu com visibilidade garantida */
 .btn-back-menu {
   background: transparent;
   border: 1px solid var(--ccb-gold);
@@ -362,7 +363,7 @@ button.btn-close:focus {
   color: var(--ccb-dark-blue);
 }
 
-/* Barra de pesquisa forçada a aparecer no telemóvel */
+/* Barra de pesquisa forçada a aparecer */
 .tv-search-container {
   width: 100% !important;
   order: 3;
@@ -483,18 +484,31 @@ button.btn-close:focus {
 }
 
 /* ==========================================
-   MEDIA QUERY EXCLUSIVA PARA TELEMÓVEIS (AJUSTE DE SCROLL E TELA CHEIA)
+   MEDIA QUERY EXCLUSIVA PARA TELEMÓVEIS (CORREÇÃO TOTAL DE SCROLL E POSICIONAMENTO)
 ========================================== */
 @media (max-width: 767px) {
+  body {
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    min-height: 100vh;
+    overflow-y: auto !important;
+  }
+
   #app-container {
     width: 100vw !important;
-    height: 100vh !important;
-    height: 100dvh !important;
+    height: auto !important;
+    min-height: 100vh !important;
     max-width: none !important;
     border-radius: 0 !important;
     border: none !important;
     box-shadow: none !important;
     margin: 0 !important;
+    overflow-y: visible !important;
+  }
+
+  .tv-main-content {
+    overflow-y: visible !important;
+    height: auto !important;
   }
 }
 
