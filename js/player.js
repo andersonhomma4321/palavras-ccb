@@ -101,15 +101,14 @@ export function focarCartaoVideo(index) {
   });
 }
 
-// Reproduz o vídeo em modo de ecrã inteiro usando a API do YouTube para detetar o fim
+// Reproduz o vídeo em ecrã inteiro usando a API do YouTube ou fallback seguro
 export function tocarVideo(index) {
   if (!listaVideos || listaVideos.length === 0) return;
   state.currentVideoIndex = index;
   const video = listaVideos[index];
-  const videoId = video.youtubeId || video.youtubeld;
+  const videold = video.youtubeld || video.youtubeId;
 
   let playerOverlay = document.getElementById("fullscreen-player-overlay");
-  
   if (!playerOverlay) {
     playerOverlay = document.createElement("div");
     playerOverlay.id = "fullscreen-player-overlay";
@@ -126,28 +125,25 @@ export function tocarVideo(index) {
       justify-content: center;
       align-items: center;
     `;
-    
     playerOverlay.innerHTML = `
       <button id="close-fullscreen-player" style="
         position: absolute;
         top: 20px;
         right: 25px;
-        background: rgba(0, 0, 0, 0.6);
+        background: rgba(0, 0, 0, 0.8);
         color: #fff;
         border: 2px solid #c5a059;
-        font-size: 1.5rem;
-        padding: 5px 15px;
+        font-size: 1.2rem;
+        padding: 8px 16px;
         border-radius: 6px;
         cursor: pointer;
         z-index: 10000;
       ">✕ Fechar</button>
-      <div style="position: relative; width: 100%; height: 100%;">
+      <div style="position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
         <div id="youtube-player-div" style="width: 100%; height: 100%;"></div>
       </div>
     `;
-    
     document.body.appendChild(playerOverlay);
-
     document.getElementById("close-fullscreen-player").addEventListener("click", () => {
       fecharPlayerFullscreen();
     });
@@ -155,36 +151,15 @@ export function tocarVideo(index) {
 
   playerOverlay.style.display = "flex";
 
-  // Se a API do YT estiver carregada, usamos a instância para controlar os eventos de fim de vídeo
-  if (window.YT && window.YT.Player) {
-    if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
-      ytPlayerInstance.loadVideoById(videoId);
-    } else {
-      ytPlayerInstance = new YT.Player('youtube-player-div', {
-        height: '100%',
-        width: '100%',
-        videoId: videoId,
-        playerVars: {
-          'autoplay': 1,
-          'enablejsapi': 1,
-          'vq': 'hd1080',
-          'hd': 1
-        },
-        events: {
-          'onStateChange': onPlayerStateChange
-        }
-      });
-    }
-  } else {
-    // Fallback caso a API demore a carregar
-    const container = document.getElementById("youtube-player-div");
-    if (container) {
-      container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&vq=hd1080&hd=1" style="width:100%; height:100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-    }
+  // Utiliza o iframe direto como fallback primário para garantir compatibilidade imediata no telemóvel e PC ao clicar
+  const container = document.getElementById("youtube-player-div");
+  if (container) {
+    container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videold}?autoplay=1&enablejsapi=1&vq=hd1080&hd=1" style="width: 100%; height: 100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
   }
 
+  // Tenta o pedido de ecrã inteiro de forma segura (sem bloquear se o navegador recusar)
   if (playerOverlay.requestFullscreen) {
-    playerOverlay.requestFullscreen().catch(err => console.log("Fullscreen recusado:", err));
+    playerOverlay.requestFullscreen().catch(err => console.log("Fullscreen recusado pelo navegador:", err));
   }
 }
 
