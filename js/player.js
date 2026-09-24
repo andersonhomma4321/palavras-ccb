@@ -251,7 +251,15 @@ export function filtrarVideos() {
 
     const atendeTodos = termos.every((t, index) => {
       if (/^\d{1,2}$/.test(t)) {
-        if (index === termos.length - 1) {
+        if (index === termos.length - 1 && termos.length >= 3) {
+          const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
+          return regex.test(titulo);
+        }
+        const regex = new RegExp(`\\b${t}\\b`);
+        return regex.test(titulo);
+      }
+      if (/^\d{4}$/.test(t)) {
+        if (index === termos.length - 1 && termos.length >= 3) {
           const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
           return regex.test(titulo);
         }
