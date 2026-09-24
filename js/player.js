@@ -245,3 +245,11 @@ export function filtrarVideos() {
     }
   });
 }
+
+// Adicione esta função no player.js se ela não estiver declarada noutro sítio
+function pararModoAleatorio() {
+  // Coloque aqui a lógica para desativar o modo aleatório, por exemplo:
+  if (typeof state !== 'undefined') {
+    state.modoAleatorioAtivo = false;
+  }
+}
