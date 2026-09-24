@@ -228,21 +228,26 @@ export function verificarFimDeVideoNoModoContinuo() {
   }
 }
 
-// Filtra os vídeos com base no termo digitado na barra de pesquisa
-export function filtrarVideos() {
-  const searchInput = document.getElementById("search-input");
-  if (!searchInput) return;
-  
-  const termo = searchInput.value.toLowerCase().trim();
-  const cards = document.querySelectorAll(".video-card-item");
-  
-  cards.forEach(card => {
-    const titulo = card.querySelector(".video-card-title").textContent.toLowerCase();
-    if (titulo.includes(termo)) {
-      card.style.display = "flex";
-    } else {
-      card.style.display = "none";
-    }
+// Função para filtrar os vídeos com base no texto digitado
+function filtrarVideos(termoBusca, todosOsVideos) {
+  // 1. Limpa o texto de busca: passa para letras minúsculas e divide por espaços
+  // Exemplo: "2026 irsal" vira ["2026", "irsal"]
+  const palavrasChave = termoBusca
+    .toLowerCase()
+    .trim()
+    .split(/\s+/);
+
+  // Se o campo de busca estiver vazio, retorna todos os vídeos
+  if (!termoBusca || palavrasChave.length === 0 || (palavrasChave.length === 1 && palavrasChave[0] === "")) {
+    return todosOsVideos;
+  }
+
+  // 2. Filtra a lista: o vídeo só passa se contiver TODAS as palavras digitadas
+  return todosOsVideos.filter(video => {
+    const tituloLower = video.title.toLowerCase();
+    
+    // Verifica se cada palavra da busca está presente no título do vídeo
+    return palavrasChave.every(palavra => tituloLower.includes(palavra));
   });
 }
 
