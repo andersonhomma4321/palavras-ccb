@@ -33,7 +33,7 @@ window.onYouTubeIframeAPIReady = function() {
 };
 
 // Renderiza a grelha de vídeos no HTML distinguindo scroll de clique no telemóvel
-export function renderizarLista(videos) {
+export async function renderizarLista(videos) {
   const playlistEl = document.getElementById("playlist");
   if (!playlistEl) return;
   playlistEl.innerHTML = "";
