@@ -229,18 +229,32 @@ export function verificarFimDeVideoNoModoContinuo() {
 }
 
 // Função para filtrar os vídeos com base no texto digitado
-// Filtra os vídeos com base no termo digitado na barra de pesquisa
-export function filtrarVideos(eventOrTermo) {
+export function filtrarVideos() {
   const searchInput = document.getElementById("search-input");
   if (!searchInput) return;
 
-  // Garante que obtemos sempre o valor correto do input, independentemente do que seja passado
-  const termo = searchInput.value.toLowerCase().trim();
+  // 1. Normaliza o texto de busca (remove acentos, coloca em minúsculas e divide por palavras)
+  const termoBruto = searchInput.value;
+  const termos = termoBruto 
+    ? termoBruto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/\s+/) 
+    : [];
+
   const cards = document.querySelectorAll(".video-card-item");
   
   cards.forEach(card => {
-    const titulo = card.querySelector(".video-card-title").textContent.toLowerCase();
-    if (titulo.includes(termo)) {
+    const tituloEl = card.querySelector(".video-card-title");
+    if (!tituloEl) return;
+
+    // Normaliza o título do vídeo da mesma forma
+    const titulo = tituloEl.textContent
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+
+    // 2. Verifica se o título contém TODAS as palavras digitadas
+    const atendeTodos = termos.every(t => titulo.includes(t));
+
+    if (atendeTodos || termos.length === 0) {
       card.style.display = "flex";
     } else {
       card.style.display = "none";
