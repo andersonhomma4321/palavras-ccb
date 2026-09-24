@@ -36,7 +36,7 @@ export function inicializarTeclado() {
             const tit = video.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
             return termos.every(t => {
               if (/^\d{1,2}$/.test(t)) {
-                const regex = new RegExp(`\\b${t}\\b`);
+                const regex = new RegExp(`\\b${t}\\b(?!:)`);
                 return regex.test(tit);
               }
               return tit.includes(t);

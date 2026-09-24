@@ -251,12 +251,12 @@ export function filtrarVideos() {
 
     // Exige que cada termo digitado exista como uma palavra isolada ou parte relevante
     const atendeTodos = termos.every(t => {
-      // Se o termo for um número de 1 ou 2 dígitos (ex: mês), procura por ele isolado ou logo após o ano
-      if (/^\d{1,2}$/.test(t)) {
-        const regex = new RegExp(`\\b${t}\\b`);
-        return regex.test(titulo);
-      }
-      return titulo.includes(t);
+    if (/^\d{1,2}$/.test(t)) {
+      // Procura o número como palavra isolada, mas garante que não está colado a dois pontos (ex: 19:30)
+      const regex = new RegExp(`\\b${t}\\b(?!:)`);
+      return regex.test(tit);
+    }
+    return tit.includes(t);
     });
 
     if (atendeTodos || termos.length === 0) {
