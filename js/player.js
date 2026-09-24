@@ -32,28 +32,40 @@ window.onYouTubeIframeAPIReady = function() {
   // A API está pronta, o player será criado sob demanda no overlay
 };
 
-// Renderiza a grelha de vídeos no HTML
 export function renderizarLista(videos) {
   const playlistEl = document.getElementById("playlist");
   if (!playlistEl) return;
   playlistEl.innerHTML = "";
   
   videos.forEach((video, index) => {
-    const videoId = video.youtubeId || video.youtubeld;
+    // Garante compatibilidade com ambas as nomenclaturas de ID do YouTube
+    const videoId = video.youtubeld || video.youtubeId;
     const card = document.createElement("div");
     card.className = "video-card-item";
-    card.setAttribute("tabindex", "-1");
+    card.setAttribute("tabindex", "0");
     card.setAttribute("data-index", index);
+    
+    const thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
     card.innerHTML = `
       <div class="video-thumbnail-wrapper">
-        <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="${video.title}">
+        <img src="${thumbUrl}" alt="${video.title}" onerror="this.src='https://img.youtube.com/vi/${videoId}/default.jpg'">
       </div>
       <div class="video-card-title">${video.title}</div>
     `;
-    card.addEventListener("click", () => {
-      pararModoAleatorio();
+    
+    card.addEventListener("click", (e) => {
+      e.preventDefault();
+      state.kbPlaylistIndex = index;
+      
+      // Verifica se a função existe antes de chamar para evitar erros
+      if (typeof pararModoAleatorio === "function") {
+        pararModoAleatorio();
+      }
+      
       tocarVideo(index);
     });
+
     playlistEl.appendChild(card);
   });
 }
