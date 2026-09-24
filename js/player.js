@@ -229,19 +229,22 @@ export function verificarFimDeVideoNoModoContinuo() {
 }
 
 // Função para filtrar os vídeos com base no texto digitado
-export function filtrarVideos(termoBusca, todosOsVideos) {
-  const palavrasChave = termoBusca
-    .toLowerCase()
-    .trim()
-    .split(/\s+/);
+// Filtra os vídeos com base no termo digitado na barra de pesquisa
+export function filtrarVideos(eventOrTermo) {
+  const searchInput = document.getElementById("search-input");
+  if (!searchInput) return;
 
-  if (!termoBusca || palavrasChave.length === 0 || (palavrasChave.length === 1 && palavrasChave[0] === "")) {
-    return todosOsVideos;
-  }
-
-  return todosOsVideos.filter(video => {
-    const tituloLower = video.title.toLowerCase();
-    return palavrasChave.every(palavra => tituloLower.includes(palavra));
+  // Garante que obtemos sempre o valor correto do input, independentemente do que seja passado
+  const termo = searchInput.value.toLowerCase().trim();
+  const cards = document.querySelectorAll(".video-card-item");
+  
+  cards.forEach(card => {
+    const titulo = card.querySelector(".video-card-title").textContent.toLowerCase();
+    if (titulo.includes(termo)) {
+      card.style.display = "flex";
+    } else {
+      card.style.display = "none";
+    }
   });
 }
 
