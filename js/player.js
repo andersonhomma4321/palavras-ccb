@@ -245,15 +245,6 @@ export function filtrarVideos(termoBusca, todosOsVideos) {
   });
 }
 
-  // 2. Filtra a lista: o vídeo só passa se contiver TODAS as palavras digitadas
-  return todosOsVideos.filter(video => {
-    const tituloLower = video.title.toLowerCase();
-    
-    // Verifica se cada palavra da busca está presente no título do vídeo
-    return palavrasChave.every(palavra => tituloLower.includes(palavra));
-  });
-}
-
 // Adicione esta função no player.js se ela não estiver declarada noutro sítio
 function pararModoAleatorio() {
   // Coloque aqui a lógica para desativar o modo aleatório, por exemplo:
