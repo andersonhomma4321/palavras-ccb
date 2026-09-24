@@ -250,11 +250,15 @@ export function filtrarVideos() {
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
 
-    const atendeTodos = termos.every(t => {
-      // Se forem números isolados (ex: dia, mês ou ano), evitamos que apanhem partes de horários
+    const atendeTodos = termos.every((t, index) => {
       if (/^\d{1,2}$/.test(t)) {
-        // Garante que o número isolado não é seguido imediatamente por um espaço e outro número de minutos (ex: "19 30")
-        const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
+        // Se for o último termo digitado (ex: o dia), protege contra horários como "19 30"
+        if (index === termos.length - 1) {
+          const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
+          return regex.test(titulo); // (ou 'tit' no keyboard.js)
+        }
+        // Se for o ano ou o mês (termos anteriores), basta ser o número isolado
+        const regex = new RegExp(`\\b${t}\\b`);
         return regex.test(titulo); // (ou 'tit' no keyboard.js)
       }
       return titulo.includes(t);

@@ -34,10 +34,15 @@ export function inicializarTeclado() {
       const listaExibida = termos.length > 0
         ? listaVideos.filter(video => {
             const tit = video.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-            return termos.every(t => {
+            return termos.every((t, index) => {
               if (/^\d{1,2}$/.test(t)) {
-                // Atualizado para evitar que números isolados apanhem partes de horários (ex: 19 30)
-                const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
+                // Se for o último termo (dia), aplica a proteção contra horários como "19 30"
+                if (index === termos.length - 1) {
+                  const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
+                  return regex.test(tit);
+                }
+                // Para o ano ou mês (termos anteriores), apenas procura o número isolado
+                const regex = new RegExp(`\\b${t}\\b`);
                 return regex.test(tit);
               }
               return tit.includes(t);
