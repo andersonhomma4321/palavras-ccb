@@ -244,19 +244,19 @@ export function filtrarVideos() {
     const tituloEl = card.querySelector(".video-card-title");
     if (!tituloEl) return;
 
+    // A variável chama-se 'titulo' aqui
     const titulo = tituloEl.textContent
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
 
-    // Exige que cada termo digitado exista como uma palavra isolada ou parte relevante
     const atendeTodos = termos.every(t => {
-    if (/^\d{1,2}$/.test(t)) {
-      // Procura o número como palavra isolada, mas garante que não está colado a dois pontos (ex: 19:30)
-      const regex = new RegExp(`\\b${t}\\b(?!:)`);
-      return regex.test(tit);
-    }
-    return tit.includes(t);
+      if (/^\d{1,2}$/.test(t)) {
+        const regex = new RegExp(`\\b${t}\\b(?!:)`);
+        // Usamos 'titulo' em vez de 'tit'
+        return regex.test(titulo);
+      }
+      return titulo.includes(t);
     });
 
     if (atendeTodos || termos.length === 0) {
