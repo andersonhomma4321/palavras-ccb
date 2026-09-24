@@ -251,10 +251,11 @@ export function filtrarVideos() {
       .toLowerCase();
 
     const atendeTodos = termos.every(t => {
+      // Se forem números isolados (ex: dia, mês ou ano), evitamos que apanhem partes de horários
       if (/^\d{1,2}$/.test(t)) {
-        const regex = new RegExp(`\\b${t}\\b(?!:)`);
-        // Usamos 'titulo' em vez de 'tit'
-        return regex.test(titulo);
+        // Garante que o número isolado não é seguido imediatamente por um espaço e outro número de minutos (ex: "19 30")
+        const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
+        return regex.test(titulo); // (ou 'tit' no keyboard.js)
       }
       return titulo.includes(t);
     });
