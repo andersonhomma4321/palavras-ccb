@@ -24,9 +24,7 @@ body {
   min-height: 100vh;
 }
 
-/* ==========================================
-   OVERLAYS E MODAIS
-========================================== */
+/* ===== OVERLAYS E MODAIS ===== */
 #login-overlay,
 #menu-overlay,
 .modal-overlay {
@@ -485,7 +483,6 @@ button.btn-close:focus {
     background-color: var(--ccb-dark-blue);
   }
 
-  /* Ocupa a tela inteira APENAS quando estiver visível (display: block) */
   #app-container[style*="display: block"] {
     display: flex !important;
     width: 100% !important;
@@ -562,35 +559,35 @@ button.btn-close:focus {
 }
 
 /* ==========================================
-   MEDIA QUERY PARA COMPUTADORES / TELAS MAIORES
+   MEDIA QUERY PARA COMPUTADORES/TELAS MAIORES
 ========================================== */
 @media (min-width: 768px) {
   .tv-header {
     flex-wrap: nowrap;
     padding: 1rem 2rem;
   }
-  
+
   .tv-header h1 {
     font-size: 1.6rem;
     order: unset;
   }
-  
+
   .btn-back-menu {
     order: unset;
     font-size: 0.9rem;
     padding: 6px 12px;
   }
-  
+
   .tv-search-container {
     width: auto;
     order: unset;
     margin-top: 0;
   }
-  
+
   .tv-search-container input {
     width: 320px;
   }
-  
+
   .tv-main-content {
     padding: 1.5rem 2rem;
   }
