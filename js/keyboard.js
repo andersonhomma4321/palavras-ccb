@@ -36,7 +36,8 @@ export function inicializarTeclado() {
             const tit = video.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
             return termos.every(t => {
               if (/^\d{1,2}$/.test(t)) {
-                const regex = new RegExp(`\\b${t}\\b(?!:)`);
+                // Atualizado para evitar que números isolados apanhem partes de horários (ex: 19 30)
+                const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
                 return regex.test(tit);
               }
               return tit.includes(t);
