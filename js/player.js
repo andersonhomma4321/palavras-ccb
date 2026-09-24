@@ -32,7 +32,7 @@ window.onYouTubeIframeAPIReady = function() {
   // A API está pronta, o player será criado sob demanda no overlay
 };
 
-// Renderiza a grelha de vídeos no HTML com eventos de clique diretos e seguros
+// Renderiza a grelha de vídeos no HTML distinguindo scroll de clique no telemóvel
 export function renderizarLista(videos) {
   const playlistEl = document.getElementById("playlist");
   if (!playlistEl) return;
@@ -54,12 +54,46 @@ export function renderizarLista(videos) {
       <div class="video-card-title" style="pointer-events: none;">${video.title}</div>
     `;
     
-    // Disparador universal de clique e toque para PC e telemóvel
-    const acionarPlay = (e) => {
+    // Variáveis para detetar se o utilizador está a fazer scroll em vez de clicar
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    card.addEventListener("touchstart", (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    card.addEventListener("touchend", (e) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      
+      // Calcula a distância do movimento para saber se foi um scroll ou um toque simples
+      const diffX = Math.abs(touchEndX - touchStartX);
+      const diffY = Math.abs(touchEndY - touchStartY);
+
+      // Se o movimento for menor que 10 pixéis, considera-se um toque válido (clique)
+      if (diffX < 10 && diffY < 10) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        if (typeof state !== 'undefined') {
+          state.kbPlaylistIndex = index;
+          state.currentVideoIndex = index;
+        }
+        
+        if (typeof pararModoAleatorio === 'function') {
+          pararModoAleatorio();
+        }
+        
+        tocarVideo(index);
+      }
+    });
+
+    // Mantém o clique normal do rato para o PC
+    card.addEventListener("click", (e) => {
       e.stopPropagation();
       e.preventDefault();
       
-      // Atualiza o estado global se ele existir
       if (typeof state !== 'undefined') {
         state.kbPlaylistIndex = index;
         state.currentVideoIndex = index;
@@ -69,31 +103,11 @@ export function renderizarLista(videos) {
         pararModoAleatorio();
       }
       
-      // Executa diretamente a abertura do vídeo
       tocarVideo(index);
-    };
-
-    // Adiciona tanto no mousedown/touchstart quanto no click para garantir resposta instantânea
-    card.addEventListener("click", acionarPlay);
-    card.addEventListener("touchend", acionarPlay);
+    });
 
     playlistEl.appendChild(card);
   });
-}
-
-// Carrega a playlist e foca o primeiro elemento
-export function carregarPlaylist() {
-  renderizarLista(listaVideos);
-  if (listaVideos.length > 0) {
-    if (state.currentVideoIndex < 0) state.currentVideoIndex = 0;
-    state.kbPlaylistIndex = 0;
-  }
-  const playlistElement = document.getElementById("playlist");
-  if (playlistElement) {
-    playlistElement.setAttribute("tabindex", "0");
-    playlistElement.focus();
-    focarCartaoVideo(0);
-  }
 }
 
 // Foca visualmente um cartão específico na grelha por teclado
