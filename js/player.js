@@ -244,7 +244,6 @@ export function filtrarVideos() {
     const tituloEl = card.querySelector(".video-card-title");
     if (!tituloEl) return;
 
-    // A variável chama-se 'titulo' aqui
     const titulo = tituloEl.textContent
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
@@ -252,14 +251,12 @@ export function filtrarVideos() {
 
     const atendeTodos = termos.every((t, index) => {
       if (/^\d{1,2}$/.test(t)) {
-        // Se for o último termo digitado (ex: o dia), protege contra horários como "19 30"
         if (index === termos.length - 1) {
           const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
-          return regex.test(titulo); // (ou 'tit' no keyboard.js)
+          return regex.test(titulo);
         }
-        // Se for o ano ou o mês (termos anteriores), basta ser o número isolado
         const regex = new RegExp(`\\b${t}\\b`);
-        return regex.test(titulo); // (ou 'tit' no keyboard.js)
+        return regex.test(titulo);
       }
       return titulo.includes(t);
     });

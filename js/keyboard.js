@@ -36,12 +36,10 @@ export function inicializarTeclado() {
             const tit = video.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
             return termos.every((t, index) => {
               if (/^\d{1,2}$/.test(t)) {
-                // Se for o último termo (dia), aplica a proteção contra horários como "19 30"
                 if (index === termos.length - 1) {
                   const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
                   return regex.test(tit);
                 }
-                // Para o ano ou mês (termos anteriores), apenas procura o número isolado
                 const regex = new RegExp(`\\b${t}\\b`);
                 return regex.test(tit);
               }
