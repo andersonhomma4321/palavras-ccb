@@ -32,82 +32,45 @@ window.onYouTubeIframeAPIReady = function() {
   // A API está pronta, o player será criado sob demanda no overlay
 };
 
-// Renderiza a grelha de vídeos no HTML distinguindo scroll de clique no telemóvel
-export async function renderizarLista(videos) {
+// Renderiza a grelha de vídeos no HTML
+export function renderizarLista(videos) {
   const playlistEl = document.getElementById("playlist");
   if (!playlistEl) return;
   playlistEl.innerHTML = "";
   
   videos.forEach((video, index) => {
-    const videold = video.youtubeld || video.youtubeId;
+    const videoId = video.youtubeId || video.youtubeld;
     const card = document.createElement("div");
     card.className = "video-card-item";
-    card.setAttribute("tabindex", "0");
+    card.setAttribute("tabindex", "-1");
     card.setAttribute("data-index", index);
-    
-    const thumbUrl = `https://img.youtube.com/vi/${videold}/hqdefault.jpg`;
-
     card.innerHTML = `
-      <div class="video-thumbnail-wrapper" style="pointer-events: none;">
-        <img src="${thumbUrl}" alt="${video.title}" onerror="this.src='https://img.youtube.com/vi/${videold}/default.jpg'">
+      <div class="video-thumbnail-wrapper">
+        <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="${video.title}">
       </div>
-      <div class="video-card-title" style="pointer-events: none;">${video.title}</div>
+      <div class="video-card-title">${video.title}</div>
     `;
-    
-    // Variáveis para detetar se o utilizador está a fazer scroll em vez de clicar
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    card.addEventListener("touchstart", (e) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    }, { passive: true });
-
-    card.addEventListener("touchend", (e) => {
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchEndY = e.changedTouches[0].clientY;
-      
-      // Calcula a distância do movimento para saber se foi um scroll ou um toque simples
-      const diffX = Math.abs(touchEndX - touchStartX);
-      const diffY = Math.abs(touchEndY - touchStartY);
-
-      // Se o movimento for menor que 10 pixéis, considera-se um toque válido (clique)
-      if (diffX < 10 && diffY < 10) {
-        e.stopPropagation();
-        e.preventDefault();
-        
-        if (typeof state !== 'undefined') {
-          state.kbPlaylistIndex = index;
-          state.currentVideoIndex = index;
-        }
-        
-        if (typeof pararModoAleatorio === 'function') {
-          pararModoAleatorio();
-        }
-        
-        tocarVideo(index);
-      }
-    });
-
-    // Mantém o clique normal do rato para o PC
-    card.addEventListener("click", (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      
-      if (typeof state !== 'undefined') {
-        state.kbPlaylistIndex = index;
-        state.currentVideoIndex = index;
-      }
-      
-      if (typeof pararModoAleatorio === 'function') {
-        pararModoAleatorio();
-      }
-      
+    card.addEventListener("click", () => {
+      pararModoAleatorio();
       tocarVideo(index);
     });
-
     playlistEl.appendChild(card);
   });
+}
+
+// Carrega a playlist e foca o primeiro elemento
+export function carregarPlaylist() {
+  renderizarLista(listaVideos);
+  if (listaVideos.length > 0) {
+    if (state.currentVideoIndex < 0) state.currentVideoIndex = 0;
+    state.kbPlaylistIndex = 0;
+  }
+  const playlistElement = document.getElementById("playlist");
+  if (playlistElement) {
+    playlistElement.setAttribute("tabindex", "0");
+    playlistElement.focus();
+    focarCartaoVideo(0);
+  }
 }
 
 // Foca visualmente um cartão específico na grelha por teclado
@@ -123,14 +86,15 @@ export function focarCartaoVideo(index) {
   });
 }
 
-// Reproduz o vídeo em ecrã inteiro usando a API do YouTube ou fallback seguro
+// Reproduz o vídeo em modo de ecrã inteiro usando a API do YouTube para detetar o fim
 export function tocarVideo(index) {
   if (!listaVideos || listaVideos.length === 0) return;
   state.currentVideoIndex = index;
   const video = listaVideos[index];
-  const videold = video.youtubeld || video.youtubeId;
+  const videoId = video.youtubeId || video.youtubeld;
 
   let playerOverlay = document.getElementById("fullscreen-player-overlay");
+  
   if (!playerOverlay) {
     playerOverlay = document.createElement("div");
     playerOverlay.id = "fullscreen-player-overlay";
@@ -147,25 +111,28 @@ export function tocarVideo(index) {
       justify-content: center;
       align-items: center;
     `;
+    
     playerOverlay.innerHTML = `
       <button id="close-fullscreen-player" style="
         position: absolute;
         top: 20px;
         right: 25px;
-        background: rgba(0, 0, 0, 0.8);
+        background: rgba(0, 0, 0, 0.6);
         color: #fff;
         border: 2px solid #c5a059;
-        font-size: 1.2rem;
-        padding: 8px 16px;
+        font-size: 1.5rem;
+        padding: 5px 15px;
         border-radius: 6px;
         cursor: pointer;
         z-index: 10000;
       ">✕ Fechar</button>
-      <div style="position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+      <div style="position: relative; width: 100%; height: 100%;">
         <div id="youtube-player-div" style="width: 100%; height: 100%;"></div>
       </div>
     `;
+    
     document.body.appendChild(playerOverlay);
+
     document.getElementById("close-fullscreen-player").addEventListener("click", () => {
       fecharPlayerFullscreen();
     });
@@ -173,15 +140,36 @@ export function tocarVideo(index) {
 
   playerOverlay.style.display = "flex";
 
-  // Utiliza o iframe direto como fallback primário para garantir compatibilidade imediata no telemóvel e PC ao clicar
-  const container = document.getElementById("youtube-player-div");
-  if (container) {
-    container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videold}?autoplay=1&enablejsapi=1&vq=hd1080&hd=1" style="width: 100%; height: 100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+  // Se a API do YT estiver carregada, usamos a instância para controlar os eventos de fim de vídeo
+  if (window.YT && window.YT.Player) {
+    if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
+      ytPlayerInstance.loadVideoById(videoId);
+    } else {
+      ytPlayerInstance = new YT.Player('youtube-player-div', {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        playerVars: {
+          'autoplay': 1,
+          'enablejsapi': 1,
+          'vq': 'hd1080',
+          'hd': 1
+        },
+        events: {
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+  } else {
+    // Fallback caso a API demore a carregar
+    const container = document.getElementById("youtube-player-div");
+    if (container) {
+      container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&enablejsapi=1&vq=hd1080&hd=1" style="width:100%; height:100%; border:none;" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    }
   }
 
-  // Tenta o pedido de ecrã inteiro de forma segura (sem bloquear se o navegador recusar)
   if (playerOverlay.requestFullscreen) {
-    playerOverlay.requestFullscreen().catch(err => console.log("Fullscreen recusado pelo navegador:", err));
+    playerOverlay.requestFullscreen().catch(err => console.log("Fullscreen recusado:", err));
   }
 }
 
@@ -193,32 +181,23 @@ function onPlayerStateChange(event) {
   }
 }
 
+// Fecha o player em ecrã inteiro e para o vídeo
 export function fecharPlayerFullscreen() {
+  modoAleatorioContinuoAtivo = false;
   const playerOverlay = document.getElementById("fullscreen-player-overlay");
   if (playerOverlay) {
     playerOverlay.style.display = "none";
-    
-    // Limpa completamente o conteúdo HTML do player (destrói o iframe e corta o áudio imediatamente)
-    const container = document.getElementById("youtube-player-div");
-    if (container) {
-      container.innerHTML = "";
+    if (ytPlayerInstance && typeof ytPlayerInstance.stopVideo === 'function') {
+      ytPlayerInstance.stopVideo();
     }
   }
-
-  // Se estiver a usar a API oficial do YouTube (YT.Player), destrói a instância se existir
-  if (typeof player !== 'undefined' && player && typeof player.stopVideo === 'function') {
-    try {
-      player.stopVideo();
-      player.destroy();
-    } catch (e) {
-      console.log("Erro ao parar o player do YouTube:", e);
-    }
+  
+  if (document.fullscreenElement && document.exitFullscreen) {
+    document.exitFullscreen().catch(err => console.log(err));
   }
-
-  // Sai do modo de ecrã inteiro do navegador, se estiver ativo
-  if (document.fullscreenElement) {
-    document.exitFullscreen().catch(err => console.log("Erro ao sair do fullscreen:", err));
-  }
+  
+  const playlistElement = document.getElementById("playlist");
+  if (playlistElement) playlistElement.focus();
 }
 
 // Inicia o modo de vídeos aleatórios contínuos
