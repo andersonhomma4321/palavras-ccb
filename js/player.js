@@ -233,7 +233,6 @@ export function filtrarVideos() {
   const searchInput = document.getElementById("search-input");
   if (!searchInput) return;
 
-  // 1. Normaliza o texto de busca (remove acentos, coloca em minúsculas e divide por palavras)
   const termoBruto = searchInput.value;
   const termos = termoBruto 
     ? termoBruto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/\s+/) 
@@ -245,14 +244,20 @@ export function filtrarVideos() {
     const tituloEl = card.querySelector(".video-card-title");
     if (!tituloEl) return;
 
-    // Normaliza o título do vídeo da mesma forma
     const titulo = tituloEl.textContent
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
 
-    // 2. Verifica se o título contém TODAS as palavras digitadas
-    const atendeTodos = termos.every(t => titulo.includes(t));
+    // Exige que cada termo digitado exista como uma palavra isolada ou parte relevante
+    const atendeTodos = termos.every(t => {
+      // Se o termo for um número de 1 ou 2 dígitos (ex: mês), procura por ele isolado ou logo após o ano
+      if (/^\d{1,2}$/.test(t)) {
+        const regex = new RegExp(`\\b${t}\\b`);
+        return regex.test(titulo);
+      }
+      return titulo.includes(t);
+    });
 
     if (atendeTodos || termos.length === 0) {
       card.style.display = "flex";

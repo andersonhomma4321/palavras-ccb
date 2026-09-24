@@ -31,11 +31,16 @@ export function inicializarTeclado() {
       const searchBox = document.getElementById("search-input");
       const termoBruto = searchBox ? searchBox.value : "";
       const termos = termoBruto ? termoBruto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/\s+/) : [];
-      
       const listaExibida = termos.length > 0
         ? listaVideos.filter(video => {
             const tit = video.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-            return termos.every(t => tit.includes(t));
+            return termos.every(t => {
+              if (/^\d{1,2}$/.test(t)) {
+                const regex = new RegExp(`\\b${t}\\b`);
+                return regex.test(tit);
+              }
+              return tit.includes(t);
+            });
           })
         : listaVideos;
 
