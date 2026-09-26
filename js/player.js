@@ -4,126 +4,94 @@
 
 import { state } from './state.js';
 import { listaVideos } from '../data/videos.js';
-import { CONFIG } from './config.js';
+import { CONFIG } from "./config.js";
 
-
-/* ==========================================
-   VARIÁVEIS DO PLAYER
-   ========================================== */
 
 let modoAleatorioContinuoAtivo = false;
 let ytPlayerInstance = null;
-let youtubeApiPromise = null;
 
 
 /* ==========================================
-   CARREGA A API DO YOUTUBE
+   CONTROLE DE CARREGAMENTO DA API DO YOUTUBE
    ========================================== */
 
-function carregarYouTubeAPI() {
+let youtubeApiPromise = null;
+let youtubeApiResolve = null;
 
-  // Se a API já estiver disponível, não precisa
-  // carregar novamente.
+
+/* ==========================================
+   INICIALIZA A API DO YOUTUBE
+   ========================================== */
+
+export function initPlayer() {
+
+  /*
+     Não configuramos o botão aleatório aqui.
+
+     O app.js já faz isso através de:
+     #btn-random-videos
+
+     Isso evita que um único clique execute
+     a reprodução aleatória duas vezes.
+  */
+
   if (window.YT && window.YT.Player) {
-    return Promise.resolve(window.YT);
+    return;
   }
 
-  // Se já existe uma requisição em andamento,
-  // reutiliza a mesma Promise.
-  if (youtubeApiPromise) {
-    return youtubeApiPromise;
+
+  /*
+     Cria uma Promise para esperar a API.
+  */
+
+  if (!youtubeApiPromise) {
+
+    youtubeApiPromise = new Promise((resolve) => {
+
+      youtubeApiResolve = resolve;
+
+    });
+
   }
 
-  youtubeApiPromise = new Promise((resolve, reject) => {
 
-    let finalizado = false;
+  /*
+     Verifica se o script da API já existe.
+  */
 
-    const timeout = setTimeout(() => {
-
-      if (!finalizado) {
-        finalizado = true;
-
-        reject(
-          new Error(
-            'A API do YouTube demorou muito para carregar.'
-          )
-        );
-      }
-
-    }, 15000);
+  const scriptExistente =
+    document.querySelector(
+      'script[src="https://www.youtube.com/iframe_api"]'
+    );
 
 
-    // Guarda uma função anterior, caso outro código
-    // já tenha definido esse callback.
-    const callbackAnterior =
-      window.onYouTubeIframeAPIReady;
+  if (!scriptExistente) {
 
+    const tag =
+      document.createElement('script');
 
-    window.onYouTubeIframeAPIReady = function () {
+    tag.src =
+      "https://www.youtube.com/iframe_api";
 
-      if (
-        typeof callbackAnterior === 'function'
-      ) {
-        callbackAnterior();
-      }
+    tag.async = true;
 
-      if (!finalizado) {
+    const firstScriptTag =
+      document.getElementsByTagName('script')[0];
 
-        finalizado = true;
+    if (firstScriptTag) {
 
-        clearTimeout(timeout);
-
-        resolve(window.YT);
-      }
-
-    };
-
-
-    // Verifica se o script já existe.
-    const scriptExistente =
-      document.querySelector(
-        'script[src="https://www.youtube.com/iframe_api"]'
+      firstScriptTag.parentNode.insertBefore(
+        tag,
+        firstScriptTag
       );
 
-
-    if (!scriptExistente) {
-
-      const tag =
-        document.createElement('script');
-
-      tag.src =
-        'https://www.youtube.com/iframe_api';
-
-      tag.async = true;
+    } else {
 
       document.head.appendChild(tag);
 
     }
 
-  });
-
-  return youtubeApiPromise;
-}
-
-
-/* ==========================================
-   INICIALIZA O PLAYER
-   ========================================== */
-
-export function initPlayer() {
-
-  // Apenas garante que a API seja carregada.
-  //
-  // O botão de reprodução aleatória NÃO é
-  // configurado aqui porque o app.js já faz isso.
-  carregarYouTubeAPI().catch(error => {
-
-    console.error(
-      'Erro ao carregar a API do YouTube:',
-      error
-    );
-
-  });
+  }
 
 }
 
@@ -132,14 +100,56 @@ export function initPlayer() {
    CALLBACK GLOBAL DA API DO YOUTUBE
    ========================================== */
 
-window.onYouTubeIframeAPIReady =
-  function () {
+window.onYouTubeIframeAPIReady = function() {
 
-    // A API ficou disponível.
-    // O player será criado somente quando
-    // um vídeo for solicitado.
+  /*
+     A API terminou de carregar.
 
-  };
+     Libera qualquer código que esteja
+     aguardando a API.
+  */
+
+  if (youtubeApiResolve) {
+
+    youtubeApiResolve(window.YT);
+
+    youtubeApiResolve = null;
+
+  }
+
+};
+
+
+/* ==========================================
+   AGUARDA A API DO YOUTUBE
+   ========================================== */
+
+function aguardarYouTubeAPI() {
+
+  if (
+    window.YT &&
+    window.YT.Player
+  ) {
+
+    return Promise.resolve(window.YT);
+
+  }
+
+
+  if (!youtubeApiPromise) {
+
+    youtubeApiPromise = new Promise((resolve) => {
+
+      youtubeApiResolve = resolve;
+
+    });
+
+  }
+
+
+  return youtubeApiPromise;
+
+}
 
 
 /* ==========================================
@@ -149,34 +159,37 @@ window.onYouTubeIframeAPIReady =
 export function renderizarLista(videos) {
 
   const playlistEl =
-    document.getElementById('playlist');
+    document.getElementById("playlist");
 
   if (!playlistEl) return;
 
-  playlistEl.innerHTML = '';
+  playlistEl.innerHTML = "";
 
 
   videos.forEach((video, index) => {
 
-    // Compatibilidade com as duas nomenclaturas
-    // usadas no projeto.
+    // Garante compatibilidade com ambas
+    // as nomenclaturas de ID do YouTube.
     const videoId =
-      video.youtubeId || video.youtubeld;
+      video.youtubeld || video.youtubeId;
 
 
     const card =
-      document.createElement('div');
+      document.createElement("div");
+
 
     card.className =
-      'video-card-item';
+      "video-card-item";
+
 
     card.setAttribute(
-      'tabindex',
-      '0'
+      "tabindex",
+      "0"
     );
 
+
     card.setAttribute(
-      'data-index',
+      "data-index",
       index
     );
 
@@ -200,12 +213,8 @@ export function renderizarLista(videos) {
     `;
 
 
-    /* ======================================
-       CLIQUE NO CARD
-       ====================================== */
-
     card.addEventListener(
-      'click',
+      "click",
       (e) => {
 
         e.preventDefault();
@@ -214,8 +223,12 @@ export function renderizarLista(videos) {
           index;
 
 
-        // Se o usuário escolher manualmente
-        // um vídeo, encerra o modo aleatório.
+        /*
+           Se o usuário escolheu um vídeo
+           manualmente, encerra o modo
+           aleatório contínuo.
+        */
+
         pararModoAleatorio();
 
 
@@ -246,7 +259,9 @@ export function carregarPlaylist() {
     if (
       state.currentVideoIndex < 0
     ) {
+
       state.currentVideoIndex = 0;
+
     }
 
     state.kbPlaylistIndex = 0;
@@ -255,17 +270,19 @@ export function carregarPlaylist() {
 
 
   const playlistElement =
-    document.getElementById('playlist');
+    document.getElementById("playlist");
 
 
   if (playlistElement) {
 
     playlistElement.setAttribute(
-      'tabindex',
-      '0'
+      "tabindex",
+      "0"
     );
 
+
     playlistElement.focus();
+
 
     focarCartaoVideo(0);
 
@@ -275,14 +292,14 @@ export function carregarPlaylist() {
 
 
 /* ==========================================
-   FOCA UM CARTÃO DA PLAYLIST
+   FOCA VISUALMENTE UM CARTÃO
    ========================================== */
 
 export function focarCartaoVideo(index) {
 
   const cards =
     document.querySelectorAll(
-      '.video-card-item'
+      ".video-card-item"
     );
 
 
@@ -291,18 +308,19 @@ export function focarCartaoVideo(index) {
     if (i === index) {
 
       card.classList.add(
-        'kb-focus'
+        "kb-focus"
       );
 
+
       card.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest'
+        behavior: "smooth",
+        block: "nearest"
       });
 
     } else {
 
       card.classList.remove(
-        'kb-focus'
+        "kb-focus"
       );
 
     }
@@ -313,7 +331,7 @@ export function focarCartaoVideo(index) {
 
 
 /* ==========================================
-   REPRODUZ UM VÍDEO
+   REPRODUZ O VÍDEO
    ========================================== */
 
 export async function tocarVideo(index) {
@@ -322,7 +340,9 @@ export async function tocarVideo(index) {
     !listaVideos ||
     listaVideos.length === 0
   ) {
+
     return;
+
   }
 
 
@@ -330,7 +350,9 @@ export async function tocarVideo(index) {
     index < 0 ||
     index >= listaVideos.length
   ) {
+
     return;
+
   }
 
 
@@ -349,7 +371,7 @@ export async function tocarVideo(index) {
   if (!videoId) {
 
     console.error(
-      'Vídeo sem ID do YouTube:',
+      "ID do YouTube não encontrado:",
       video
     );
 
@@ -364,18 +386,18 @@ export async function tocarVideo(index) {
 
   let playerOverlay =
     document.getElementById(
-      'fullscreen-player-overlay'
+      "fullscreen-player-overlay"
     );
 
 
   if (!playerOverlay) {
 
     playerOverlay =
-      document.createElement('div');
+      document.createElement("div");
 
 
     playerOverlay.id =
-      'fullscreen-player-overlay';
+      "fullscreen-player-overlay";
 
 
     playerOverlay.style.cssText = `
@@ -394,32 +416,26 @@ export async function tocarVideo(index) {
 
 
     playerOverlay.innerHTML = `
-      <button
-        id="close-fullscreen-player"
-        style="
-          position: absolute;
-          top: 20px;
-          right: 25px;
-          background: rgba(0, 0, 0, 0.6);
-          color: #fff;
-          border: 2px solid #c5a059;
-          font-size: 1.5rem;
-          padding: 5px 15px;
-          border-radius: 6px;
-          cursor: pointer;
-          z-index: 10000;
-        "
-      >
-        ✕
-      </button>
+      <button id="close-fullscreen-player" style="
+        position: absolute;
+        top: 20px;
+        right: 25px;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        border: 2px solid #c5a059;
+        font-size: 1.5rem;
+        padding: 5px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        z-index: 10000;
+      ">✕ Fechar</button>
 
-      <div
-        style="
-          position: relative;
-          width: 100%;
-          height: 100%;
-        "
-      >
+      <div style="
+        position: relative;
+        width: 100%;
+        height: 100%;
+      ">
+
         <div
           id="youtube-player-div"
           style="
@@ -427,6 +443,7 @@ export async function tocarVideo(index) {
             height: 100%;
           "
         ></div>
+
       </div>
     `;
 
@@ -436,12 +453,17 @@ export async function tocarVideo(index) {
     );
 
 
+    /*
+       Mantém exatamente o botão Fechar
+       existente no seu programa.
+    */
+
     document
       .getElementById(
-        'close-fullscreen-player'
+        "close-fullscreen-player"
       )
       .addEventListener(
-        'click',
+        "click",
         () => {
 
           fecharPlayerFullscreen();
@@ -452,16 +474,12 @@ export async function tocarVideo(index) {
   }
 
 
-  /* ======================================
-     MOSTRA O PLAYER
-     ====================================== */
-
   playerOverlay.style.display =
-    'flex';
+    "flex";
 
 
   /* ======================================
-     ENTRA EM TELA CHEIA
+     FULLSCREEN
      ====================================== */
 
   if (
@@ -473,7 +491,7 @@ export async function tocarVideo(index) {
       .catch(
         err =>
           console.log(
-            'Fullscreen recusado:',
+            "Fullscreen recusado:",
             err
           )
       );
@@ -487,47 +505,45 @@ export async function tocarVideo(index) {
 
   try {
 
-    await carregarYouTubeAPI();
+    await aguardarYouTubeAPI();
 
   } catch (error) {
 
     console.error(
-      'Não foi possível carregar a API do YouTube:',
+      "Erro ao carregar a API do YouTube:",
       error
     );
 
-    alert(
-      'Não foi possível carregar o player do YouTube.'
-    );
-
     return;
 
   }
 
 
   /* ======================================
-     PROCURA O CONTAINER
+     LOCALIZA O CONTAINER
      ====================================== */
 
-  const playerContainer =
+  const container =
     document.getElementById(
-      'youtube-player-div'
+      "youtube-player-div"
     );
 
 
-  if (!playerContainer) {
+  if (!container) {
+
     return;
+
   }
 
 
   /* ======================================
-     SE JÁ EXISTE PLAYER
+     REUTILIZA O PLAYER EXISTENTE
      ====================================== */
 
   if (
     ytPlayerInstance &&
     typeof ytPlayerInstance.loadVideoById ===
-      'function'
+      "function"
   ) {
 
     ytPlayerInstance.loadVideoById(
@@ -545,27 +561,30 @@ export async function tocarVideo(index) {
 
   ytPlayerInstance =
     new YT.Player(
-      'youtube-player-div',
+      "youtube-player-div",
       {
 
-        height: '100%',
+        height: "100%",
 
-        width: '100%',
+        width: "100%",
 
         videoId: videoId,
 
 
         playerVars: {
 
+          /*
+             O vídeo deve começar
+             automaticamente.
+          */
+
           autoplay: 1,
 
           enablejsapi: 1,
 
-          vq: 'hd1080',
+          vq: "hd1080",
 
-          hd: 1,
-
-          playsinline: 0
+          hd: 1
 
         },
 
@@ -576,10 +595,7 @@ export async function tocarVideo(index) {
             onPlayerReady,
 
           onStateChange:
-            onPlayerStateChange,
-
-          onError:
-            onPlayerError
+            onPlayerStateChange
 
         }
 
@@ -595,7 +611,12 @@ export async function tocarVideo(index) {
 
 function onPlayerReady(event) {
 
-  // Garante que o vídeo comece.
+  /*
+     Garante que o vídeo comece
+     automaticamente assim que o
+     player estiver pronto.
+  */
+
   event.target.playVideo();
 
 }
@@ -610,8 +631,8 @@ function onPlayerStateChange(event) {
   /*
      YT.PlayerState.ENDED = 0
 
-     Quando o vídeo termina, verifica se
-     o modo aleatório contínuo está ativo.
+     Quando o vídeo terminar, entra
+     aqui.
   */
 
   if (
@@ -627,89 +648,41 @@ function onPlayerStateChange(event) {
 
 
 /* ==========================================
-   ERROS DO PLAYER
-   ========================================== */
-
-function onPlayerError(event) {
-
-  console.error(
-    'Erro no player do YouTube:',
-    event.data
-  );
-
-
-  /*
-     Se estiver no modo aleatório contínuo
-     e um vídeo apresentar erro, tenta
-     continuar com outro vídeo.
-  */
-
-  if (
-    modoAleatorioContinuoAtivo
-  ) {
-
-    setTimeout(
-      () => {
-
-        verificarFimDeVideoNoModoContinuo();
-
-      },
-      1000
-    );
-
-  }
-
-}
-
-
-/* ==========================================
-   FECHA O PLAYER
+   FECHA O PLAYER EM TELA CHEIA
    ========================================== */
 
 export function fecharPlayerFullscreen() {
 
-  // Desliga o modo aleatório.
+  /*
+     Ao fechar, desativa o modo
+     aleatório contínuo.
+  */
+
   modoAleatorioContinuoAtivo =
     false;
 
 
-  // Também mantém o estado global sincronizado,
-  // caso ele exista no state.js.
-  if (
-    typeof state !== 'undefined'
-  ) {
-
-    state.modoAleatorioAtivo =
-      false;
-
-  }
-
-
   const playerOverlay =
     document.getElementById(
-      'fullscreen-player-overlay'
+      "fullscreen-player-overlay"
     );
 
 
   if (playerOverlay) {
 
     playerOverlay.style.display =
-      'none';
-
-  }
+      "none";
 
 
-  /* ======================================
-     PARA O VÍDEO
-     ====================================== */
+    if (
+      ytPlayerInstance &&
+      typeof ytPlayerInstance.stopVideo ===
+        "function"
+    ) {
 
-  if (
-    ytPlayerInstance &&
-    typeof ytPlayerInstance.stopVideo ===
-      'function'
-  ) {
+      ytPlayerInstance.stopVideo();
 
-    ytPlayerInstance.stopVideo();
+    }
 
   }
 
@@ -726,19 +699,20 @@ export function fecharPlayerFullscreen() {
     document
       .exitFullscreen()
       .catch(
-        err => console.log(err)
+        err =>
+          console.log(err)
       );
 
   }
 
 
   /* ======================================
-     VOLTA O FOCO PARA A PLAYLIST
+     DEVOLVE O FOCO À PLAYLIST
      ====================================== */
 
   const playlistElement =
     document.getElementById(
-      'playlist'
+      "playlist"
     );
 
 
@@ -752,7 +726,7 @@ export function fecharPlayerFullscreen() {
 
 
 /* ==========================================
-   INICIA REPRODUÇÃO ALEATÓRIA CONTÍNUA
+   INICIA O MODO ALEATÓRIO CONTÍNUO
    ========================================== */
 
 export function iniciarVideosAleatoriosContinuos() {
@@ -775,18 +749,9 @@ export function iniciarVideosAleatoriosContinuos() {
     true;
 
 
-  if (
-    typeof state !== 'undefined'
-  ) {
-
-    state.modoAleatorioAtivo =
-      true;
-
-  }
-
-
   /*
-     Escolhe o primeiro vídeo aleatoriamente.
+     Escolhe o primeiro vídeo
+     aleatoriamente.
   */
 
   const randomIndex =
@@ -797,7 +762,7 @@ export function iniciarVideosAleatoriosContinuos() {
 
 
   /*
-     Começa a reprodução.
+     Começa o vídeo.
   */
 
   tocarVideo(randomIndex);
@@ -806,15 +771,10 @@ export function iniciarVideosAleatoriosContinuos() {
 
 
 /* ==========================================
-   AVANÇA PARA O PRÓXIMO VÍDEO ALEATÓRIO
+   PRÓXIMO VÍDEO ALEATÓRIO
    ========================================== */
 
 export function verificarFimDeVideoNoModoContinuo() {
-
-  /*
-     Se o usuário fechou o player,
-     não continua.
-  */
 
   if (
     !modoAleatorioContinuoAtivo
@@ -847,10 +807,9 @@ export function verificarFimDeVideoNoModoContinuo() {
 
 
   /*
-     Pequeno atraso para garantir que
-     o YouTube terminou completamente
-     o vídeo anterior antes de carregar
-     o próximo.
+     Pequeno intervalo para garantir
+     que o vídeo anterior terminou
+     completamente.
   */
 
   setTimeout(
@@ -877,14 +836,14 @@ export function verificarFimDeVideoNoModoContinuo() {
    PARA O MODO ALEATÓRIO
    ========================================== */
 
-export function pararModoAleatorio() {
+function pararModoAleatorio() {
 
   modoAleatorioContinuoAtivo =
     false;
 
 
   if (
-    typeof state !== 'undefined'
+    typeof state !== "undefined"
   ) {
 
     state.modoAleatorioAtivo =
@@ -903,13 +862,11 @@ export function filtrarVideos() {
 
   const searchInput =
     document.getElementById(
-      'search-input'
+      "search-input"
     );
 
 
-  if (!searchInput) {
-    return;
-  }
+  if (!searchInput) return;
 
 
   const termoBruto =
@@ -919,10 +876,10 @@ export function filtrarVideos() {
   const termos =
     termoBruto
       ? termoBruto
-          .normalize('NFD')
+          .normalize("NFD")
           .replace(
             /[\u0300-\u036f]/g,
-            ''
+            ""
           )
           .toLowerCase()
           .split(/\s+/)
@@ -931,7 +888,7 @@ export function filtrarVideos() {
 
   const cards =
     document.querySelectorAll(
-      '.video-card-item'
+      ".video-card-item"
     );
 
 
@@ -939,21 +896,19 @@ export function filtrarVideos() {
 
     const tituloEl =
       card.querySelector(
-        '.video-card-title'
+        ".video-card-title"
       );
 
 
-    if (!tituloEl) {
-      return;
-    }
+    if (!tituloEl) return;
 
 
     const titulo =
       tituloEl.textContent
-        .normalize('NFD')
+        .normalize("NFD")
         .replace(
           /[\u0300-\u036f]/g,
-          ''
+          ""
         )
         .toLowerCase();
 
@@ -961,11 +916,6 @@ export function filtrarVideos() {
     const atendeTodos =
       termos.every(
         (t, index) => {
-
-          /*
-             Trata números de 1 ou 2 dígitos
-             separadamente.
-          */
 
           if (
             /^\d{1,2}$/.test(t)
@@ -1002,11 +952,6 @@ export function filtrarVideos() {
           }
 
 
-          /*
-             Trata números de quatro
-             dígitos.
-          */
-
           if (
             /^\d{4}$/.test(t)
           ) {
@@ -1042,12 +987,6 @@ export function filtrarVideos() {
           }
 
 
-          /*
-             Para palavras normais,
-             procura em qualquer parte
-             do título.
-          */
-
           return titulo.includes(t);
 
         }
@@ -1060,12 +999,12 @@ export function filtrarVideos() {
     ) {
 
       card.style.display =
-        'flex';
+        "flex";
 
     } else {
 
       card.style.display =
-        'none';
+        "none";
 
     }
 
@@ -1075,30 +1014,43 @@ export function filtrarVideos() {
 
 
 /* ==========================================
-   CONVERSÃO UTF-8 -> BASE64
+   IMPORTAÇÃO DA CONFIGURAÇÃO DO GITHUB
+   ========================================== */
+
+
+/*
+   A importação foi mantida do seu
+   player.js original.
+*/
+
+
+/* ==========================================
+   UTF-8 -> BASE64
    ========================================== */
 
 export function utf8ToBase64(str) {
 
   return btoa(
+
     encodeURIComponent(str)
       .replace(
         /%([0-9A-F]{2})/g,
         function(match, p1) {
 
           return String.fromCharCode(
-            '0x' + p1
+            "0x" + p1
           );
 
         }
       )
+
   );
 
 }
 
 
 /* ==========================================
-   CONVERSÃO BASE64 -> UTF-8
+   BASE64 -> UTF-8
    ========================================== */
 
 export function base64ToUtf8(base64) {
@@ -1108,23 +1060,21 @@ export function base64ToUtf8(base64) {
     Array.prototype.map.call(
 
       atob(
-        base64.replace(/\s/g, '')
+        base64.replace(/\s/g, "")
       ),
 
       function(c) {
 
-        return (
-          '%' +
+        return "%" +
           (
-            '00' +
+            "00" +
             c.charCodeAt(0)
               .toString(16)
-          ).slice(-2)
-        );
+          ).slice(-2);
 
       }
 
-    ).join('')
+    ).join("")
 
   );
 
@@ -1142,11 +1092,11 @@ export function formatarArrayParaCodigo(
   const itensFormatados =
     array.map(
       item =>
-        `  { title: "${item.title.replace(/"/g, '\\"')}" , youtubeId: "${item.youtubeId}" }`
+        `  { title: "${item.title.replace(/"/g, '\\"')}", youtubeId: "${item.youtubeId}" }`
     );
 
 
-  return `const listaVideos = [\n${itensFormatados.join(' ,\n')}\n];`;
+  return `const listaVideos = [\n${itensFormatados.join(",\n")}\n];`;
 
 }
 
@@ -1166,7 +1116,7 @@ export async function salvarListaNoGitHub(
   if (!token) {
 
     throw new Error(
-      'Informe o Token do GitHub.'
+      "Informe o Token do GitHub."
     );
 
   }
@@ -1179,10 +1129,6 @@ export async function salvarListaNoGitHub(
     `${CONFIG.GITHUB_FILE}`;
 
 
-  /* ======================================
-     BUSCA O ARQUIVO
-     ====================================== */
-
   const resGet =
     await fetch(
       apiUrl,
@@ -1190,11 +1136,11 @@ export async function salvarListaNoGitHub(
 
         headers: {
 
-          Authorization:
+          "Authorization":
             `Bearer ${token}`,
 
-          Accept:
-            'application/vnd.github.v3+json'
+          "Accept":
+            "application/vnd.github.v3+json"
 
         }
 
@@ -1209,7 +1155,7 @@ export async function salvarListaNoGitHub(
     ) {
 
       throw new Error(
-        'Token do GitHub inválido.'
+        "Token do GitHub inválido."
       );
 
     }
@@ -1220,7 +1166,7 @@ export async function salvarListaNoGitHub(
     ) {
 
       throw new Error(
-        'Repositório ou arquivo index.html não encontrado.'
+        "Repositório ou arquivo index.html não encontrado."
       );
 
     }
@@ -1243,10 +1189,6 @@ export async function salvarListaNoGitHub(
     );
 
 
-  /* ======================================
-     LOCALIZA A LISTA DE VÍDEOS
-     ====================================== */
-
   const regexLista =
     /const listaVideos = \[\s*[\s\S]*?\s*\];/;
 
@@ -1258,15 +1200,11 @@ export async function salvarListaNoGitHub(
   ) {
 
     throw new Error(
-      'A estrutura listaVideos não foi encontrada no arquivo.'
+      "A estrutura listaVideos não foi encontrada no arquivo."
     );
 
   }
 
-
-  /* ======================================
-     GERA NOVA LISTA
-     ====================================== */
 
   const novoCodigoArray =
     formatarArrayParaCodigo(
@@ -1281,14 +1219,10 @@ export async function salvarListaNoGitHub(
     );
 
 
-  /* ======================================
-     ATUALIZA SENHA DO USUÁRIO
-     ====================================== */
-
   if (novaSenhaUser) {
 
     const regexUser =
-      /let SENHA_USUARIO\s*=\s*".*?";/;
+      /let SENHA_USUARIO = ".*?";/;
 
 
     contentDecoded =
@@ -1300,14 +1234,10 @@ export async function salvarListaNoGitHub(
   }
 
 
-  /* ======================================
-     ATUALIZA SENHA DO ADMIN
-     ====================================== */
-
   if (novaSenhaAdmin) {
 
     const regexAdmin =
-      /let SENHA_ADMIN\s*=\s*".*?";/;
+      /let SENHA_ADMIN = ".*?";/;
 
 
     contentDecoded =
@@ -1319,56 +1249,45 @@ export async function salvarListaNoGitHub(
   }
 
 
-  /* ======================================
-     CONVERTE PARA BASE64
-     ====================================== */
-
   const contentEncoded =
     utf8ToBase64(
       contentDecoded
     );
 
 
-  /* ======================================
-     ENVIA PARA O GITHUB
-     ====================================== */
-
   const resPut =
     await fetch(
       apiUrl,
       {
 
-        method: 'PUT',
+        method: "PUT",
 
         headers: {
 
-          Authorization:
+          "Authorization":
             `Bearer ${token}`,
 
-          Accept:
-            'application/vnd.github.v3+json',
+          "Accept":
+            "application/vnd.github.v3+json",
 
-          'Content-Type':
-            'application/json'
+          "Content-Type":
+            "application/json"
 
         },
 
-
         body:
-          JSON.stringify(
-            {
+          JSON.stringify({
 
-              message:
-                mensagemCommit,
+            message:
+              mensagemCommit,
 
-              content:
-                contentEncoded,
+            content:
+              contentEncoded,
 
-              sha:
-                fileData.sha
+            sha:
+              fileData.sha
 
-            }
-          )
+          })
 
       }
     );
@@ -1382,7 +1301,7 @@ export async function salvarListaNoGitHub(
 
     throw new Error(
       errData.message ||
-      'Erro ao salvar no GitHub.'
+      "Erro ao salvar no GitHub."
     );
 
   }
