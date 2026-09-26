@@ -423,12 +423,12 @@ export async function tocarVideo(index) {
         background: rgba(0, 0, 0, 0.6);
         color: #fff;
         border: 2px solid #c5a059;
-        font-size: 1.5rem;
-        padding: 5px 15px;
+        font-size: 1.2rem;
+        padding: 2px 12px;
         border-radius: 6px;
         cursor: pointer;
         z-index: 10000;
-      ">✕ Fechar</button>
+      ">✕</button>
 
       <div style="
         position: relative;
