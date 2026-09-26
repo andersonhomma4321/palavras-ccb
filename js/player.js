@@ -402,7 +402,7 @@ export async function tocarVideo(index) {
     });
   }
 
-  // Mostra o overlay e entra em tela cheia imediatamente durante o clique do usuário
+  // Mostra o overlay e entra em tela cheia imediatamente durante o clique do utilizador
   playerOverlay.style.display = 'flex';
   
   if (playerOverlay.requestFullscreen) {
