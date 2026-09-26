@@ -351,10 +351,7 @@ export async function tocarVideo(index) {
   const videoId = video.youtubeId || video.youtubeld;
 
   if (!videoId) {
-    console.error(
-      "ID do YouTube não encontrado:",
-      video
-    );
+    console.error("ID do YouTube não encontrado:", video);
     return;
   }
 
