@@ -410,7 +410,7 @@ export async function tocarVideo(index) {
           z-index: 10000;
         "
       >
-        ✕ Fechar
+        ✕
       </button>
 
       <div
