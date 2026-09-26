@@ -335,49 +335,119 @@ export function focarCartaoVideo(index) {
    ========================================== */
 
 export async function tocarVideo(index) {
-
-  if (
-    !listaVideos ||
-    listaVideos.length === 0
-  ) {
-
+  if (!listaVideos || listaVideos.length === 0) {
     return;
-
   }
 
-
-  if (
-    index < 0 ||
-    index >= listaVideos.length
-  ) {
-
+  if (index < 0 || index >= listaVideos.length) {
     return;
-
   }
 
+  state.currentVideoIndex = index;
 
-  state.currentVideoIndex =
-    index;
+  const video = listaVideos[index];
 
-
-  const video =
-    listaVideos[index];
-
-
-  const videoId =
-    video.youtubeId || video.youtubeld;
-
+  // Suporte a ambas as grafias do ID do YouTube no objeto de dados
+  const videoId = video.youtubeId || video.youtubeld;
 
   if (!videoId) {
-
     console.error(
       "ID do YouTube não encontrado:",
       video
     );
-
     return;
-
   }
+
+  /* ======================================
+     CRIA O OVERLAY SE NÃO EXISTIR
+     ====================================== */
+  let playerOverlay = document.getElementById('fullscreen-player-overlay');
+  
+  if (!playerOverlay) {
+    playerOverlay = document.createElement('div');
+    playerOverlay.id = 'fullscreen-player-overlay';
+    playerOverlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    `;
+    
+    playerOverlay.innerHTML = `
+      <button id="close-fullscreen-player" style="
+        position: absolute;
+        top: 20px;
+        right: 25px;
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        border: 2px solid #c5a059;
+        font-size: 1.5rem;
+        padding: 5px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        z-index: 10000;
+      ">✕ Fechar</button>
+      <div style="position: relative; width: 100%; height: 100%;">
+        <div id="youtube-player-div" style="width: 100%; height: 100%;"></div>
+      </div>
+    `;
+    document.body.appendChild(playerOverlay);
+
+    document.getElementById('close-fullscreen-player').addEventListener('click', () => {
+      fecharPlayerFullscreen();
+    });
+  }
+
+  // Mostra o overlay e entra em tela cheia imediatamente durante o clique do usuário
+  playerOverlay.style.display = 'flex';
+  
+  if (playerOverlay.requestFullscreen) {
+    playerOverlay.requestFullscreen().catch(err => console.log('Fullscreen recusado:', err));
+  }
+
+  // Aguarda a API do YouTube carregar
+  try {
+    await carregarYouTubeAPI();
+  } catch (error) {
+    console.error('Não foi possível carregar a API do YouTube:', error);
+    alert('Não foi possível carregar o player do YouTube.');
+    return;
+  }
+
+  // Se já existe uma instância do player, apenas carrega o novo vídeo com autoplay
+  if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
+    ytPlayerInstance.loadVideoById(videoId);
+    return;
+  }
+
+  // Caso contrário, cria a nova instância do player do YouTube
+  ytPlayerInstance = new YT.Player('youtube-player-div', {
+    height: '100%',
+    width: '100%',
+    videoId: videoId,
+    playerVars: {
+      autoplay: 1,
+      enablejsapi: 1,
+      vq: 'hd1080',
+      hd: 1,
+      playsinline: 0
+    },
+    events: {
+      onReady: (event) => {
+        event.target.playVideo();
+      },
+      onStateChange: onPlayerStateChange,
+      onError: onPlayerError
+    }
+  });
+}
 
 
   /* ======================================
