@@ -398,7 +398,7 @@ export async function tocarVideo(index) {
         id="close-fullscreen-player"
         style="
           position: absolute;
-          top: 20px;
+          top: 40px;
           right: 25px;
           background: rgba(0, 0, 0, 0.6);
           color: #fff;
