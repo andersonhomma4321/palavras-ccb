@@ -38,6 +38,14 @@ export function focarCartaoVideo(index) {
     });
 }
 
+export function focarAdminMenu() {
+    const adminElement = document.getElementById('admin-menu') || document.querySelector('.admin-section');
+    if (adminElement) {
+        adminElement.focus();
+        adminElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
 export function initKeyboardNavigation() {
     window.addEventListener('resize', () => {
         calcularColunas();
