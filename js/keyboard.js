@@ -93,9 +93,15 @@ export function inicializarTeclado() {
                 e.preventDefault();
                 state.kbPlaylistIndex = 0;
                 focarCartaoVideo(state.kbPlaylistIndex);
+                // Move o foco para o elemento da grelha ou garante que o próximo evento trate a grelha
+                const primeiroCartao = document.querySelector('.video-card-item');
+                if (primeiroCartao) primeiroCartao.focus();
             } else if (e.key === "ArrowUp") {
                 e.preventDefault();
                 if (searchBox) searchBox.focus();
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                btnRandom.click();
             }
             return;
         }
