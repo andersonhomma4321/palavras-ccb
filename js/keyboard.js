@@ -2,7 +2,6 @@
 GERENCIAMENTO DE TECLADO / CONTROLES
 ========================================== */
 import { state } from './state.js';
-import { listaVideos, listaExibida } from '../data/videos.js';
 
 let colunas = 4; // Quantidade padrão de colunas na grade de vídeos
 
@@ -64,15 +63,15 @@ export function initKeyboardNavigation() {
         }
 
         const cards = document.querySelectorAll('.video-card-item');
-        if (cards.length > 0 && Array.from(cards).includes(document.activeElement) || document.activeElement === btnRandom) {
+        if (cards.length > 0 && (Array.from(cards).includes(document.activeElement) || document.activeElement === btnRandom)) {
             
             if (e.key === "ArrowRight") {
                 e.preventDefault();
                 if (document.activeElement === btnRandom) {
                     focarCartaoVideo(0);
                 } else {
-                    if (listaExibida.length > 0) {
-                        state.kbPlaylistIndex = (state.kbPlaylistIndex + 1) % listaExibida.length;
+                    if (cards.length > 0) {
+                        state.kbPlaylistIndex = (state.kbPlaylistIndex + 1) % cards.length;
                         focarCartaoVideo(state.kbPlaylistIndex);
                     }
                 }
@@ -81,7 +80,7 @@ export function initKeyboardNavigation() {
                 if (document.activeElement === btnRandom) {
                     return;
                 } else {
-                    state.kbPlaylistIndex = (state.kbPlaylistIndex - 1 + listaExibida.length) % listaExibida.length;
+                    state.kbPlaylistIndex = (state.kbPlaylistIndex - 1 + cards.length) % cards.length;
                     focarCartaoVideo(state.kbPlaylistIndex);
                 }
             } else if (e.key === "ArrowDown") {
@@ -91,7 +90,7 @@ export function initKeyboardNavigation() {
                     focarCartaoVideo(state.kbPlaylistIndex);
                 } else {
                     let novoIndex = state.kbPlaylistIndex + colunas; 
-                    if (novoIndex >= listaExibida.length) novoIndex = listaExibida.length - 1;
+                    if (novoIndex >= cards.length) novoIndex = cards.length - 1;
                     state.kbPlaylistIndex = novoIndex;
                     focarCartaoVideo(state.kbPlaylistIndex);
                 }
