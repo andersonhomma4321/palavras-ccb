@@ -237,40 +237,19 @@ export function renderizarLista(videos) {
    ========================================== */
 
 export function carregarPlaylist() {
-
-  renderizarLista(listaVideos);
-
-
-  if (listaVideos.length > 0) {
-
-    if (
-      state.currentVideoIndex < 0
-    ) {
-      state.currentVideoIndex = 0;
+    renderizarLista(listaVideos);
+    if (listaVideos.length > 0) {
+        if (state.currentVideoIndex < 0) {
+            state.currentVideoIndex = 0;
+        }
+        state.kbPlaylistIndex = 0;
+        const playlistElement = document.getElementById('playlist');
+        if (playlistElement) {
+            playlistElement.setAttribute('tabindex', '0');
+            playlistElement.focus();
+            focarCartaoVideo(0);
+        }
     }
-
-    state.kbPlaylistIndex = 0;
-
-  }
-
-
-  const playlistElement =
-    document.getElementById('playlist');
-
-
-  if (playlistElement) {
-
-    playlistElement.setAttribute(
-      'tabindex',
-      '0'
-    );
-
-    playlistElement.focus();
-
-    focarCartaoVideo(0);
-
-  }
-
 }
 
 
