@@ -38,6 +38,14 @@ export function focarCartaoVideo(index) {
     });
 }
 
+export function focarMenuPrincipal() {
+    const menuElement = document.getElementById('main-menu') || document.querySelector('nav') || document.getElementById('search-input');
+    if (menuElement) {
+        menuElement.focus();
+        menuElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
 export function focarAdminMenu() {
     const adminElement = document.getElementById('admin-menu') || document.querySelector('.admin-section');
     if (adminElement) {
