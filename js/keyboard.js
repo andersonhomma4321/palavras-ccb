@@ -27,100 +27,77 @@ export function inicializarTeclado() {
     }
 
     // 2. TELA "PALAVRAS" (YOUTUBE TV) - GRELHA DE VÍDEOS
-    if (appVisivel) {
-      const searchBox = document.getElementById("search-input");
-      const termoBruto = searchBox ? searchBox.value : "";
-      const termos = termoBruto ? termoBruto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/\s+/) : [];
-      const listaExibida = termos.length > 0
-        ? listaVideos.filter(video => {
-            const tit = video.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-            return termos.every((t, index) => {
-              if (/^\d{1,2}$/.test(t)) {
-                if (index === termos.length - 1 && termos.length >= 3) {
-                  const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
-                  return regex.test(tit);
-                }
-                const regex = new RegExp(`\\b${t}\\b`);
-                return regex.test(tit);
-              }
-              if (/^\d{4}$/.test(t)) {
-                if (index === termos.length - 1 && termos.length >= 3) {
-                  const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
-                  return regex.test(tit);
-                }
-                const regex = new RegExp(`\\b${t}\\b`);
-                return regex.test(tit);
-              }
-              return tit.includes(t);
-            });
-          })
-        : listaVideos;
-
-      // Calcula dinamicamente a quantidade de colunas na grelha
-      const gridContainer = document.getElementById("playlist");
-      let colunas = 4;
-      if (gridContainer) {
-        const computedStyle = window.getComputedStyle(gridContainer);
-        const colTemplate = computedStyle.getPropertyValue("grid-template-columns");
-        colunas = colTemplate ? colTemplate.split(" ").length : 4;
-      }
-
-      // SE O FOCO ESTIVER NO CAMPO DE PESQUISA
-      if (document.activeElement === searchBox) {
-        if (e.key === "ArrowDown" || e.key === "Enter") {
-          e.preventDefault();
-          // Sai da busca e vai para o primeiro cartão da grelha
-          state.kbPlaylistIndex = 0;
-          focarCartaoVideo(state.kbPlaylistIndex);
+    // SE O FOCO ESTIVER NO CAMPO DE PESQUISA
+    if (document.activeElement === searchBox) {
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            // Vai para o botão de vídeos aleatórios se existir, senão vai para a grelha
+            const btnRandom = document.getElementById("btn-random-videos");
+            if (btnRandom) {
+                btnRandom.focus();
+            } else {
+                state.kbPlaylistIndex = 0;
+                focarCartaoVideo(state.kbPlaylistIndex);
+            }
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            const btnAppBack = document.getElementById("btn-app-back");
+            if (btnAppBack) btnAppBack.focus();
         } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
-          // Permite mover livremente o cursor dentro do texto da caixa de pesquisa
-          return;
+            return;
         }
         return;
-      }
+    }
 
-      // NAVEGAÇÃO POR SETAS NOS CARTÕES DE VÍDEO
-      if (e.key === "ArrowRight") {
+    // TRATAMENTO PARA O BOTÃO DE VÍDEOS ALEATÓRIOS (caso esteja focado)
+    const btnRandom = document.getElementById("btn-random-videos");
+    if (document.activeElement === btnRandom) {
+        if (e.key === "ArrowDown") {
+            e.preventDefault();
+            state.kbPlaylistIndex = 0;
+            focarCartaoVideo(state.kbPlaylistIndex);
+        } else if (e.key === "ArrowUp") {
+            e.preventDefault();
+            if (searchBox) searchBox.focus();
+        }
+        return;
+    }
+
+    // NAVEGAÇÃO POR SETAS NOS CARTÕES DE VÍDEO
+    if (e.key === "ArrowRight") {
         e.preventDefault();
         if (listaExibida.length > 0) {
-          state.kbPlaylistIndex = (state.kbPlaylistIndex + 1) % listaExibida.length;
-          focarCartaoVideo(state.kbPlaylistIndex);
+            state.kbPlaylistIndex = (state.kbPlaylistIndex + 1) % listaExibida.length;
+            focarCartaoVideo(state.kbPlaylistIndex);
         }
-      } else if (e.key === "ArrowLeft") {
+    } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         if (listaExibida.length > 0) {
-          state.kbPlaylistIndex = (state.kbPlaylistIndex - 1 + listaExibida.length) % listaExibida.length;
-          focarCartaoVideo(state.kbPlaylistIndex);
+            state.kbPlaylistIndex = (state.kbPlaylistIndex - 1 + listaExibida.length) % listaExibida.length;
+            focarCartaoVideo(state.kbPlaylistIndex);
         }
-      } else if (e.key === "ArrowDown") {
+    } else if (e.key === "ArrowDown") {
         e.preventDefault();
         if (listaExibida.length > 0) {
-          let novoIndex = state.kbPlaylistIndex + colunas;
-          if (novoIndex >= listaExibida.length) novoIndex = listaExibida.length - 1;
-          state.kbPlaylistIndex = novoIndex;
-          focarCartaoVideo(state.kbPlaylistIndex);
+            let novoIndex = state.kbPlaylistIndex + colunas;
+            if (novoIndex >= listaExibida.length) novoIndex = listaExibida.length - 1;
+            state.kbPlaylistIndex = novoIndex;
+            focarCartaoVideo(state.kbPlaylistIndex);
         }
-      } else if (e.key === "ArrowUp") {
+    } else if (e.key === "ArrowUp") {
         e.preventDefault();
         let novoIndex = state.kbPlaylistIndex - colunas;
         if (novoIndex < 0) {
-          // Se estiver na primeira linha e carregar para cima, volta para o campo de pesquisa
-          if (searchBox) searchBox.focus();
+            // Se estiver na primeira linha, vai para o botão de vídeos aleatórios primeiro
+            if (btnRandom) {
+                btnRandom.focus();
+            } else if (searchBox) {
+                searchBox.focus();
+            }
         } else {
-          state.kbPlaylistIndex = novoIndex;
-          focarCartaoVideo(state.kbPlaylistIndex);
+            state.kbPlaylistIndex = novoIndex;
+            focarCartaoVideo(state.kbPlaylistIndex);
         }
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        if (listaExibida[state.kbPlaylistIndex]) {
-          const videoAlvo = listaExibida[state.kbPlaylistIndex];
-          const indexOriginal = listaVideos.findIndex(v => (v.youtubeId || v.youtubeld) === (videoAlvo.youtubeId || videoAlvo.youtubeld));
-          if (indexOriginal !== -1) {
-            tocarVideo(indexOriginal);
-          }
-        }
-      }
-      return;
     }
 
     // 3. MENU PRINCIPAL OU MODAIS (Navegação vertical genérica por botões)
