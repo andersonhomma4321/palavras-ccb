@@ -54,6 +54,10 @@ export function focarAdminMenu() {
     }
 }
 
+export function inicializarTeclado() {
+    initKeyboardNavigation();
+}
+
 export function initKeyboardNavigation() {
     window.addEventListener('resize', () => {
         calcularColunas();
