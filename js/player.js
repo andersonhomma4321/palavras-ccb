@@ -875,181 +875,80 @@ export function pararModoAleatorio() {
 
 
 /* ==========================================
-   FILTRA OS VÍDEOS
-   ========================================== */
-
+FILTRA OS VÍDEOS
+========================================== */
 export function filtrarVideos() {
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) return;
 
-  const searchInput =
-    document.getElementById(
-      'search-input'
-    );
+    const termoBruto = searchInput.value;
+    const termos = termoBruto
+        ? termoBruto
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .split(/\s+/)
+        : [];
 
+    const cards = document.querySelectorAll('.video-card-item');
 
-  if (!searchInput) {
-    return;
-  }
+    cards.forEach(card => {
+        const tituloEl = card.querySelector('.video-card-title');
+        if (!tituloEl) return;
 
+        const titulo = tituloEl.textContent
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
 
-  const termoBruto =
-    searchInput.value;
+        const atendeTodos = termos.every((t, index) => {
+            /*
+               Trata números de 1 ou 2 dígitos (ex: Mês ou Dia).
+               Se houver um termo numérico anterior de 4 dígitos (Ano), 
+               garantimos que este número de 2 dígitos seja tratado como MÊS 
+               (logo após o ano, ex: '2026 09' não pega '2026 ... 09').
+            */
+            if (/^\d{1,2}$/.test(t)) {
+                // Se o termo anterior na busca foi um ano de 4 dígitos, este número é o mês
+                const termoAnterior = index > 0 ? termos[index - 1] : null;
+                if (termoAnterior && /^\d{4}$/.test(termoAnterior)) {
+                    // Regex para garantir que o número venha logo após o ano (Ano Mês)
+                    const regexAnoMes = new RegExp(`${termoAnterior}\\s+0?${parseInt(t, 10)}\\b`);
+                    return regexAnoMes.test(titulo);
+                }
 
-
-  const termos =
-    termoBruto
-      ? termoBruto
-          .normalize('NFD')
-          .replace(
-            /[\u0300-\u036f]/g,
-            ''
-          )
-          .toLowerCase()
-          .split(/\s+/)
-      : [];
-
-
-  const cards =
-    document.querySelectorAll(
-      '.video-card-item'
-    );
-
-
-  cards.forEach(card => {
-
-    const tituloEl =
-      card.querySelector(
-        '.video-card-title'
-      );
-
-
-    if (!tituloEl) {
-      return;
-    }
-
-
-    const titulo =
-      tituloEl.textContent
-        .normalize('NFD')
-        .replace(
-          /[\u0300-\u036f]/g,
-          ''
-        )
-        .toLowerCase();
-
-
-    const atendeTodos =
-      termos.every(
-        (t, index) => {
-
-          /*
-             Trata números de 1 ou 2 dígitos
-             separadamente.
-          */
-
-          if (
-            /^\d{1,2}$/.test(t)
-          ) {
-
-            if (
-              index ===
-                termos.length - 1 &&
-              termos.length >= 3
-            ) {
-
-              const regex =
-                new RegExp(
-                  `\\b${t}\\b(?!\\s*\\d{2})`
-                );
-
-              return regex.test(
-                titulo
-              );
-
+                if (index === termos.length - 1 && termos.length >= 3) {
+                    const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
+                    return regex.test(titulo);
+                }
+                const regex = new RegExp(`\\b${t}\\b`);
+                return regex.test(titulo);
             }
 
-
-            const regex =
-              new RegExp(
-                `\\b${t}\\b`
-              );
-
-
-            return regex.test(
-              titulo
-            );
-
-          }
-
-
-          /*
-             Trata números de quatro
-             dígitos.
-          */
-
-          if (
-            /^\d{4}$/.test(t)
-          ) {
-
-            if (
-              index ===
-                termos.length - 1 &&
-              termos.length >= 3
-            ) {
-
-              const regex =
-                new RegExp(
-                  `\\b${t}\\b(?!\\s*\\d{2})`
-                );
-
-              return regex.test(
-                titulo
-              );
-
+            /*
+               Trata números de quatro dígitos (Ano).
+            */
+            if (/^\d{4}$/.test(t)) {
+                if (index === termos.length - 1 && termos.length >= 3) {
+                    const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
+                    return regex.test(titulo);
+                }
+                const regex = new RegExp(`\\b${t}\\b`);
+                return regex.test(titulo);
             }
 
+            /*
+               Para palavras normais, procura em qualquer parte do título.
+            */
+            return titulo.includes(t);
+        });
 
-            const regex =
-              new RegExp(
-                `\\b${t}\\b`
-              );
-
-
-            return regex.test(
-              titulo
-            );
-
-          }
-
-
-          /*
-             Para palavras normais,
-             procura em qualquer parte
-             do título.
-          */
-
-          return titulo.includes(t);
-
+        if (atendeTodos || termos.length === 0) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
         }
-      );
-
-
-    if (
-      atendeTodos ||
-      termos.length === 0
-    ) {
-
-      card.style.display =
-        'flex';
-
-    } else {
-
-      card.style.display =
-        'none';
-
-    }
-
-  });
-
+    });
 }
 
 
