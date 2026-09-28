@@ -67,27 +67,30 @@ export function inicializarTeclado() {
 
         // SE O FOCO ESTIVER NO CAMPO DE PESQUISA
         if (document.activeElement === searchBox) {
-          if (e.key === "ArrowDown") {
-              e.preventDefault();
-              const btnRandom = document.getElementById("btn-random-videos");
-              if (btnRandom) {
-                  btnRandom.focus();
-              } else {
-                  state.kbPlaylistIndex = 0;
-                  focarCartaoVideo(state.kbPlaylistIndex);
-              }
-          } else if (e.key === "ArrowUp") {
-              e.preventDefault();
-              const btnAppBack = document.getElementById("btn-app-back");
-              if (btnAppBack) btnAppBack.focus();
-          } else if (e.key === "ArrowLeft") {
-              e.preventDefault();
-              const btnAppBack = document.getElementById("btn-app-back");
-              if (btnAppBack) btnAppBack.focus();
-          } else if (e.key === "ArrowRight") {
-              return; // Permite mover o cursor livremente pelo texto dentro da busca
-          }
-          return;
+            if (e.key === "ArrowDown") {
+                e.preventDefault();
+                const btnRandom = document.getElementById("btn-random-videos");
+                if (btnRandom) {
+                    btnRandom.focus();
+                } else {
+                    state.kbPlaylistIndex = 0;
+                    focarCartaoVideo(state.kbPlaylistIndex);
+                }
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                const btnAppBack = document.getElementById("btn-app-back") || document.getElementById("btn-back") || document.getElementById("btn-voltar");
+                if (btnAppBack) btnAppBack.focus();
+            } else if (e.key === "ArrowLeft") {
+                e.preventDefault();
+                // Tenta encontrar o botão do menu por diferentes IDs comuns no projeto
+                const btnMenu = document.getElementById("btn-app-back") || document.getElementById("btn-back") || document.getElementById("btn-voltar") || document.querySelector(".btn-voltar") || document.querySelector("header button");
+                if (btnMenu) {
+                    btnMenu.focus();
+                }
+            } else if (e.key === "ArrowRight") {
+                return; // Permite mover o cursor livremente pelo texto dentro da busca
+            }
+            return;
         }
 
         // TRATAMENTO PARA O BOTÃO DE VÍDEOS ALEATÓRIOS (caso esteja focado)
