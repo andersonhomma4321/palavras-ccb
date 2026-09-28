@@ -2,7 +2,7 @@
 GERENCIAMENTO DE TECLADO / CONTROLES
 ========================================== */
 import { state } from './state.js';
-import { listaVideos, listaExibida } from './data.js';
+import { listaVideos, listaExibida } from '../data.js';
 import { filtrarVideos, renderizarLista } from './player.js';
 
 let colunas = 4; // Quantidade padrão de colunas na grade de vídeos
