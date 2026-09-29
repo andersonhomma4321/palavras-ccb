@@ -275,7 +275,7 @@ export function focarCartaoVideo(index) {
 
 
 /* ==========================================
-REPRODUZ UM VÍDEO
+REPRODUZ UM VÍDEO (VIA IFRAME DIRETO COM ALTA RESOLUÇÃO)
 ========================================== */
 export async function tocarVideo(index) {
     if (!listaVideos || listaVideos.length === 0) {
@@ -334,20 +334,13 @@ export async function tocarVideo(index) {
                 ✕
             </button>
             <div
+                id="youtube-player-container"
                 style="
                     position: relative;
                     width: 100%;
                     height: 100%;
                 "
-            >
-                <div
-                    id="youtube-player-div"
-                    style="
-                        width: 100%;
-                        height: 100%;
-                    "
-                ></div>
-            </div>
+            ></div>
         `;
         document.body.appendChild(playerOverlay);
 
@@ -371,79 +364,25 @@ export async function tocarVideo(index) {
     }
 
     /* ======================================
-    AGUARDA A API DO YOUTUBE
+    INSERE O IFRAME COM PARÂMETROS DE MÁXIMA QUALIDADE
     ====================================== */
-    try {
-        await carregarYouTubeAPI();
-    } catch (error) {
-        console.error('Não foi possível carregar a API do YouTube:', error);
-        alert('Não foi possível carregar o player do YouTube.');
-        return;
-    }
-
-    /* ======================================
-    PROCURA O CONTAINER
-    ====================================== */
-    const playerContainer = document.getElementById('youtube-player-div');
+    const playerContainer = document.getElementById('youtube-player-container');
     if (!playerContainer) {
         return;
     }
 
-    /* ======================================
-    SE JÁ EXISTE PLAYER
-    ====================================== */
-    if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
-        ytPlayerInstance.loadVideoById(videoId);
-        if (typeof ytPlayerInstance.setPlaybackQuality === 'function') {
-            ytPlayerInstance.setPlaybackQuality('hd2160');
-        }
-        return;
-    }
-
-    /* ======================================
-    CRIA O PLAYER DO YOUTUBE
-    ====================================== */
-    ytPlayerInstance = new YT.Player(
-        'youtube-player-div',
-        {
-            height: '100%',
-            width: '100%',
-            videoId: videoId,
-            playerVars: {
-                autoplay: 1,
-                enablejsapi: 1,
-                vq: 'hd2160', // Tenta forçar a resolução máxima (4K / 2160p)
-                hd: 1,
-                playsinline: 0,
-                rel: 0
-            },
-            events: {
-                onReady: (event) => {
-                    // Força a qualidade máxima assim que o player carrega
-                    if (typeof event.target.setPlaybackQuality === 'function') {
-                        event.target.setPlaybackQuality('hd2160');
-                    }
-                    event.target.playVideo();
-                },
-                onStateChange: (event) => {
-                    // Reforça a alta resolução quando o vídeo começa a tocar ativamente
-                    if (event.data === YT.PlayerState.PLAYING) {
-                        if (typeof event.target.setPlaybackQuality === 'function') {
-                            event.target.setPlaybackQuality('hd2160');
-                        }
-                    }
-                    if (typeof onPlayerStateChange === 'function') {
-                        onPlayerStateChange(event);
-                    }
-                },
-                onError: (event) => {
-                    if (typeof onPlayerError === 'function') {
-                        onPlayerError(event);
-                    }
-                }
-            }
-        }
-    );
+    // Usar a URL de embed direta forçando alta definição e desativando limitações de banda do player
+    playerContainer.innerHTML = `
+        <iframe 
+            id="youtube-player-div"
+            src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&vq=hd2160&hd=1&modestbranding=1&rel=0" 
+            width="100%" 
+            height="100%" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    `;
 }
 
 
