@@ -885,14 +885,19 @@ export function filtrarVideos() {
             .toLowerCase();
         
         const atendeTodos = termos.every((t) => {
-            // Trata números de 1 ou 2 dígitos de forma isolada e exata (ex: 6 não casa com 13)
+            // Trata números de 1 ou 2 dígitos de forma isolada e exata
             if (/^\d{1,2}$/.test(t)) {
                 const regex = new RegExp(`\\b${t}\\b`);
                 return regex.test(titulo);
             }
-            // Trata números de quatro dígitos (ex: anos como 2026)
+            // Trata números de quatro dígitos (anos)
             if (/^\d{4}$/.test(t)) {
                 const regex = new RegExp(`\\b${t}\\b`);
+                return regex.test(titulo);
+            }
+            // Se o termo tiver apenas 1 caractere (ex: 'l'), exige que alguma palavra comece com essa letra
+            if (t.length === 1) {
+                const regex = new RegExp(`\\b${t}`);
                 return regex.test(titulo);
             }
             // Para palavras normais, procura em qualquer parte do título
