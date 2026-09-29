@@ -1,293 +1,71 @@
 /* ==========================================
-   GESTOR DO PLAYER E DA LISTA DE VÍDEOS
-   ========================================== */
-
-import { state } from './state.js';
-import { listaVideos } from '../data/videos.js';
-import { CONFIG } from './config.js';
-
-
-/* ==========================================
-   VARIÁVEIS DO PLAYER
-   ========================================== */
-
-let modoAleatorioContinuoAtivo = false;
-let ytPlayerInstance = null;
-let youtubeApiPromise = null;
-
-
-/* ==========================================
-   CARREGA A API DO YOUTUBE
-   ========================================== */
-
-function carregarYouTubeAPI() {
-
-  // Se a API já estiver disponível, não precisa
-  // carregar novamente.
-  if (window.YT && window.YT.Player) {
-    return Promise.resolve(window.YT);
-  }
-
-  // Se já existe uma requisição em andamento,
-  // reutiliza a mesma Promise.
-  if (youtubeApiPromise) {
-    return youtubeApiPromise;
-  }
-
-  youtubeApiPromise = new Promise((resolve, reject) => {
-
-    let finalizado = false;
-
-    const timeout = setTimeout(() => {
-
-      if (!finalizado) {
-        finalizado = true;
-
-        reject(
-          new Error(
-            'A API do YouTube demorou muito para carregar.'
-          )
-        );
-      }
-
-    }, 15000);
-
-
-    // Guarda uma função anterior, caso outro código
-    // já tenha definido esse callback.
-    const callbackAnterior =
-      window.onYouTubeIframeAPIReady;
-
-
-    window.onYouTubeIframeAPIReady = function () {
-
-      if (
-        typeof callbackAnterior === 'function'
-      ) {
-        callbackAnterior();
-      }
-
-      if (!finalizado) {
-
-        finalizado = true;
-
-        clearTimeout(timeout);
-
-        resolve(window.YT);
-      }
-
-    };
-
-
-    // Verifica se o script já existe.
-    const scriptExistente =
-      document.querySelector(
-        'script[src="https://www.youtube.com/iframe_api"]'
-      );
-
-
-    if (!scriptExistente) {
-
-      const tag =
-        document.createElement('script');
-
-      tag.src =
-        'https://www.youtube.com/iframe_api';
-
-      tag.async = true;
-
-      document.head.appendChild(tag);
-
-    }
-
-  });
-
-  return youtubeApiPromise;
-}
-
-
-/* ==========================================
-   INICIALIZA O PLAYER
-   ========================================== */
-
-export function initPlayer() {
-
-  // Apenas garante que a API seja carregada.
-  //
-  // O botão de reprodução aleatória NÃO é
-  // configurado aqui porque o app.js já faz isso.
-  carregarYouTubeAPI().catch(error => {
-
-    console.error(
-      'Erro ao carregar a API do YouTube:',
-      error
-    );
-
-  });
-
-}
-
-
-/* ==========================================
-   CALLBACK GLOBAL DA API DO YOUTUBE
-   ========================================== */
-
-window.onYouTubeIframeAPIReady =
-  function () {
-
-    // A API ficou disponível.
-    // O player será criado somente quando
-    // um vídeo for solicitado.
-
-  };
-
-
-/* ==========================================
-   RENDERIZA A LISTA DE VÍDEOS
-   ========================================== */
-
-export function renderizarLista(videos) {
-
-  const playlistEl =
-    document.getElementById('playlist');
-
-  if (!playlistEl) return;
-
-  playlistEl.innerHTML = '';
-
-
-  videos.forEach((video, index) => {
-
-    // Compatibilidade com as duas nomenclaturas
-    // usadas no projeto.
-    const videoId =
-      video.youtubeId || video.youtubeld;
-
-
-    const card =
-      document.createElement('div');
-
-    card.className =
-      'video-card-item';
-
-    card.setAttribute(
-      'tabindex',
-      '0'
-    );
-
-    card.setAttribute(
-      'data-index',
-      index
-    );
-
-
-    const thumbUrl =
-      `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-
-
-    card.innerHTML = `
-      <div class="video-thumbnail-wrapper">
-        <img
-          src="${thumbUrl}"
-          alt="${video.title}"
-          onerror="this.src='https://img.youtube.com/vi/${videoId}/default.jpg'"
-        >
-      </div>
-
-      <div class="video-card-title">
-        ${video.title}
-      </div>
-    `;
-
-
-    /* ======================================
-       CLIQUE NO CARD
-       ====================================== */
-
-    card.addEventListener(
-      'click',
-      (e) => {
-
-        e.preventDefault();
-
-        state.kbPlaylistIndex =
-          index;
-
-
-        // Se o usuário escolher manualmente
-        // um vídeo, encerra o modo aleatório.
-        pararModoAleatorio();
-
-
-        tocarVideo(index);
-
-      }
-    );
-
-
-    playlistEl.appendChild(card);
-
-  });
-
-}
-
-
-/* ==========================================
-   CARREGA A PLAYLIST
-   ========================================== */
-
-export function carregarPlaylist() {
-    renderizarLista(listaVideos);
-    if (listaVideos.length > 0) {
-        if (state.currentVideoIndex < 0) {
-            state.currentVideoIndex = 0;
-        }
-        state.kbPlaylistIndex = 0;
-        const playlistElement = document.getElementById('playlist');
-        if (playlistElement) {
-            playlistElement.setAttribute('tabindex', '0');
-            playlistElement.focus();
-            focarCartaoVideo(0);
-        }
-    }
-}
-
-
-/* ==========================================
-FOCA UM CARTÃO DA PLAYLIST
+PLAYER.JS - Gestão do Leitor de Vídeos e Overlay
 ========================================== */
-export function focarCartaoVideo(index) {
-    const cards = document.querySelectorAll('.video-card-item');
-    cards.forEach((card, i) => {
-        if (i === index) {
-            card.classList.add('kb-focus');
-            // Comando que faz o scroll automático na grelha até o cartão focado
-            card.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'nearest'
-            });
-        } else {
-            card.classList.remove('kb-focus');
-        }
-    });
-}
 
+// Variáveis globais do player mantidas em conformidade com o projeto
+export let ytPlayerInstance = null;
+let apiLoadingPromise = null;
+
+// Objeto de estado global do projeto
+const state = {
+    currentVideoIndex: 0
+};
+
+// Se a sua aplicação utiliza uma lista de vídeos externa, ela será referenciada aqui
+// (Certifique-se de que listaVideos está importada ou declarada globalmente no seu escopo)
+
+/* ======================================
+CARREGA A API DO YOUTUBE (CASO NECESSÁRIO)
+====================================== */
+export function carregarYouTubeAPI() {
+    if (window.YT && window.YT.Player) {
+        return Promise.resolve();
+    }
+    if (apiLoadingPromise) {
+        return apiLoadingPromise;
+    }
+
+    apiLoadingPromise = new Promise((resolve, reject) => {
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        if (firstScriptTag && firstScriptTag.parentNode) {
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        } else {
+            document.head.appendChild(tag);
+        }
+
+        window.onYouTubeIframeAPIReady = () => {
+            resolve();
+        };
+
+        // Timeout de segurança caso a API demore a responder
+        setTimeout(() => {
+            if (window.YT && window.YT.Player) {
+                resolve();
+            } else {
+                reject(new Error('Timeout ao carregar a API do YouTube'));
+            }
+        }, 10000);
+    });
+
+    return apiLoadingPromise;
+}
 
 /* ==========================================
 REPRODUZ UM VÍDEO
 ========================================== */
 export async function tocarVideo(index) {
-    if (!listaVideos || listaVideos.length === 0) {
+    if (!window.listaVideos || window.listaVideos.length === 0) {
         return;
     }
-    if (index < 0 || index >= listaVideos.length) {
+    if (index < 0 || index >= window.listaVideos.length) {
         return;
     }
     state.currentVideoIndex = index;
-    const video = listaVideos[index];
+    const video = window.listaVideos[index];
     
-    // Compatibilidade com as nomenclaturas do projeto
+    // Compatibilidade com as duas nomenclaturas de ID presentes no projeto
     const videoId = video.youtubeId || video.youtubeld;
     if (!videoId) {
         console.error('Vídeo sem ID do YouTube:', video);
@@ -295,7 +73,7 @@ export async function tocarVideo(index) {
     }
 
     /* ======================================
-    CRIA O OVERLAY
+    CRIA OU RECUPERA O OVERLAY EM FULLSCREEN
     ====================================== */
     let playerOverlay = document.getElementById('fullscreen-player-overlay');
     if (!playerOverlay) {
@@ -308,7 +86,7 @@ export async function tocarVideo(index) {
             width: 100vw;
             height: 100vh;
             background: #000;
-            z-index: 9999;
+            z-index: 99999;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -319,523 +97,86 @@ export async function tocarVideo(index) {
                 id="close-fullscreen-player"
                 style="
                     position: absolute;
-                    top: 40px;
-                    right: 25px;
-                    background: rgba(0, 0, 0, 0.6);
+                    top: 25px;
+                    right: 35px;
+                    background: rgba(0, 0, 0, 0.8);
                     color: #fff;
                     border: 2px solid #c5a059;
-                    font-size: 1.5rem;
-                    padding: 3px 12px;
-                    border-radius: 6px;
+                    font-size: 1.8rem;
+                    padding: 5px 15px;
+                    border-radius: 8px;
                     cursor: pointer;
-                    z-index: 10000;
+                    z-index: 100000;
                 "
             >
                 ✕
             </button>
             <div
+                id="youtube-player-container"
                 style="
                     position: relative;
                     width: 100%;
                     height: 100%;
                 "
-            >
-                <div
-                    id="youtube-player-div"
-                    style="
-                        width: 100%;
-                        height: 100%;
-                    "
-                ></div>
-            </div>
+            ></div>
         `;
         document.body.appendChild(playerOverlay);
 
-        document.getElementById('close-fullscreen-player').addEventListener('click', () => {
+        // Evento seguro no botão "X" para fechar
+        document.getElementById('close-fullscreen-player').addEventListener('click', (e) => {
+            e.stopPropagation();
             fecharPlayerFullscreen();
         });
     }
 
-    /* ======================================
-    MOSTRA O PLAYER
-    ====================================== */
+    // Exibe o overlay
     playerOverlay.style.display = 'flex';
 
-    /* ======================================
-    ENTRA EM TELA CHEIA
-    ====================================== */
+    // Solicita o modo tela cheia do navegador
     if (playerOverlay.requestFullscreen) {
-        playerOverlay.requestFullscreen().catch(
-            err => console.log('Fullscreen recusado:', err)
-        );
+        playerOverlay.requestFullscreen().catch(err => console.log('Fullscreen recusado:', err));
     }
 
     /* ======================================
-    AGUARDA A API DO YOUTUBE
+    INSERE O IFRAME DO VÍDEO
     ====================================== */
-    try {
-        await carregarYouTubeAPI();
-    } catch (error) {
-        console.error('Não foi possível carregar a API do YouTube:', error);
-        alert('Não foi possível carregar o player do YouTube.');
-        return;
+    const playerContainer = document.getElementById('youtube-player-container');
+    if (playerContainer) {
+        playerContainer.innerHTML = `
+            <iframe 
+                src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1" 
+                width="100%" 
+                height="100%" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        `;
     }
-
-    /* ======================================
-    PROCURA O CONTAINER
-    ====================================== */
-    const playerContainer = document.getElementById('youtube-player-div');
-    if (!playerContainer) {
-        return;
-    }
-
-    /* ======================================
-    SE JÁ EXISTE PLAYER
-    ====================================== */
-    if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
-        ytPlayerInstance.loadVideoById(videoId);
-        if (typeof ytPlayerInstance.setPlaybackQuality === 'function') {
-            ytPlayerInstance.setPlaybackQuality('hd2160');
-        }
-        return;
-    }
-
-    /* ======================================
-    CRIA O PLAYER DO YOUTUBE
-    ====================================== */
-    ytPlayerInstance = new YT.Player(
-        'youtube-player-div',
-        {
-            height: '100%',
-            width: '100%',
-            videoId: videoId,
-            playerVars: {
-                autoplay: 1,
-                enablejsapi: 1,
-                vq: 'hd2160', // Tenta forçar a resolução máxima (4K / 2160p)
-                hd: 1,
-                playsinline: 0,
-                rel: 0
-            },
-            events: {
-                onReady: (event) => {
-                    // Força a qualidade máxima assim que o player carrega
-                    if (typeof event.target.setPlaybackQuality === 'function') {
-                        event.target.setPlaybackQuality('hd2160');
-                    }
-                    event.target.playVideo();
-                },
-                onStateChange: (event) => {
-                    // Reforça a alta resolução quando o vídeo começa a tocar ativamente
-                    if (event.data === YT.PlayerState.PLAYING) {
-                        if (typeof event.target.setPlaybackQuality === 'function') {
-                            event.target.setPlaybackQuality('hd2160');
-                        }
-                    }
-                    if (typeof onPlayerStateChange === 'function') {
-                        onPlayerStateChange(event);
-                    }
-                },
-                onError: (event) => {
-                    if (typeof onPlayerError === 'function') {
-                        onPlayerError(event);
-                    }
-                }
-            }
-        }
-    );
 }
 
-
 /* ==========================================
-   PARA O MODO ALEATÓRIO
-   ========================================== */
-
-export function pararModoAleatorio() {
-
-  modoAleatorioContinuoAtivo =
-    false;
-
-
-  if (
-    typeof state !== 'undefined'
-  ) {
-
-    state.modoAleatorioAtivo =
-      false;
-
-  }
-
-}
-
-
-/* ==========================================
-FILTRA OS VÍDEOS
+FECHA O PLAYER FULLSCREEN
 ========================================== */
-export function filtrarVideos() {
-    const searchInput = document.getElementById('search-input');
-    if (!searchInput) {
-        return;
-    }
-    const termoBruto = searchInput.value;
-    const termos = termoBruto
-        ? termoBruto
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .split(/\s+/)
-        : [];
-    const cards = document.querySelectorAll('.video-card-item');
-    cards.forEach(card => {
-        const tituloEl = card.querySelector('.video-card-title');
-        if (!tituloEl) {
-            return;
+export function fecharPlayerFullscreen() {
+    const playerOverlay = document.getElementById('fullscreen-player-overlay');
+    if (playerOverlay) {
+        // Destrói o iframe e interrompe o fluxo do vídeo imediatamente
+        const container = document.getElementById('youtube-player-container');
+        if (container) {
+            container.innerHTML = '';
         }
-        const titulo = tituloEl.textContent
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase();
-        
-        const atendeTodos = termos.every((t) => {
-            // Trata números de 1 ou 2 dígitos de forma isolada e exata
-            if (/^\d{1,2}$/.test(t)) {
-                const regex = new RegExp(`\\b${t}\\b`);
-                return regex.test(titulo);
-            }
-            // Trata números de quatro dígitos (anos)
-            if (/^\d{4}$/.test(t)) {
-                const regex = new RegExp(`\\b${t}\\b`);
-                return regex.test(titulo);
-            }
-            // Se o termo tiver apenas 1 caractere (ex: 'l'), exige que alguma palavra comece com essa letra
-            if (t.length === 1) {
-                const regex = new RegExp(`\\b${t}`);
-                return regex.test(titulo);
-            }
-            // Para palavras normais, procura em qualquer parte do título
-            return titulo.includes(t);
-        });
-
-        if (atendeTodos || termos.length === 0) {
-            card.style.display = 'flex';
-        } else {
-            card.style.display = 'none';
-        }
-    });
-}
-
-
-/* ==========================================
-   CONVERSÃO UTF-8 -> BASE64
-   ========================================== */
-
-export function utf8ToBase64(str) {
-
-  return btoa(
-    encodeURIComponent(str)
-      .replace(
-        /%([0-9A-F]{2})/g,
-        function(match, p1) {
-
-          return String.fromCharCode(
-            '0x' + p1
-          );
-
-        }
-      )
-  );
-
-}
-
-
-/* ==========================================
-   CONVERSÃO BASE64 -> UTF-8
-   ========================================== */
-
-export function base64ToUtf8(base64) {
-
-  return decodeURIComponent(
-
-    Array.prototype.map.call(
-
-      atob(
-        base64.replace(/\s/g, '')
-      ),
-
-      function(c) {
-
-        return (
-          '%' +
-          (
-            '00' +
-            c.charCodeAt(0)
-              .toString(16)
-          ).slice(-2)
-        );
-
-      }
-
-    ).join('')
-
-  );
-
-}
-
-
-/* ==========================================
-   FORMATA ARRAY PARA CÓDIGO
-   ========================================== */
-
-export function formatarArrayParaCodigo(
-  array
-) {
-
-  const itensFormatados =
-    array.map(
-      item =>
-        `  { title: "${item.title.replace(/"/g, '\\"')}" , youtubeId: "${item.youtubeId}" }`
-    );
-
-
-  return `const listaVideos = [\n${itensFormatados.join(' ,\n')}\n];`;
-
-}
-
-
-/* ==========================================
-   SALVA LISTA NO GITHUB
-   ========================================== */
-
-export async function salvarListaNoGitHub(
-  token,
-  novaLista,
-  mensagemCommit,
-  novaSenhaUser = null,
-  novaSenhaAdmin = null
-) {
-
-  if (!token) {
-
-    throw new Error(
-      'Informe o Token do GitHub.'
-    );
-
-  }
-
-
-  const apiUrl =
-    `https://api.github.com/repos/` +
-    `${CONFIG.GITHUB_OWNER}/` +
-    `${CONFIG.GITHUB_REPO}/contents/` +
-    `${CONFIG.GITHUB_FILE}`;
-
-
-  /* ======================================
-     BUSCA O ARQUIVO
-     ====================================== */
-
-  const resGet =
-    await fetch(
-      apiUrl,
-      {
-
-        headers: {
-
-          Authorization:
-            `Bearer ${token}`,
-
-          Accept:
-            'application/vnd.github.v3+json'
-
-        }
-
-      }
-    );
-
-
-  if (!resGet.ok) {
-
-    if (
-      resGet.status === 401
-    ) {
-
-      throw new Error(
-        'Token do GitHub inválido.'
-      );
-
+        playerOverlay.style.display = 'none';
     }
 
-
-    if (
-      resGet.status === 404
-    ) {
-
-      throw new Error(
-        'Repositório ou arquivo index.html não encontrado.'
-      );
-
+    // Sai do modo tela cheia do navegador com segurança
+    if (document.fullscreenElement) {
+        document.exitFullscreen().catch(err => console.log('Erro ao sair do fullscreen:', err));
     }
 
-
-    throw new Error(
-      `Erro na busca (${resGet.status})`
-    );
-
-  }
-
-
-  const fileData =
-    await resGet.json();
-
-
-  let contentDecoded =
-    base64ToUtf8(
-      fileData.content
-    );
-
-
-  /* ======================================
-     LOCALIZA A LISTA DE VÍDEOS
-     ====================================== */
-
-  const regexLista =
-    /const listaVideos = \[\s*[\s\S]*?\s*\];/;
-
-
-  if (
-    !regexLista.test(
-      contentDecoded
-    )
-  ) {
-
-    throw new Error(
-      'A estrutura listaVideos não foi encontrada no arquivo.'
-    );
-
-  }
-
-
-  /* ======================================
-     GERA NOVA LISTA
-     ====================================== */
-
-  const novoCodigoArray =
-    formatarArrayParaCodigo(
-      novaLista
-    );
-
-
-  contentDecoded =
-    contentDecoded.replace(
-      regexLista,
-      novoCodigoArray
-    );
-
-
-  /* ======================================
-     ATUALIZA SENHA DO USUÁRIO
-     ====================================== */
-
-  if (novaSenhaUser) {
-
-    const regexUser =
-      /let SENHA_USUARIO\s*=\s*".*?";/;
-
-
-    contentDecoded =
-      contentDecoded.replace(
-        regexUser,
-        `let SENHA_USUARIO = "${novaSenhaUser}";`
-      );
-
-  }
-
-
-  /* ======================================
-     ATUALIZA SENHA DO ADMIN
-     ====================================== */
-
-  if (novaSenhaAdmin) {
-
-    const regexAdmin =
-      /let SENHA_ADMIN\s*=\s*".*?";/;
-
-
-    contentDecoded =
-      contentDecoded.replace(
-        regexAdmin,
-        `let SENHA_ADMIN = "${novaSenhaAdmin}";`
-      );
-
-  }
-
-
-  /* ======================================
-     CONVERTE PARA BASE64
-     ====================================== */
-
-  const contentEncoded =
-    utf8ToBase64(
-      contentDecoded
-    );
-
-
-  /* ======================================
-     ENVIA PARA O GITHUB
-     ====================================== */
-
-  const resPut =
-    await fetch(
-      apiUrl,
-      {
-
-        method: 'PUT',
-
-        headers: {
-
-          Authorization:
-            `Bearer ${token}`,
-
-          Accept:
-            'application/vnd.github.v3+json',
-
-          'Content-Type':
-            'application/json'
-
-        },
-
-
-        body:
-          JSON.stringify(
-            {
-
-              message:
-                mensagemCommit,
-
-              content:
-                contentEncoded,
-
-              sha:
-                fileData.sha
-
-            }
-          )
-
-      }
-    );
-
-
-  if (!resPut.ok) {
-
-    const errData =
-      await resPut.json();
-
-
-    throw new Error(
-      errData.message ||
-      'Erro ao salvar no GitHub.'
-    );
-
-  }
-
+    // Devolve o foco para o elemento principal de grelha de vídeos da interface
+    const gridContainer = document.querySelector('.tv-grid-container');
+    if (gridContainer) {
+        gridContainer.focus();
+    }
 }
