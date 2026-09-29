@@ -82,13 +82,12 @@ export function inicializarTeclado() {
                 if (btnAppBack) btnAppBack.focus();
             } else if (e.key === "ArrowLeft") {
                 e.preventDefault();
-                // Tenta encontrar o botão do menu por diferentes IDs comuns no projeto
                 const btnMenu = document.getElementById("btn-app-back") || document.getElementById("btn-back") || document.getElementById("btn-voltar") || document.querySelector(".btn-voltar") || document.querySelector("header button");
                 if (btnMenu) {
                     btnMenu.focus();
                 }
             } else if (e.key === "ArrowRight") {
-                return; // Permite mover o cursor livremente pelo texto dentro da busca
+                return; // Permite mover o cursor livremente pelo texto
             }
             return;
         }
@@ -100,7 +99,6 @@ export function inicializarTeclado() {
                 e.preventDefault();
                 state.kbPlaylistIndex = 0;
                 focarCartaoVideo(state.kbPlaylistIndex);
-                // Move o foco para o elemento da grelha ou garante que o próximo evento trate a grelha
                 const primeiroCartao = document.querySelector('.video-card-item');
                 if (primeiroCartao) primeiroCartao.focus();
             } else if (e.key === "ArrowUp") {
@@ -109,6 +107,27 @@ export function inicializarTeclado() {
             } else if (e.key === "Enter") {
                 e.preventDefault();
                 btnRandom.click();
+            }
+            return;
+        }
+
+        // TRATAMENTO PARA O BOTÃO DE MENU / VOLTAR (caso esteja focado)
+        const btnMenu = document.getElementById("btn-app-back") || document.getElementById("btn-back") || document.getElementById("btn-voltar");
+        if (document.activeElement === btnMenu) {
+            if (e.key === "ArrowRight") {
+                e.preventDefault();
+                if (searchBox) searchBox.focus();
+            } else if (e.key === "ArrowDown") {
+                e.preventDefault();
+                if (btnRandom) {
+                    btnRandom.focus();
+                } else {
+                    state.kbPlaylistIndex = 0;
+                    focarCartaoVideo(state.kbPlaylistIndex);
+                }
+            } else if (e.key === "Enter") {
+                e.preventDefault();
+                btnMenu.click();
             }
             return;
         }
@@ -149,6 +168,19 @@ export function inicializarTeclado() {
             }
         } else if (e.key === "Enter") {
             e.preventDefault();
+            
+            const elementoFocado = document.activeElement;
+            
+            if (elementoFocado === btnMenu || (btnMenu && btnMenu.contains(elementoFocado))) {
+                btnMenu.click();
+                return;
+            }
+
+            if (elementoFocado === btnRandom) {
+                btnRandom.click();
+                return;
+            }
+
             if (listaExibida[state.kbPlaylistIndex]) {
                 const videoAlvo = listaExibida[state.kbPlaylistIndex];
                 const indexOriginal = listaVideos.findIndex(v => (v.youtubeId || v.youtubeld) === (videoAlvo.youtubeId || videoAlvo.youtubeld));
