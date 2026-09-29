@@ -348,11 +348,12 @@ button.btn-close:focus {
   box-shadow: 0 0 10px var(--ccb-gold);
 }
 .tv-main-content {
-  flex: 1;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto; 
+    flex: 1;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto !important; /* Garante que o scroll do mouse funcione aqui */
+    max-height: calc(95vh - 80px); /* Limita a altura para ativar a barra de rolagem */
 }
 .tv-random-section {
   margin-bottom: 1.5rem;
@@ -380,11 +381,12 @@ button.btn-close:focus {
 } 
 /* GRADE DE CARTÕES DE VÍDEOS */
 .tv-grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
-  outline: none;
-  padding-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 20px;
+    outline: none;
+    padding-bottom: 2rem;
+    overflow: visible;
 }
 .video-card-item {
   background: rgba(255, 255, 255, 0.05);
