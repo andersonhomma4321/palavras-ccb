@@ -1,18 +1,68 @@
 /* ==========================================
-GESTOR DO PLAYER E DA LISTA DE VÍDEOS (NATIVO HTML5 / 4K SEM IFRAME)
+GESTOR DO PLAYER E DA LISTA DE VÍDEOS
 ========================================== */
 import { state } from './state.js';
 import { listaVideos } from '../data/videos.js';
 import { CONFIG } from './config.js';
 
 let modoAleatorioContinuoAtivo = false;
-let videoElementInstance = null;
+let ytPlayerInstance = null;
+let youtubeApiPromise = null;
 
 /* ==========================================
-INICIALIZA O PLAYER
+CARREGA A API DO YOUTUBE
 ========================================== */
+function carregarYouTubeAPI() {
+    if (window.YT && window.YT.Player) {
+        return Promise.resolve(window.YT);
+    } 
+    if (youtubeApiPromise) {
+        return youtubeApiPromise;
+    }
+
+    youtubeApiPromise = new Promise((resolve, reject) => {
+        let finalizado = false;
+        const timeout = setTimeout(() => {
+            if (!finalizado) {
+                finalizado = true;
+                reject(new Error('A API do YouTube demorou muito para carregar.'));
+            }
+        }, 15000);
+
+        const callbackAnterior = window.onYouTubeIframeAPIReady;
+        window.onYouTubeIframeAPIReady = function () {
+            if (typeof callbackAnterior === 'function') {
+                callbackAnterior();
+            }
+            if (!finalizado) {
+                finalizado = true;
+                clearTimeout(timeout);
+                resolve(window.YT);
+            }
+        };
+
+        const scriptExistente = document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
+        if (!scriptExistente) {
+            const tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            tag.async = true;
+            document.head.appendChild(tag);
+        } else if (window.YT && window.YT.Player) {
+            if (!finalizado) {
+                finalizado = true;
+                clearTimeout(timeout);
+                resolve(window.YT);
+            }
+        }
+    });
+
+    return youtubeApiPromise;
+}
+
 export function initPlayer() {
-    // Não precisa carregar a API do YouTube, pois usa o player nativo HTML5.
+    carregarYouTubeAPI().catch(error => {
+        console.error('Erro ao carregar a API do YouTube:', error);
+    });
 }
 
 /* ==========================================
@@ -50,9 +100,6 @@ export function renderizarLista(videos) {
     });
 }
 
-/* ==========================================
-CARREGA A PLAYLIST
-========================================== */
 export function carregarPlaylist() {
     renderizarLista(listaVideos);
     if (listaVideos.length > 0) {
@@ -69,9 +116,6 @@ export function carregarPlaylist() {
     }
 }
 
-/* ==========================================
-FOCA UM CARTÃO DA PLAYLIST
-========================================== */
 export function focarCartaoVideo(index) {
     const cards = document.querySelectorAll('.video-card-item');
     cards.forEach((card, i) => {
@@ -85,7 +129,7 @@ export function focarCartaoVideo(index) {
 }
 
 /* ==========================================
-REPRODUZ UM VÍDEO (TAG NATIVA HTML5)
+REPRODUZ UM VÍDEO VIA IFRAME
 ========================================== */
 export async function tocarVideo(index) {
     if (!listaVideos || listaVideos.length === 0) return;
@@ -116,7 +160,9 @@ export async function tocarVideo(index) {
                 font-size: 1.5rem; padding: 3px 12px; border-radius: 6px;
                 cursor: pointer; z-index: 10000;
             ">&times;</button>
-            <video id="native-video-player" controls autoplay style="width: 100%; height: 100%; background: #000;"></video>
+            <div style="position: relative; width: 100%; height: 100%;">
+                <div id="youtube-player-div" style="width: 100%; height: 100%;"></div>
+            </div>
         `;
         document.body.appendChild(playerOverlay);
         
@@ -131,29 +177,63 @@ export async function tocarVideo(index) {
         playerOverlay.requestFullscreen().catch(err => console.log('Fullscreen recusado:', err));
     }
 
-    videoElementInstance = document.getElementById('native-video-player');
-    
-    // ATENÇÃO: Aponta para a rota local gerada pelo yt-dlp (ex: http://localhost:8080/stream?v=ID)
-    // Isso garante que o motor de extração entregue a resolução máxima (1080p, 4K, etc.) livre de restrições de iframe.
-    videoElementInstance.src = `http://localhost:8080/stream?v=${videoId}`;
-    
-    videoElementInstance.load();
-    videoElementInstance.play().catch(e => console.log("Autoplay restrito pelo navegador:", e));
+    try {
+        await carregarYouTubeAPI();
+    } catch (error) {
+        console.error('Não foi possível carregar a API do YouTube:', error);
+        alert('Não foi possível carregar o player do YouTube.');
+        return;
+    }
 
-    videoElementInstance.onended = () => {
-        if (modoAleatorioContinuoAtivo) {
+    const playerContainer = document.getElementById('youtube-player-div');
+    if (!playerContainer) return;
+
+    if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
+        ytPlayerInstance.loadVideoById(videoId);
+        return;
+    }
+
+    ytPlayerInstance = new window.YT.Player('youtube-player-div', {
+        height: '100%',
+        width: '100%',
+        videoId: videoId,
+        playerVars: {
+            autoplay: 1,
+            enablejsapi: 1,
+            vq: 'hd1080',
+            hd: 1,
+            playsinline: 0,
+            rel: 0
+        },
+        events: {
+            onReady: onPlayerReady,
+            onStateChange: onPlayerStateChange,
+            onError: onPlayerError
+        }
+    });
+}
+
+function onPlayerReady(event) {
+    // Força a melhor qualidade possível suportada pelo player do iframe
+    if (typeof event.target.setPlaybackQuality === 'function') {
+        event.target.setPlaybackQuality('hd1080');
+    }
+    event.target.playVideo();
+}
+
+function onPlayerStateChange(event) {
+    if (window.YT && event.data === window.YT.PlayerState.ENDED) {
+        verificarFimDeVideoNoModoContinuo();
+    }
+}
+
+function onPlayerError(event) {
+    console.error('Erro no player do YouTube:', event.data);
+    if (modoAleatorioContinuoAtivo) {
+        setTimeout(() => {
             verificarFimDeVideoNoModoContinuo();
-        }
-    };
-    
-    videoElementInstance.onerror = () => {
-        console.error('Erro na reprodução nativa do vídeo.');
-        if (modoAleatorioContinuoAtivo) {
-            setTimeout(() => {
-                verificarFimDeVideoNoModoContinuo();
-            }, 1000);
-        }
-    };
+        }, 1000);
+    }
 }
 
 /* ==========================================
@@ -170,9 +250,8 @@ export function fecharPlayerFullscreen() {
         playerOverlay.style.display = 'none';
     }
     
-    if (videoElementInstance) {
-        videoElementInstance.pause();
-        videoElementInstance.src = "";
+    if (ytPlayerInstance && typeof ytPlayerInstance.stopVideo === 'function') {
+        ytPlayerInstance.stopVideo();
     }
     
     if (document.fullscreenElement && document.exitFullscreen) {
@@ -186,7 +265,7 @@ export function fecharPlayerFullscreen() {
 }
 
 /* ==========================================
-INICIA REPRODUÇÃO ALEATÓRIA CONTÍNUA
+MODO ALEATÓRIO CONTÍNUO
 ========================================== */
 export function iniciarVideosAleatoriosContinuos() {
     if (!listaVideos || listaVideos.length === 0) return;
@@ -200,9 +279,6 @@ export function iniciarVideosAleatoriosContinuos() {
     tocarVideo(randomIndex);
 }
 
-/* ==========================================
-AVANÇA PARA O PRÓXIMO VÍDEO ALEATÓRIO
-========================================== */
 export function verificarFimDeVideoNoModoContinuo() {
     if (!modoAleatorioContinuoAtivo) return;
     if (!listaVideos || listaVideos.length === 0) return;
@@ -215,9 +291,6 @@ export function verificarFimDeVideoNoModoContinuo() {
     }, 300);
 }
 
-/* ==========================================
-PARA O MODO ALEATÓRIO
-========================================== */
 export function pararModoAleatorio() {
     modoAleatorioContinuoAtivo = false;
     if (typeof state !== 'undefined') {
@@ -268,7 +341,7 @@ export function filtrarVideos() {
 }
 
 /* ==========================================
-CONVERSÃO UTF-8 -> BASE64
+UTILITÁRIOS BASE64 E GITHUB
 ========================================== */
 export function utf8ToBase64(str) {
     return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
@@ -276,18 +349,12 @@ export function utf8ToBase64(str) {
     }));
 }
 
-/* ==========================================
-CONVERSÃO BASE64 -> UTF-8
-========================================== */
 export function base64ToUtf8(base64) {
     return decodeURIComponent(Array.prototype.map.call(atob(base64.replace(/\s/g, '')), function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
 }
 
-/* ==========================================
-FORMATA ARRAY PARA CÓDIGO
-========================================== */
 export function formatarArrayParaCodigo(array) {
     const itensFormatados = array.map(
         item => `  { title: "${item.title.replace(/"/g, '\\"')}", youtubeld: "${item.youtubeld || item.youtubeId}" }`
@@ -295,9 +362,6 @@ export function formatarArrayParaCodigo(array) {
     return `const listaVideos = [\n${itensFormatados.join(',\n')}\n];`;
 }
 
-/* ==========================================
-SALVA LISTA NO GITHUB
-========================================== */
 export async function salvarListaNoGitHub(token, novaLista, mensagemCommit, novaSenhaUser = null, novaSenhaAdmin = null) {
     if (!token) {
         throw new Error('Informe o Token do GitHub.');
