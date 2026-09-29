@@ -871,10 +871,8 @@ export function filtrarVideos() {
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase()
-            .trim()
             .split(/\s+/)
         : [];
-
     const cards = document.querySelectorAll('.video-card-item');
     cards.forEach(card => {
         const tituloEl = card.querySelector('.video-card-title');
@@ -885,8 +883,19 @@ export function filtrarVideos() {
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase();
-
-        const atendeTodos = termos.every(t => {
+        
+        const atendeTodos = termos.every((t) => {
+            // Trata números de 1 ou 2 dígitos de forma isolada e exata (ex: 6 não casa com 13)
+            if (/^\d{1,2}$/.test(t)) {
+                const regex = new RegExp(`\\b${t}\\b`);
+                return regex.test(titulo);
+            }
+            // Trata números de quatro dígitos (ex: anos como 2026)
+            if (/^\d{4}$/.test(t)) {
+                const regex = new RegExp(`\\b${t}\\b`);
+                return regex.test(titulo);
+            }
+            // Para palavras normais, procura em qualquer parte do título
             return titulo.includes(t);
         });
 
