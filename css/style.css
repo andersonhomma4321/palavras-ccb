@@ -7,12 +7,14 @@
   --ccb-gray: #e9ecef;
   --ccb-red: #d9534f;
 }
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
 body {
   background-color: var(--ccb-dark-blue);
   color: #333;
@@ -21,9 +23,10 @@ body {
   align-items: center;
   min-height: 100vh;
 }
+
 /* ==========================================
    OVERLAYS E MODAIS 
-   ========================================== */
+========================================== */
 #login-overlay,
 #menu-overlay,
 .modal-overlay {
@@ -34,17 +37,19 @@ body {
   height: 100%;
   background: rgba(6, 23, 46, 0.95);
   display: flex;
-  justify-content: center;
+  justify-content: center; 
   align-items: center;
   z-index: 2000;
 }
+
 #menu-overlay,
 .modal-overlay {
   display: none;
 }
+
 /* ==========================================
    CARDS DE LOGIN E ADMINISTRAÇÃO
-   ========================================== */
+========================================== */
 .login-card,
 .admin-card,
 .menu-card {
@@ -60,6 +65,7 @@ body {
   max-height: 90vh;
   overflow-y: auto;
 }
+
 .login-card h2,
 .admin-card h2, 
 .menu-card h2 {
@@ -67,16 +73,18 @@ body {
   margin-bottom: 0.5rem;
   font-size: 1.5rem;
 }
+
 .login-card p,
 .admin-card p,
 .menu-card p {
   font-size: 0.9rem;
   color: #666;
   margin-bottom: 1.5rem;
-} 
+}
+
 /* ==========================================
    INPUTS E FORMULÁRIOS
-   ========================================== */
+========================================== */
 .login-card input,
 .admin-card input {
   width: 100%;
@@ -87,14 +95,16 @@ body {
   font-size: 0.95rem;
   outline: none;
 }
+
 .login-card input:focus,
 .admin-card input:focus {
   border-color: var(--ccb-blue);
   box-shadow: 0 0 5px rgba(11, 37, 69, 0.3);
 }
+
 /* ==========================================
    BOTÕES DE AÇÃO E FORMULÁRIOS
-   ========================================== */
+========================================== */
 .login-card button[type="submit"],
 .admin-card button[type="submit"],
 .admin-card button.btn-action,
@@ -116,6 +126,7 @@ body {
   transition: all 0.2s ease;
   margin-top: 0.25rem;
 }
+
 .login-card button[type="submit"]:hover,
 .admin-card button[type="submit"]:hover,
 .admin-card button.btn-action:hover,
@@ -127,15 +138,17 @@ body {
   background: var(--ccb-gold) !important;
   color: var(--ccb-dark-blue) !important;
   border-top: 5px solid var(--ccb-gold) !important; 
-}
+} 
+
 /* ==========================================
    MENU PRINCIPAL E ADMIN (.btn-menu)
-   ========================================== */
+========================================== */
 .menu-grid {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
+
 .btn-menu {
   width: 100%;
   padding: 1rem;
@@ -153,18 +166,20 @@ body {
   justify-content: center;
   gap: 10px;
 } 
+
 .btn-menu:hover,
 .btn-menu:focus,
 .btn-menu.kb-focus {
   background: var(--ccb-gold) !important;
   color: var(--ccb-dark-blue) !important;
-  border-top: 6px solid var(--ccb-gold) !important;
+  border-top: 6px solid var(--ccb-gold) !important; 
   transform: translateY(-2px);
   outline: 2px solid var(--ccb-dark-blue);
 }
+
 /* ==========================================
    BOTÃO DE FECHAR MODAL
-   ========================================== */
+========================================== */
 button.btn-close {
   position: absolute;
   top: 10px;
@@ -182,25 +197,29 @@ button.btn-close {
   justify-content: center;
   z-index: 10;
 }
+
 button.btn-close:hover,
 button.btn-close:focus {
   color: var(--ccb-blue);
   outline: none;
 }
+
 /* ==========================================
    PAINEL ADMINISTRATIVO DE VÍDEOS
-   ========================================== */
+========================================== */
 .admin-manage-section {
   text-align: left;
   margin-top: 15px;
   border-top: 1px solid #ddd;
   padding-top: 15px;
 }
+
 .admin-manage-section h3 {
   font-size: 1rem;
   color: var(--ccb-blue);
   margin-bottom: 10px;
 }
+
 .admin-video-list {
   list-style: none; 
   max-height: 180px;
@@ -209,6 +228,7 @@ button.btn-close:focus {
   border-radius: 4px;
   padding: 5px;
 }
+
 .admin-video-item {
   display: flex;
   justify-content: space-between;
@@ -217,15 +237,18 @@ button.btn-close:focus {
   border-bottom: 1px solid #eee;
   font-size: 0.85rem;
 }
+
 .admin-video-item:last-child {
   border-bottom: none;
 }
-.admin-video-item span {
+
+.admin-video-item span { 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 75%;
 }
+
 .btn-delete-item { 
   background: var(--ccb-red) !important;
   color: #fff !important;
@@ -237,13 +260,16 @@ button.btn-close:focus {
   font-size: 0.75rem;
   font-weight: bold;
 }
+
 .btn-delete-item:hover {
   background: #c9302c !important;
 }
+
 .token-area {
   text-align: left;
   margin-bottom: 15px;
 }
+
 .token-area label {
   font-size: 0.85rem;
   font-weight: bold;
@@ -251,26 +277,30 @@ button.btn-close:focus {
   display: block;
   margin-top: 10px;
   margin-bottom: 4px;
-} 
+}
+
 .admin-message {
   margin-top: 10px;
   font-size: 0.85rem;
   font-weight: bold;
 }
+
 .error-message {
   color: red !important;
   margin-top: 10px;
   display: none;
   font-weight: bold;
 }
+
 .placeholder-description {
   margin-top: 20px;
   font-size: 1rem !important;
   color: #555 !important;
 }
+
 /* ==========================================
    ESTILOS DA APLICAÇÃO "PALAVRAS" (YOUTUBE TV)
-   ========================================== */
+========================================== */
 #app-container {
   display: none;
   width: 98vw;
@@ -282,9 +312,10 @@ button.btn-close:focus {
   overflow: hidden;
   box-shadow: 0 15px 40px rgba(0,0,0,0.7);
   margin: auto;
-  flex-direction: column;
-  position: relative; /* Permite posicionar elementos filhos com absolute se necessário */
+  flex-direction: column; 
+  position: relative;
 }
+
 /* Cabeçalho Responsivo Otimizado */
 .tv-header {
   background: var(--ccb-blue);
@@ -300,6 +331,7 @@ button.btn-close:focus {
   box-sizing: border-box;
   flex-shrink: 0;
 }
+
 .tv-header h1 {
   font-size: 1.15rem;
   color: var(--ccb-gold); 
@@ -308,6 +340,7 @@ button.btn-close:focus {
   order: 2;
   margin: 0;
 }
+
 /* Botão Menu */
 .btn-back-menu {
   background: transparent;
@@ -324,15 +357,18 @@ button.btn-close:focus {
   justify-content: center;
   transition: all 0.2s;
 }
+
 .btn-back-menu:hover {
   background: var(--ccb-gold);
   color: var(--ccb-dark-blue);
-} 
+}
+
 .tv-search-container {
   width: 100%;
   order: 3;
   margin-top: 2px;
 }
+
 .tv-search-container input {
   width: 100%;
   padding: 0.5rem 0.8rem;
@@ -344,20 +380,24 @@ button.btn-close:focus {
   outline: none;
   transition: all 0.2s;
 }
+
 .tv-search-container input:focus {
   box-shadow: 0 0 10px var(--ccb-gold);
 }
+
 .tv-main-content {
-    flex: 1;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto !important; /* Garante que o scroll do mouse funcione aqui */
-    max-height: calc(95vh - 80px); /* Limita a altura para ativar a barra de rolagem */
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto !important;
+  max-height: calc(95vh - 80px);
 }
+
 .tv-random-section {
   margin-bottom: 1.5rem;
 }
+
 /* Botão Vídeos Aleatórios */
 .btn-random-tv {
   width: 100%;
@@ -372,22 +412,25 @@ button.btn-close:focus {
   box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
   transition: transform 0.2s, background 0.2s;
 }
+
 .btn-random-tv:hover,
 .btn-random-tv.kb-focus {
   transform: scale(1.01);
   background: #fff;
   color: var(--ccb-blue);
   outline: 3px solid var(--ccb-gold);
-} 
+}
+
 /* GRADE DE CARTÕES DE VÍDEOS */
 .tv-grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 20px;
-    outline: none;
-    padding-bottom: 2rem;
-    overflow: visible;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  outline: none;
+  padding-bottom: 2rem;
+  overflow: visible;
 }
+
 .video-card-item {
   background: rgba(255, 255, 255, 0.05);
   border: 2px solid transparent;
@@ -398,19 +441,22 @@ button.btn-close:focus {
   display: flex;
   flex-direction: column;
 }
+
 .video-card-item:hover,
 .video-card-item.kb-focus {
   transform: translateY(-5px);
   border-color: var(--ccb-gold);
   background: rgba(255, 255, 255, 0.12);
   outline: none;
-} 
+}
+
 .video-thumbnail-wrapper {
   position: relative;
   width: 100%;
   padding-bottom: 56.25%;
   background: #000;
 }
+
 .video-thumbnail-wrapper img {
   position: absolute;
   top: 0;
@@ -419,6 +465,7 @@ button.btn-close:focus {
   height: 100%;
   object-fit: cover;
 }
+
 .video-card-title {
   padding: 10px 12px;
   font-size: 0.9rem;
@@ -432,11 +479,11 @@ button.btn-close:focus {
 } 
 
 /* ==========================================
-   BOTÃO FLUTUANTE DE CONFIGURAÇÃO (CANTO INFERIOR DIREITO)
-   ========================================== */
+   BOTÃO FLUTUANTE DE CONFIGURAÇÃO
+========================================== */
 .btn-config-flutuante {
   position: fixed;
-  bottom: 25px;
+  bottom: 25px; 
   right: 25px;
   z-index: 9999;
   background-color: var(--ccb-blue);
@@ -466,13 +513,14 @@ button.btn-close:focus {
 
 /* ==========================================
    MEDIA QUERY EXCLUSIVA PARA TELEMÓVEIS (MOBILE)
-   ========================================== */
+========================================== */
 @media (max-width: 767px) {
   body {
     min-height: 100vh;
     overflow-y: auto !important;
     background-color: var(--ccb-dark-blue);
   }
+  
   #app-container[style*="display: block"] {
     display: flex !important;
     width: 100% !important;
@@ -485,6 +533,7 @@ button.btn-close:focus {
     margin: 0 !important;
     overflow: visible !important;
   }
+  
   .tv-header {
     position: sticky !important;
     top: 0; 
@@ -492,26 +541,31 @@ button.btn-close:focus {
     flex-wrap: wrap !important;
     padding: 10px 12px !important;
   }
+  
   .tv-header h1 {
     font-size: 1.1rem !important;
     order: 2 !important;
   }
+  
   .btn-back-menu {
     display: inline-flex !important;
-    order: 1 !important;
+    order: 1 !important; 
     font-size: 0.8rem !important;
     padding: 6px 10px !important;
   }
+  
   .tv-search-container {
     display: block !important;
     width: 100% !important;
     order: 3 !important;
     margin-top: 8px !important;
   }
+  
   .tv-search-container input {
     width: 100% !important;
     font-size: 0.9rem !important;
   } 
+  
   .tv-main-content {
     display: flex !important;
     flex-direction: column !important;
@@ -519,17 +573,20 @@ button.btn-close:focus {
     overflow: visible !important;
     padding: 10px !important;
   }
+  
   .tv-random-section {
     display: block !important;
     width: 100% !important;
     margin-bottom: 15px !important;
   }
+  
   .btn-random-tv {
     display: block !important;
     width: 100% !important;
     padding: 12px !important;
     font-size: 1rem !important;
-  }
+  } 
+  
   .tv-grid-container {
     display: grid !important;
     grid-template-columns: 1fr !important;
@@ -541,29 +598,34 @@ button.btn-close:focus {
 
 /* ==========================================
    MEDIA QUERY PARA COMPUTADORES / TELAS MAIORES
-   ========================================== */
+========================================== */
 @media (min-width: 768px) {
   .tv-header {
     flex-wrap: nowrap;
     padding: 1rem 2rem;
   }
+  
   .tv-header h1 {
     font-size: 1.6rem;
     order: unset;
   }
+  
   .btn-back-menu {
     order: unset;
     font-size: 0.9rem;
     padding: 6px 12px;
   }
+  
   .tv-search-container {
     width: auto;
     order: unset;
     margin-top: 0;
-  } 
+  }  
+  
   .tv-search-container input {
     width: 320px;
   }
+  
   .tv-main-content {
     padding: 1.5rem 2rem;
   }

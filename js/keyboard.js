@@ -1,205 +1,161 @@
-/* ==========================================
-   GESTOR DE NAVEGAÇÃO POR TECLADO
-   ========================================== */
 import { state } from './state.js';
 import { listaVideos } from '../data/videos.js';
 import { tocarVideo, focarCartaoVideo } from './player.js';
 
 export function inicializarTeclado() {
   document.addEventListener("keydown", (e) => {
-    // Verifica o estado atual da interface
     const loginOverlay = document.getElementById("login-overlay");
     const menuOverlay = document.getElementById("menu-overlay");
     const adminModal = document.getElementById("admin-form-overlay") || document.getElementById("admin-modal");
     const appContainer = document.getElementById("app-container");
     
     const loginVisivel = loginOverlay && window.getComputedStyle(loginOverlay).display !== "none";
-    const menuVisivel = menuOverlay && window.getComputedStyle(menuOverlay).display !== "none";
-    const adminVisivel = adminModal && window.getComputedStyle(adminModal).display !== "none";
     const appVisivel = appContainer && window.getComputedStyle(appContainer).display !== "none";
+    
+    if (loginVisivel) return;
 
-    // 1. SE O LOGIN ESTIVER VISÍVEL
-    if (loginVisivel) {
-      if (e.key === "Enter") {
-        // Deixa o formulário de login submeter naturalmente ou gerencia aqui
+    if (appVisivel) {
+      const searchBox = document.getElementById("search-input");
+      const termoBruto = searchBox ? searchBox.value : "";
+      const termos = termoBruto ? termoBruto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/\s+/) : [];
+      
+      const listaExibida = termos.length > 0
+        ? listaVideos.filter(video => {
+            const tit = video.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+            return termos.every((t) => {
+              if (/^\d{1,2}$/.test(t)) {
+                const regex = new RegExp(`\\b${t}\\b`);
+                return regex.test(tit);
+              }
+              if (/^\d{4}$/.test(t)) {
+                const regex = new RegExp(`\\b${t}\\b`);
+                return regex.test(tit);
+              }
+              return tit.includes(t);
+            });
+          })
+        : listaVideos;
+
+      const gridContainer = document.getElementById("playlist");
+      let colunas = 4;
+      if (gridContainer) {
+        const computedStyle = window.getComputedStyle(gridContainer);
+        const colTemplate = computedStyle.getPropertyValue("grid-template-columns");
+        colunas = colTemplate ? colTemplate.split(" ").length : 4;
+      }
+
+      if (document.activeElement === searchBox) {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          const btnRandom = document.getElementById("btn-random-videos");
+          if (btnRandom) {
+            btnRandom.focus();
+          } else {
+            state.kbPlaylistIndex = 0;
+            focarCartaoVideo(state.kbPlaylistIndex);
+          }
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          const btnAppBack = document.getElementById("btn-app-back");
+          if (btnAppBack) btnAppBack.focus();
+        } else if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          const btnMenu = document.getElementById("btn-app-back");
+          if (btnMenu) btnMenu.focus();
+        }
+        return;
+      }
+
+      const btnRandom = document.getElementById("btn-random-videos");
+      if (document.activeElement === btnRandom) {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          state.kbPlaylistIndex = 0;
+          focarCartaoVideo(state.kbPlaylistIndex);
+          const primeiroCartao = document.querySelector('.video-card-item');
+          if (primeiroCartao) primeiroCartao.focus();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          if (searchBox) searchBox.focus();
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          btnRandom.click();
+        }
+        return;
+      }
+
+      const btnMenu = document.getElementById("btn-app-back");
+      if (document.activeElement === btnMenu) {
+        if (e.key === "ArrowRight") {
+          e.preventDefault();
+          if (searchBox) searchBox.focus();
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          if (btnRandom) {
+            btnRandom.focus();
+          } else {
+            state.kbPlaylistIndex = 0;
+            focarCartaoVideo(state.kbPlaylistIndex);
+          }
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          btnMenu.click();
+        }
+        return;
+      }
+
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        if (listaExibida.length > 0) {
+          state.kbPlaylistIndex = (state.kbPlaylistIndex + 1) % listaExibida.length;
+          focarCartaoVideo(state.kbPlaylistIndex);
+        }
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        if (listaExibida.length > 0) {
+          state.kbPlaylistIndex = (state.kbPlaylistIndex - 1 + listaExibida.length) % listaExibida.length;
+          focarCartaoVideo(state.kbPlaylistIndex);
+        }
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (listaExibida.length > 0) {
+          let novoIndex = state.kbPlaylistIndex + colunas;
+          if (novoIndex >= listaExibida.length) novoIndex = listaExibida.length - 1;
+          state.kbPlaylistIndex = novoIndex;
+          focarCartaoVideo(state.kbPlaylistIndex);
+        }
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        let novoIndex = state.kbPlaylistIndex - colunas;
+        if (novoIndex < 0) {
+          if (btnRandom) {
+            btnRandom.focus();
+          } else if (searchBox) {
+            searchBox.focus();
+          }
+        } else {
+          state.kbPlaylistIndex = novoIndex;
+          focarCartaoVideo(state.kbPlaylistIndex);
+        }
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        if (listaExibida[state.kbPlaylistIndex]) {
+          const videoAlvo = listaExibida[state.kbPlaylistIndex];
+          const indexOriginal = listaVideos.findIndex(v => (v.youtubeId || v.youtubeld) === (videoAlvo.youtubeId || videoAlvo.youtubeld));
+          if (indexOriginal !== -1) {
+            tocarVideo(indexOriginal);
+          }
+        }
       }
       return;
     }
 
-    // 2. TELA "PALAVRAS" (YOUTUBE TV) - GRELHA DE VÍDEOS
-    if (appVisivel) {
-        const searchBox = document.getElementById("search-input");
-        const termoBruto = searchBox ? searchBox.value : "";
-        const termos = termoBruto ? termoBruto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().split(/\s+/) : [];
-        const listaExibida = termos.length > 0
-            ? listaVideos.filter(video => {
-                const tit = video.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-                return termos.every((t, index) => {
-                    if (/^\d{1,2}$/.test(t)) {
-                        if (index === termos.length - 1 && termos.length >= 3) {
-                            const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
-                            return regex.test(tit);
-                        }
-                        const regex = new RegExp(`\\b${t}\\b`);
-                        return regex.test(tit);
-                    }
-                    if (/^\d{4}$/.test(t)) {
-                        if (index === termos.length - 1 && termos.length >= 3) {
-                            const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
-                            return regex.test(tit);
-                        }
-                        const regex = new RegExp(`\\b${t}\\b`);
-                        return regex.test(tit);
-                    }
-                    return tit.includes(t);
-                });
-            })
-            : listaVideos;
-
-        // Calcula dinamicamente a quantidade de colunas na grelha
-        const gridContainer = document.getElementById("playlist");
-        let colunas = 4;
-        if (gridContainer) {
-            const computedStyle = window.getComputedStyle(gridContainer);
-            const colTemplate = computedStyle.getPropertyValue("grid-template-columns");
-            colunas = colTemplate ? colTemplate.split(" ").length : 4;
-        }
-
-        // SE O FOCO ESTIVER NO CAMPO DE PESQUISA
-        if (document.activeElement === searchBox) {
-            if (e.key === "ArrowDown") {
-                e.preventDefault();
-                const btnRandom = document.getElementById("btn-random-videos");
-                if (btnRandom) {
-                    btnRandom.focus();
-                } else {
-                    state.kbPlaylistIndex = 0;
-                    focarCartaoVideo(state.kbPlaylistIndex);
-                }
-            } else if (e.key === "ArrowUp") {
-                e.preventDefault();
-                const btnAppBack = document.getElementById("btn-app-back") || document.getElementById("btn-back") || document.getElementById("btn-voltar");
-                if (btnAppBack) btnAppBack.focus();
-            } else if (e.key === "ArrowLeft") {
-                e.preventDefault();
-                const btnMenu = document.getElementById("btn-app-back") || document.getElementById("btn-back") || document.getElementById("btn-voltar") || document.querySelector(".btn-voltar") || document.querySelector("header button");
-                if (btnMenu) {
-                    btnMenu.focus();
-                }
-            } else if (e.key === "ArrowRight") {
-                return; // Permite mover o cursor livremente pelo texto
-            }
-            return;
-        }
-
-        // TRATAMENTO PARA O BOTÃO DE VÍDEOS ALEATÓRIOS (caso esteja focado)
-        const btnRandom = document.getElementById("btn-random-videos");
-        if (document.activeElement === btnRandom) {
-            if (e.key === "ArrowDown") {
-                e.preventDefault();
-                state.kbPlaylistIndex = 0;
-                focarCartaoVideo(state.kbPlaylistIndex);
-                const primeiroCartao = document.querySelector('.video-card-item');
-                if (primeiroCartao) primeiroCartao.focus();
-            } else if (e.key === "ArrowUp") {
-                e.preventDefault();
-                if (searchBox) searchBox.focus();
-            } else if (e.key === "Enter") {
-                e.preventDefault();
-                btnRandom.click();
-            }
-            return;
-        }
-
-        // TRATAMENTO PARA O BOTÃO DE MENU / VOLTAR (caso esteja focado)
-        const btnMenu = document.getElementById("btn-app-back") || document.getElementById("btn-back") || document.getElementById("btn-voltar");
-        if (document.activeElement === btnMenu) {
-            if (e.key === "ArrowRight") {
-                e.preventDefault();
-                if (searchBox) searchBox.focus();
-            } else if (e.key === "ArrowDown") {
-                e.preventDefault();
-                if (btnRandom) {
-                    btnRandom.focus();
-                } else {
-                    state.kbPlaylistIndex = 0;
-                    focarCartaoVideo(state.kbPlaylistIndex);
-                }
-            } else if (e.key === "Enter") {
-                e.preventDefault();
-                btnMenu.click();
-            }
-            return;
-        }
-
-        // NAVEGAÇÃO POR SETAS NOS CARTÕES DE VÍDEO
-        if (e.key === "ArrowRight") {
-            e.preventDefault();
-            if (listaExibida.length > 0) {
-                state.kbPlaylistIndex = (state.kbPlaylistIndex + 1) % listaExibida.length;
-                focarCartaoVideo(state.kbPlaylistIndex);
-            }
-        } else if (e.key === "ArrowLeft") {
-            e.preventDefault();
-            if (listaExibida.length > 0) {
-                state.kbPlaylistIndex = (state.kbPlaylistIndex - 1 + listaExibida.length) % listaExibida.length;
-                focarCartaoVideo(state.kbPlaylistIndex);
-            }
-        } else if (e.key === "ArrowDown") {
-            e.preventDefault();
-            if (listaExibida.length > 0) {
-                let novoIndex = state.kbPlaylistIndex + colunas;
-                if (novoIndex >= listaExibida.length) novoIndex = listaExibida.length - 1;
-                state.kbPlaylistIndex = novoIndex;
-                focarCartaoVideo(state.kbPlaylistIndex);
-            }
-        } else if (e.key === "ArrowUp") {
-            e.preventDefault();
-            let novoIndex = state.kbPlaylistIndex - colunas;
-            if (novoIndex < 0) {
-                if (btnRandom) {
-                    btnRandom.focus();
-                } else if (searchBox) {
-                    searchBox.focus();
-                }
-            } else {
-                state.kbPlaylistIndex = novoIndex;
-                focarCartaoVideo(state.kbPlaylistIndex);
-            }
-        } else if (e.key === "Enter") {
-            e.preventDefault();
-            
-            const elementoFocado = document.activeElement;
-            
-            if (elementoFocado === btnMenu || (btnMenu && btnMenu.contains(elementoFocado))) {
-                btnMenu.click();
-                return;
-            }
-
-            if (elementoFocado === btnRandom) {
-                btnRandom.click();
-                return;
-            }
-
-            if (listaExibida[state.kbPlaylistIndex]) {
-                const videoAlvo = listaExibida[state.kbPlaylistIndex];
-                const indexOriginal = listaVideos.findIndex(v => (v.youtubeId || v.youtubeld) === (videoAlvo.youtubeId || videoAlvo.youtubeld));
-                if (indexOriginal !== -1) {
-                    tocarVideo(indexOriginal);
-                }
-            }
-        }
-        return;
-    }
-
-
-    // 3. MENU PRINCIPAL OU MODAIS (Navegação vertical genérica por botões)
     const botoesAtivos = Array.from(document.querySelectorAll('button:not([style*="display: none"]), .btn-menu:not([style*="display: none"])'))
       .filter(btn => {
         const rect = btn.getBoundingClientRect();
         return rect.width > 0 && rect.height > 0;
       });
-
+      
     if (botoesAtivos.length > 0) {
       let currentIndex = botoesAtivos.indexOf(document.activeElement);
       if (e.key === "ArrowDown" || e.key === "ArrowRight") {
@@ -215,7 +171,6 @@ export function inicializarTeclado() {
   });
 }
 
-// Exporta com ambos os nomes para evitar erros de incompatibilidade no app.js
 export const initKeyboard = inicializarTeclado;
 
 export function focarMenuPrincipal() {
