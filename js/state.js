@@ -1,8 +1,8 @@
 export const state = {
 
-  SENHA_USUARIO: "ccb123",
+  SENHA_USUARIO: "777",
 
-  SENHA_ADMIN: "admin123",
+  SENHA_ADMIN: "123456",
 
   currentVideoIndex: 0,
 
