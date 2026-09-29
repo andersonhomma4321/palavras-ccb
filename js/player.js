@@ -254,40 +254,23 @@ export function carregarPlaylist() {
 
 
 /* ==========================================
-   FOCA UM CARTÃO DA PLAYLIST
-   ========================================== */
-
+FOCA UM CARTÃO DA PLAYLIST
+========================================== */
 export function focarCartaoVideo(index) {
-
-  const cards =
-    document.querySelectorAll(
-      '.video-card-item'
-    );
-
-
-  cards.forEach((card, i) => {
-
-    if (i === index) {
-
-      card.classList.add(
-        'kb-focus'
-      );
-
-      card.scrollIntoView({
-        behavior: 'smooth',
-        block: 'nearest'
-      });
-
-    } else {
-
-      card.classList.remove(
-        'kb-focus'
-      );
-
-    }
-
-  });
-
+    const cards = document.querySelectorAll('.video-card-item');
+    cards.forEach((card, i) => {
+        if (i === index) {
+            card.classList.add('kb-focus');
+            // Comando que faz o scroll automático na grelha até o cartão focado
+            card.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'nearest'
+            });
+        } else {
+            card.classList.remove('kb-focus');
+        }
+    });
 }
 
 
