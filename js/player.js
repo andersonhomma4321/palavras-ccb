@@ -1,74 +1,18 @@
 /* ==========================================
-GESTOR DO PLAYER E DA LISTA DE VÍDEOS
+GESTOR DO PLAYER E DA LISTA DE VÍDEOS (NATIVO HTML5 / 4K SEM IFRAME)
 ========================================== */
 import { state } from './state.js';
 import { listaVideos } from '../data/videos.js';
 import { CONFIG } from './config.js';
 
-/* ==========================================
-VARIÁVEIS DO PLAYER
-========================================== */
 let modoAleatorioContinuoAtivo = false;
-let ytPlayerInstance = null;
-let youtubeApiPromise = null;
-
-/* ==========================================
-CARREGA A API DO YOUTUBE
-========================================== */
-function carregarYouTubeAPI() {
-    if (window.YT && window.YT.Player) {
-        return Promise.resolve(window.YT);
-    } 
-    if (youtubeApiPromise) {
-        return youtubeApiPromise;
-    }
-
-    youtubeApiPromise = new Promise((resolve, reject) => {
-        let finalizado = false;
-        const timeout = setTimeout(() => {
-            if (!finalizado) {
-                finalizado = true;
-                reject(new Error('A API do YouTube demorou muito para carregar.'));
-            }
-        }, 15000);
-
-        const callbackAnterior = window.onYouTubeIframeAPIReady;
-        window.onYouTubeIframeAPIReady = function () {
-            if (typeof callbackAnterior === 'function') {
-                callbackAnterior();
-            }
-            if (!finalizado) {
-                finalizado = true;
-                clearTimeout(timeout);
-                resolve(window.YT);
-            }
-        };
-
-        const scriptExistente = document.querySelector('script[src="https://www.youtube.com/iframe_api"]');
-        if (!scriptExistente) {
-            const tag = document.createElement('script');
-            tag.src = 'https://www.youtube.com/iframe_api';
-            tag.async = true;
-            document.head.appendChild(tag);
-        } else if (window.YT && window.YT.Player) {
-            if (!finalizado) {
-                finalizado = true;
-                clearTimeout(timeout);
-                resolve(window.YT);
-            }
-        }
-    });
-
-    return youtubeApiPromise;
-}
+let videoElementInstance = null;
 
 /* ==========================================
 INICIALIZA O PLAYER
 ========================================== */
 export function initPlayer() {
-    carregarYouTubeAPI().catch(error => {
-        console.error('Erro ao carregar a API do YouTube:', error);
-    });
+    // Não precisa carregar a API do YouTube, pois usa o player nativo HTML5.
 }
 
 /* ==========================================
@@ -141,7 +85,7 @@ export function focarCartaoVideo(index) {
 }
 
 /* ==========================================
-REPRODUZ UM VÍDEO
+REPRODUZ UM VÍDEO (TAG NATIVA HTML5)
 ========================================== */
 export async function tocarVideo(index) {
     if (!listaVideos || listaVideos.length === 0) return;
@@ -172,9 +116,7 @@ export async function tocarVideo(index) {
                 font-size: 1.5rem; padding: 3px 12px; border-radius: 6px;
                 cursor: pointer; z-index: 10000;
             ">&times;</button>
-            <div style="position: relative; width: 100%; height: 100%;">
-                <div id="youtube-player-div" style="width: 100%; height: 100%;"></div>
-            </div>
+            <video id="native-video-player" controls autoplay style="width: 100%; height: 100%; background: #000;"></video>
         `;
         document.body.appendChild(playerOverlay);
         
@@ -189,58 +131,29 @@ export async function tocarVideo(index) {
         playerOverlay.requestFullscreen().catch(err => console.log('Fullscreen recusado:', err));
     }
 
-    try {
-        await carregarYouTubeAPI();
-    } catch (error) {
-        console.error('Não foi possível carregar a API do YouTube:', error);
-        alert('Não foi possível carregar o player do YouTube.');
-        return;
-    }
+    videoElementInstance = document.getElementById('native-video-player');
+    
+    // ATENÇÃO: Aponta para a rota local gerada pelo yt-dlp (ex: http://localhost:8080/stream?v=ID)
+    // Isso garante que o motor de extração entregue a resolução máxima (1080p, 4K, etc.) livre de restrições de iframe.
+    videoElementInstance.src = `http://localhost:8080/stream?v=${videoId}`;
+    
+    videoElementInstance.load();
+    videoElementInstance.play().catch(e => console.log("Autoplay restrito pelo navegador:", e));
 
-    const playerContainer = document.getElementById('youtube-player-div');
-    if (!playerContainer) return;
-
-    if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
-        ytPlayerInstance.loadVideoById(videoId);
-        return;
-    }
-
-    ytPlayerInstance = new window.YT.Player('youtube-player-div', {
-        height: '100%',
-        width: '100%',
-        videoId: videoId,
-        playerVars: {
-            autoplay: 1,
-            enablejsapi: 1,
-            vq: 'hd1080',
-            hd: 1,
-            playsinline: 0
-        },
-        events: {
-            onReady: onPlayerReady,
-            onStateChange: onPlayerStateChange,
-            onError: onPlayerError
-        }
-    });
-}
-
-function onPlayerReady(event) {
-    event.target.playVideo();
-}
-
-function onPlayerStateChange(event) {
-    if (event.data === window.YT.PlayerState.ENDED) {
-        verificarFimDeVideoNoModoContinuo();
-    }
-}
-
-function onPlayerError(event) {
-    console.error('Erro no player do YouTube:', event.data);
-    if (modoAleatorioContinuoAtivo) {
-        setTimeout(() => {
+    videoElementInstance.onended = () => {
+        if (modoAleatorioContinuoAtivo) {
             verificarFimDeVideoNoModoContinuo();
-        }, 1000);
-    }
+        }
+    };
+    
+    videoElementInstance.onerror = () => {
+        console.error('Erro na reprodução nativa do vídeo.');
+        if (modoAleatorioContinuoAtivo) {
+            setTimeout(() => {
+                verificarFimDeVideoNoModoContinuo();
+            }, 1000);
+        }
+    };
 }
 
 /* ==========================================
@@ -257,8 +170,9 @@ export function fecharPlayerFullscreen() {
         playerOverlay.style.display = 'none';
     }
     
-    if (ytPlayerInstance && typeof ytPlayerInstance.stopVideo === 'function') {
-        ytPlayerInstance.stopVideo();
+    if (videoElementInstance) {
+        videoElementInstance.pause();
+        videoElementInstance.src = "";
     }
     
     if (document.fullscreenElement && document.exitFullscreen) {
