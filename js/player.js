@@ -125,6 +125,8 @@ export function focarCartaoVideo(index) {
   });
 }
 
+// ... (mantenha as funções anteriores de carregamento da API)
+
 export async function tocarVideo(index) {
   if (!listaVideos || listaVideos.length === 0) return;
   if (index < 0 || index >= listaVideos.length) return;
@@ -186,6 +188,7 @@ export async function tocarVideo(index) {
 
   playerOverlay.style.display = 'flex';
   
+  // Solicita tela cheia nativa do navegador imediatamente
   if (playerOverlay.requestFullscreen) {
     playerOverlay.requestFullscreen().catch(err => console.log('Fullscreen recusado:', err));
   }
@@ -202,7 +205,11 @@ export async function tocarVideo(index) {
   if (!playerContainer) return;
 
   if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
-    ytPlayerInstance.loadVideoById(videoId);
+    // Carrega o vídeo explicitamente solicitando a melhor qualidade disponível ('highres' ou 'hd1080')
+    ytPlayerInstance.loadVideoById({
+      videoId: videoId,
+      suggestedQuality: 'highres'
+    });
     return;
   }
 
@@ -213,13 +220,27 @@ export async function tocarVideo(index) {
     playerVars: {
       autoplay: 1,
       enablejsapi: 1,
-      vq: 'hd1080',
+      vq: 'highres', // Força a preferência por alta resolução inicial
       hd: 1,
-      playsinline: 0
+      playsinline: 0,
+      rel: 0
     },
     events: {
-      onReady: onPlayerReady,
-      onStateChange: onPlayerStateChange,
+      onReady: (event) => {
+        event.target.setPlaybackQuality('highres');
+        event.target.playVideo();
+      },
+      onStateChange: (event) => {
+        // Dispara ao iniciar o buffer/reprodução para garantir que a qualidade máxima seja aplicada
+        if (event.data === window.YT.PlayerState.BUFFERING || event.data === window.YT.PlayerState.PLAYING) {
+          if (typeof event.target.setPlaybackQuality === 'function') {
+            event.target.setPlaybackQuality('highres');
+          }
+        }
+        if (event.data === window.YT.PlayerState.ENDED) {
+          verificarFimDeVideoNoModoContinuo();
+        }
+      },
       onError: onPlayerError
     }
   });
