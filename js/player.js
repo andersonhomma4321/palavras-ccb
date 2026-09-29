@@ -200,13 +200,17 @@ export async function tocarVideo(index) {
         playerVars: {
             autoplay: 1,
             enablejsapi: 1,
-            vq: 'hd1080',
-            hd: 1,
-            playsinline: 0,
-            rel: 0
+            controls: 1,
+            modestbranding: 1,
+            iv_load_policy: 3,
+            fs: 1,
+            vq: 'highres' // Força a tentativa de resolução máxima (4K/2160p)
         },
         events: {
-            onReady: onPlayerReady,
+            onReady: (event) => {
+                event.target.setPlaybackQuality('highres');
+                event.target.playVideo();
+            },
             onStateChange: onPlayerStateChange,
             onError: onPlayerError
         }
