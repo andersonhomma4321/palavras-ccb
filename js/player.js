@@ -275,7 +275,7 @@ export function focarCartaoVideo(index) {
 
 
 /* ==========================================
-REPRODUZ UM VÍDEO (VIA IFRAME DIRETO COM ALTA RESOLUÇÃO)
+REPRODUZ UM VÍDEO
 ========================================== */
 export async function tocarVideo(index) {
     if (!listaVideos || listaVideos.length === 0) {
@@ -334,13 +334,20 @@ export async function tocarVideo(index) {
                 ✕
             </button>
             <div
-                id="youtube-player-container"
                 style="
                     position: relative;
                     width: 100%;
                     height: 100%;
                 "
-            ></div>
+            >
+                <div
+                    id="youtube-player-div"
+                    style="
+                        width: 100%;
+                        height: 100%;
+                    "
+                ></div>
+            </div>
         `;
         document.body.appendChild(playerOverlay);
 
@@ -364,309 +371,79 @@ export async function tocarVideo(index) {
     }
 
     /* ======================================
-    INSERE O IFRAME COM PARÂMETROS DE MÁXIMA QUALIDADE
+    AGUARDA A API DO YOUTUBE
     ====================================== */
-    const playerContainer = document.getElementById('youtube-player-container');
+    try {
+        await carregarYouTubeAPI();
+    } catch (error) {
+        console.error('Não foi possível carregar a API do YouTube:', error);
+        alert('Não foi possível carregar o player do YouTube.');
+        return;
+    }
+
+    /* ======================================
+    PROCURA O CONTAINER
+    ====================================== */
+    const playerContainer = document.getElementById('youtube-player-div');
     if (!playerContainer) {
         return;
     }
 
-    // Usar a URL de embed direta forçando alta definição e desativando limitações de banda do player
-    playerContainer.innerHTML = `
-        <iframe 
-            id="youtube-player-div"
-            src="https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&vq=hd2160&hd=1&modestbranding=1&rel=0" 
-            width="100%" 
-            height="100%" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-        </iframe>
-    `;
-}
+    /* ======================================
+    SE JÁ EXISTE PLAYER
+    ====================================== */
+    if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
+        ytPlayerInstance.loadVideoById(videoId);
+        if (typeof ytPlayerInstance.setPlaybackQuality === 'function') {
+            ytPlayerInstance.setPlaybackQuality('hd2160');
+        }
+        return;
+    }
 
-
-/* ==========================================
-   PLAYER PRONTO
-   ========================================== */
-
-function onPlayerReady(event) {
-
-  // Garante que o vídeo comece.
-  event.target.playVideo();
-
-}
-
-
-/* ==========================================
-   MONITORA O ESTADO DO PLAYER
-   ========================================== */
-
-function onPlayerStateChange(event) {
-
-  /*
-     YT.PlayerState.ENDED = 0
-
-     Quando o vídeo termina, verifica se
-     o modo aleatório contínuo está ativo.
-  */
-
-  if (
-    event.data ===
-    YT.PlayerState.ENDED
-  ) {
-
-    verificarFimDeVideoNoModoContinuo();
-
-  }
-
-}
-
-
-/* ==========================================
-   ERROS DO PLAYER
-   ========================================== */
-
-function onPlayerError(event) {
-
-  console.error(
-    'Erro no player do YouTube:',
-    event.data
-  );
-
-
-  /*
-     Se estiver no modo aleatório contínuo
-     e um vídeo apresentar erro, tenta
-     continuar com outro vídeo.
-  */
-
-  if (
-    modoAleatorioContinuoAtivo
-  ) {
-
-    setTimeout(
-      () => {
-
-        verificarFimDeVideoNoModoContinuo();
-
-      },
-      1000
+    /* ======================================
+    CRIA O PLAYER DO YOUTUBE
+    ====================================== */
+    ytPlayerInstance = new YT.Player(
+        'youtube-player-div',
+        {
+            height: '100%',
+            width: '100%',
+            videoId: videoId,
+            playerVars: {
+                autoplay: 1,
+                enablejsapi: 1,
+                vq: 'hd2160', // Tenta forçar a resolução máxima (4K / 2160p)
+                hd: 1,
+                playsinline: 0,
+                rel: 0
+            },
+            events: {
+                onReady: (event) => {
+                    // Força a qualidade máxima assim que o player carrega
+                    if (typeof event.target.setPlaybackQuality === 'function') {
+                        event.target.setPlaybackQuality('hd2160');
+                    }
+                    event.target.playVideo();
+                },
+                onStateChange: (event) => {
+                    // Reforça a alta resolução quando o vídeo começa a tocar ativamente
+                    if (event.data === YT.PlayerState.PLAYING) {
+                        if (typeof event.target.setPlaybackQuality === 'function') {
+                            event.target.setPlaybackQuality('hd2160');
+                        }
+                    }
+                    if (typeof onPlayerStateChange === 'function') {
+                        onPlayerStateChange(event);
+                    }
+                },
+                onError: (event) => {
+                    if (typeof onPlayerError === 'function') {
+                        onPlayerError(event);
+                    }
+                }
+            }
+        }
     );
-
-  }
-
-}
-
-
-/* ==========================================
-   FECHA O PLAYER
-   ========================================== */
-
-export function fecharPlayerFullscreen() {
-
-  // Desliga o modo aleatório.
-  modoAleatorioContinuoAtivo =
-    false;
-
-
-  // Também mantém o estado global sincronizado,
-  // caso ele exista no state.js.
-  if (
-    typeof state !== 'undefined'
-  ) {
-
-    state.modoAleatorioAtivo =
-      false;
-
-  }
-
-
-  const playerOverlay =
-    document.getElementById(
-      'fullscreen-player-overlay'
-    );
-
-
-  if (playerOverlay) {
-
-    playerOverlay.style.display =
-      'none';
-
-  }
-
-
-  /* ======================================
-     PARA O VÍDEO
-     ====================================== */
-
-  if (
-    ytPlayerInstance &&
-    typeof ytPlayerInstance.stopVideo ===
-      'function'
-  ) {
-
-    ytPlayerInstance.stopVideo();
-
-  }
-
-
-  /* ======================================
-     SAI DO FULLSCREEN
-     ====================================== */
-
-  if (
-    document.fullscreenElement &&
-    document.exitFullscreen
-  ) {
-
-    document
-      .exitFullscreen()
-      .catch(
-        err => console.log(err)
-      );
-
-  }
-
-
-  /* ======================================
-     VOLTA O FOCO PARA A PLAYLIST
-     ====================================== */
-
-  const playlistElement =
-    document.getElementById(
-      'playlist'
-    );
-
-
-  if (playlistElement) {
-
-    playlistElement.focus();
-
-  }
-
-}
-
-
-/* ==========================================
-   INICIA REPRODUÇÃO ALEATÓRIA CONTÍNUA
-   ========================================== */
-
-export function iniciarVideosAleatoriosContinuos() {
-
-  if (
-    !listaVideos ||
-    listaVideos.length === 0
-  ) {
-
-    return;
-
-  }
-
-
-  /*
-     Ativa o modo contínuo.
-  */
-
-  modoAleatorioContinuoAtivo =
-    true;
-
-
-  if (
-    typeof state !== 'undefined'
-  ) {
-
-    state.modoAleatorioAtivo =
-      true;
-
-  }
-
-
-  /*
-     Escolhe o primeiro vídeo aleatoriamente.
-  */
-
-  const randomIndex =
-    Math.floor(
-      Math.random() *
-      listaVideos.length
-    );
-
-
-  /*
-     Começa a reprodução.
-  */
-
-  tocarVideo(randomIndex);
-
-}
-
-
-/* ==========================================
-   AVANÇA PARA O PRÓXIMO VÍDEO ALEATÓRIO
-   ========================================== */
-
-export function verificarFimDeVideoNoModoContinuo() {
-
-  /*
-     Se o usuário fechou o player,
-     não continua.
-  */
-
-  if (
-    !modoAleatorioContinuoAtivo
-  ) {
-
-    return;
-
-  }
-
-
-  if (
-    !listaVideos ||
-    listaVideos.length === 0
-  ) {
-
-    return;
-
-  }
-
-
-  /*
-     Escolhe outro vídeo aleatoriamente.
-  */
-
-  const proximoAleatorio =
-    Math.floor(
-      Math.random() *
-      listaVideos.length
-    );
-
-
-  /*
-     Pequeno atraso para garantir que
-     o YouTube terminou completamente
-     o vídeo anterior antes de carregar
-     o próximo.
-  */
-
-  setTimeout(
-    () => {
-
-      if (
-        modoAleatorioContinuoAtivo
-      ) {
-
-        tocarVideo(
-          proximoAleatorio
-        );
-
-      }
-
-    },
-    300
-  );
-
 }
 
 
