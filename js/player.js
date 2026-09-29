@@ -275,279 +275,159 @@ export function focarCartaoVideo(index) {
 
 
 /* ==========================================
-   REPRODUZ UM VÍDEO
-   ========================================== */
-
+REPRODUZ UM VÍDEO
+========================================== */
 export async function tocarVideo(index) {
+    if (!listaVideos || listaVideos.length === 0) {
+        return;
+    }
+    if (index < 0 || index >= listaVideos.length) {
+        return;
+    }
+    state.currentVideoIndex = index;
+    const video = listaVideos[index];
+    // Compatibilidade com as duas nomenclaturas usadas no projeto (youtubeId ou youtubeld)
+    const videoId = video.youtubeId || video.youtubeld;
+    if (!videoId) {
+        console.error('Vídeo sem ID do YouTube:', video);
+        return;
+    }
 
-  if (
-    !listaVideos ||
-    listaVideos.length === 0
-  ) {
-    return;
-  }
+    /* ======================================
+    CRIA O OVERLAY
+    ====================================== */
+    let playerOverlay = document.getElementById('fullscreen-player-overlay');
+    if (!playerOverlay) {
+        playerOverlay = document.createElement('div');
+        playerOverlay.id = 'fullscreen-player-overlay';
+        playerOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        `;
+        playerOverlay.innerHTML = `
+            <button
+                id="close-fullscreen-player"
+                style="
+                    position: absolute;
+                    top: 40px;
+                    right: 25px;
+                    background: rgba(0, 0, 0, 0.6);
+                    color: #fff;
+                    border: 2px solid #c5a059;
+                    font-size: 1.5rem;
+                    padding: 3px 12px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    z-index: 10000;
+                "
+            >
+                ✕
+            </button>
+            <div
+                style="
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                "
+            >
+                <div
+                    id="youtube-player-div"
+                    style="
+                        width: 100%;
+                        height: 100%;
+                    "
+                ></div>
+            </div>
+        `;
+        document.body.appendChild(playerOverlay);
 
+        document.getElementById('close-fullscreen-player').addEventListener('click', () => {
+            fecharPlayerFullscreen();
+        });
+    }
 
-  if (
-    index < 0 ||
-    index >= listaVideos.length
-  ) {
-    return;
-  }
+    /* ======================================
+    MOSTRA O PLAYER
+    ====================================== */
+    playerOverlay.style.display = 'flex';
 
+    /* ======================================
+    ENTRA EM TELA CHEIA
+    ====================================== */
+    if (playerOverlay.requestFullscreen) {
+        playerOverlay.requestFullscreen().catch(
+            err => console.log('Fullscreen recusado:', err)
+        );
+    }
 
-  state.currentVideoIndex =
-    index;
+    /* ======================================
+    AGUARDA A API DO YOUTUBE
+    ====================================== */
+    try {
+        await carregarYouTubeAPI();
+    } catch (error) {
+        console.error('Não foi possível carregar a API do YouTube:', error);
+        alert('Não foi possível carregar o player do YouTube.');
+        return;
+    }
 
+    /* ======================================
+    PROCURA O CONTAINER
+    ====================================== */
+    const playerContainer = document.getElementById('youtube-player-div');
+    if (!playerContainer) {
+        return;
+    }
 
-  const video =
-    listaVideos[index];
-
-
-  const videoId =
-    video.youtubeId || video.youtubeld;
-
-
-  if (!videoId) {
-
-    console.error(
-      'Vídeo sem ID do YouTube:',
-      video
-    );
-
-    return;
-
-  }
-
-
-  /* ======================================
-     CRIA O OVERLAY
-     ====================================== */
-
-  let playerOverlay =
-    document.getElementById(
-      'fullscreen-player-overlay'
-    );
-
-
-  if (!playerOverlay) {
-
-    playerOverlay =
-      document.createElement('div');
-
-
-    playerOverlay.id =
-      'fullscreen-player-overlay';
-
-
-    playerOverlay.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #000;
-      z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    `;
-
-
-    playerOverlay.innerHTML = `
-      <button
-        id="close-fullscreen-player"
-        style="
-          position: absolute;
-          top: 40px;
-          right: 25px;
-          background: rgba(0, 0, 0, 0.6);
-          color: #fff;
-          border: 2px solid #c5a059;
-          font-size: 1.5rem;
-          padding: 3px 12px;
-          border-radius: 6px;
-          cursor: pointer;
-          z-index: 10000;
-        "
-      >
-        ✕
-      </button>
-
-      <div
-        style="
-          position: relative;
-          width: 100%;
-          height: 100%;
-        "
-      >
-        <div
-          id="youtube-player-div"
-          style="
-            width: 100%;
-            height: 100%;
-          "
-        ></div>
-      </div>
-    `;
-
-
-    document.body.appendChild(
-      playerOverlay
-    );
-
-
-    document
-      .getElementById(
-        'close-fullscreen-player'
-      )
-      .addEventListener(
-        'click',
-        () => {
-
-          fecharPlayerFullscreen();
-
+    /* ======================================
+    SE JÁ EXISTE PLAYER
+    ====================================== */
+    if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
+        ytPlayerInstance.loadVideoById(videoId);
+        if (typeof ytPlayerInstance.setPlaybackQuality === 'function') {
+            ytPlayerInstance.setPlaybackQuality('hd1080');
         }
-      );
+        return;
+    }
 
-  }
-
-
-  /* ======================================
-     MOSTRA O PLAYER
-     ====================================== */
-
-  playerOverlay.style.display =
-    'flex';
-
-
-  /* ======================================
-     ENTRA EM TELA CHEIA
-     ====================================== */
-
-  if (
-    playerOverlay.requestFullscreen
-  ) {
-
-    playerOverlay
-      .requestFullscreen()
-      .catch(
-        err =>
-          console.log(
-            'Fullscreen recusado:',
-            err
-          )
-      );
-
-  }
-
-
-  /* ======================================
-     AGUARDA A API DO YOUTUBE
-     ====================================== */
-
-  try {
-
-    await carregarYouTubeAPI();
-
-  } catch (error) {
-
-    console.error(
-      'Não foi possível carregar a API do YouTube:',
-      error
-    );
-
-    alert(
-      'Não foi possível carregar o player do YouTube.'
-    );
-
-    return;
-
-  }
-
-
-  /* ======================================
-     PROCURA O CONTAINER
-     ====================================== */
-
-  const playerContainer =
-    document.getElementById(
-      'youtube-player-div'
-    );
-
-
-  if (!playerContainer) {
-    return;
-  }
-
-
-  /* ======================================
-     SE JÁ EXISTE PLAYER
-     ====================================== */
-
-  if (
-    ytPlayerInstance &&
-    typeof ytPlayerInstance.loadVideoById ===
-      'function'
-  ) {
-
-    ytPlayerInstance.loadVideoById(
-      videoId
-    );
-
-    return;
-
-  }
-
-
-  /* ======================================
-     CRIA O PLAYER DO YOUTUBE
-     ====================================== */
-
-  ytPlayerInstance =
-    new YT.Player(
-      'youtube-player-div',
-      {
-
-        height: '100%',
-
-        width: '100%',
-
-        videoId: videoId,
-
-
-        playerVars: {
-
-          autoplay: 1,
-
-          enablejsapi: 1,
-
-          vq: 'hd1080',
-
-          hd: 1,
-
-          playsinline: 0
-
-        },
-
-
-        events: {
-
-          onReady:
-            onPlayerReady,
-
-          onStateChange:
-            onPlayerStateChange,
-
-          onError:
-            onPlayerError
-
+    /* ======================================
+    CRIA O PLAYER DO YOUTUBE
+    ====================================== */
+    ytPlayerInstance = new YT.Player(
+        'youtube-player-div',
+        {
+            height: '100%',
+            width: '100%',
+            videoId: videoId,
+            playerVars: {
+                autoplay: 1,
+                enablejsapi: 1,
+                vq: 'hd1080',
+                hd: 1,
+                playsinline: 0
+            },
+            events: {
+                onReady: (event) => {
+                    // Força a resolução máxima e inicia a reprodução
+                    if (typeof event.target.setPlaybackQuality === 'function') {
+                        event.target.setPlaybackQuality('hd1080');
+                    }
+                    event.target.playVideo();
+                },
+                onStateChange: onPlayerStateChange,
+                onError: onPlayerError
+            }
         }
-
-      }
     );
-
 }
 
 
