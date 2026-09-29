@@ -286,7 +286,8 @@ export async function tocarVideo(index) {
     }
     state.currentVideoIndex = index;
     const video = listaVideos[index];
-    // Compatibilidade com as duas nomenclaturas usadas no projeto (youtubeId ou youtubeld)
+    
+    // Compatibilidade com as nomenclaturas do projeto
     const videoId = video.youtubeId || video.youtubeld;
     if (!videoId) {
         console.error('Vídeo sem ID do YouTube:', video);
@@ -394,7 +395,7 @@ export async function tocarVideo(index) {
     if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
         ytPlayerInstance.loadVideoById(videoId);
         if (typeof ytPlayerInstance.setPlaybackQuality === 'function') {
-            ytPlayerInstance.setPlaybackQuality('hd1080');
+            ytPlayerInstance.setPlaybackQuality('hd2160');
         }
         return;
     }
@@ -411,20 +412,35 @@ export async function tocarVideo(index) {
             playerVars: {
                 autoplay: 1,
                 enablejsapi: 1,
-                vq: 'hd1080',
+                vq: 'hd2160', // Tenta forçar a resolução máxima (4K / 2160p)
                 hd: 1,
-                playsinline: 0
+                playsinline: 0,
+                rel: 0
             },
             events: {
                 onReady: (event) => {
-                    // Força a resolução máxima e inicia a reprodução
+                    // Força a qualidade máxima assim que o player carrega
                     if (typeof event.target.setPlaybackQuality === 'function') {
-                        event.target.setPlaybackQuality('hd1080');
+                        event.target.setPlaybackQuality('hd2160');
                     }
                     event.target.playVideo();
                 },
-                onStateChange: onPlayerStateChange,
-                onError: onPlayerError
+                onStateChange: (event) => {
+                    // Reforça a alta resolução quando o vídeo começa a tocar ativamente
+                    if (event.data === YT.PlayerState.PLAYING) {
+                        if (typeof event.target.setPlaybackQuality === 'function') {
+                            event.target.setPlaybackQuality('hd2160');
+                        }
+                    }
+                    if (typeof onPlayerStateChange === 'function') {
+                        onPlayerStateChange(event);
+                    }
+                },
+                onError: (event) => {
+                    if (typeof onPlayerError === 'function') {
+                        onPlayerError(event);
+                    }
+                }
             }
         }
     );
