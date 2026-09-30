@@ -27,5 +27,6 @@ export const listaVideos = [
   { title: "2026 05 27   Palavra Vídeo – QUA 15 00   Salmos 139   IrHélio", youtubeId: "6i8DOQp5hF0" },
   { title: "2026 05 24   Palavra Vídeo – DOM 10 00   II Coríntios 5   IrSalvador", youtubeId: "Cz1p46RAWhs" },
   { title: "2026 05 20   Palavra Vídeo – QUA 15 00   II Timóteo 2   IrLuiz", youtubeId: "kdKGOGGQtF4" },
-  { title: "2026 05 17   Palavra Vídeo – DOM 10 00   Marcos 16   IrNilson", youtubeId: "g9MzP5vL-z8" }
+  { title: "2026 05 17   Palavra Vídeo – DOM 10 00   Marcos 16   IrNilson", youtubeId: "g9MzP5vL-z8" },
+  { title: "2026 05 13   Palavra Vídeo – QUA 15 00   Lucas 18   IrHélio", youtubeId: "CDODsXpEvVc" }
 ];
