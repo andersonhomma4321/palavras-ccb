@@ -33,5 +33,6 @@ export const listaVideos = [
   { title: "2026 05 06   Palavra Vídeo – QUA 15 00   II Coríntios 4   IrSalvador", youtubeId: "r7CwNKPwYM0" },
   { title: "2026 04 29   Palavra Vídeo – QUA 15 00   Gálatas 6   IrHélio", youtubeId: "1RDcr_vR26c" },
   { title: "2026 04 26   Palavra Vídeo – DOM 10 00   Mateus 2   IrHélio", youtubeId: "8gEyIQRR0Wk" },
-  { title: "2026 04 22   Palavra Vídeo – QUA 15 00   Provérbios 27   IrLuiz", youtubeId: "AvsLs9F9gLg" }
+  { title: "2026 04 22   Palavra Vídeo – QUA 15 00   Provérbios 27   IrLuiz", youtubeId: "AvsLs9F9gLg" },
+  { title: "2026 04 19   Palavra Vídeo – DOM 10 00   Salmos 23   IrHélio", youtubeId: "ozkFLGcH4XM" }
 ];
