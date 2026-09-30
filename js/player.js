@@ -320,42 +320,60 @@ export function pararModoAleatorio() {
   }
 }
 
+/* ==========================================
+FILTRA OS VÍDEOS
+========================================== */
 export function filtrarVideos() {
-  const searchInput = document.getElementById('search-input');
-  if (!searchInput) return;
-  
-  const termoBruto = searchInput.value;
-  const termos = termoBruto
-    ? termoBruto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/\s+/)
-    : [];
-    
-  const cards = document.querySelectorAll('.video-card-item');
-  cards.forEach(card => {
-    const tituloEl = card.querySelector('.video-card-title');
-    if (!tituloEl) return;
-    
-    const titulo = tituloEl.textContent.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    
-    const atendeTodos = termos.every((t) => {
-      if (/^\d{1,2}$/.test(t)) {
-        const regex = new RegExp(`\\b${t}\\b`);
-        return regex.test(titulo);
-      }
-      if (/^\d{4}$/.test(t)) {
-        const regex = new RegExp(`\\b${t}\\b`);
-        return regex.test(titulo);
-      }
-      if (t.length === 1) {
-        const regex = new RegExp(`\\b${t}`);
-        return regex.test(titulo);
-      }
-      return titulo.includes(t);
-    });
-    
-    if (atendeTodos || termos.length === 0) {
-      card.style.display = 'flex';
-    } else {
-      card.style.display = 'none';
+    const searchInput = document.getElementById('search-input');
+    if (!searchInput) {
+        return;
     }
-  });
+
+    const termoBruto = searchInput.value;
+    const termos = termoBruto
+        ? termoBruto
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .split(/\s+/)
+        : [];
+
+    const cards = document.querySelectorAll('.video-card-item');
+    cards.forEach(card => {
+        const tituloEl = card.querySelector('.video-card-title');
+        if (!tituloEl) {
+            return;
+        }
+
+        const titulo = tituloEl.textContent
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+
+        const atendeTodos = termos.every((t) => {
+            // Trata números de 1 ou 2 dígitos de forma isolada e exata
+            if (/^\d{1,2}$/.test(t)) {
+                const regex = new RegExp(`\\b${t}\\b`);
+                return regex.test(titulo);
+            }
+            // Trata números de quatro dígitos (anos)
+            if (/^\d{4}$/.test(t)) {
+                const regex = new RegExp(`\\b${t}\\b`);
+                return regex.test(titulo);
+            }
+            // Se o termo tiver apenas 1 caractere (ex: 'l'), exige que alguma palavra comece com essa letra
+            if (t.length === 1) {
+                const regex = new RegExp(`\\b${t}`);
+                return regex.test(titulo);
+            }
+            // Para palavras normais, procura em qualquer parte do título
+            return titulo.includes(t);
+        });
+
+        if (atendeTodos || termos.length === 0) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
 }
