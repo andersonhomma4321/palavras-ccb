@@ -20,5 +20,6 @@ export const listaVideos = [
   { title: "2026 06 24   Palavra Vídeo – QUA 15 00   Marcos 10 17   IrHélio", youtubeId: "RJxy7OvRbUk" },
   { title: "2026 06 21   Palavra Vídeo – DOM 10 00   II Coríntios 5   IrSalvador", youtubeId: "JF-60Kvunug" },
   { title: "2026 06 17   Palavra Vídeo – QUA 15 00   João 1 15   IrLuiz", youtubeId: "nEyYpzN0YhE" },
-  { title: "2026 06 14   Palavra Vídeo – DOM 10 00   II Coríntios 2   IrSalvador", youtubeId: "0LmQt_L2xhA" }
+  { title: "2026 06 14   Palavra Vídeo – DOM 10 00   II Coríntios 2   IrSalvador", youtubeId: "0LmQt_L2xhA" },
+  { title: "2026 06 07   Palavra Vídeo – DOM 10 00   Isaías 7   IrSalvador", youtubeId: "Pv1mCB6RRLA" }
 ];
