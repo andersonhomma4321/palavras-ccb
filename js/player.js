@@ -286,6 +286,10 @@ export function fecharPlayerFullscreen() {
   const playlistElement = document.getElementById('playlist');
   if (playlistElement) {
     playlistElement.focus();
+    // Sincroniza a borda visual com o índice correto salvo no estado
+    if (typeof state.kbPlaylistIndex === 'number') {
+      focarCartaoVideo(state.kbPlaylistIndex);
+    }
   }
 }
 
