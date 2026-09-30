@@ -37,5 +37,6 @@ export const listaVideos = [
   { title: "2026 04 19   Palavra Vídeo – DOM 10 00   Salmos 23   IrHélio", youtubeId: "ozkFLGcH4XM" },
   { title: "2026 04 12   Palavra Vídeo – DOM 10 00   Tiago 4   IrSalvador", youtubeId: "9RUSq1caB4M" },
   { title: "2026 04 08   Palavra Vídeo – QUA 15 00   Romanos 5   IrLuiz", youtubeId: "VpG2GFM0zn0" },
-  { title: "2026 03 29   Palavra Vídeo – DOM 10 00   Isaías 54   IrHélio", youtubeId: "RnIPxDoSQqk" }
+  { title: "2026 03 29   Palavra Vídeo – DOM 10 00   Isaías 54   IrHélio", youtubeId: "RnIPxDoSQqk" },
+  { title: "2026 03 22   Palavra Vídeo – DOM 10 00   Hebreus 3   IrLuiz", youtubeId: "tnccPlupVbM" }
 ];
