@@ -1,19 +1,50 @@
+/* ==========================================
+GESTOR DE NAVEGAÇÃO POR TECLADO
+========================================== */
 import { state } from './state.js';
 import { listaVideos } from '../data/videos.js';
 import { tocarVideo, focarCartaoVideo } from './player.js';
 
+// Função auxiliar para focar o primeiro cartão visível com base na lista filtrada
+function focarPrimeiroCartaoVisivel(listaExibida) {
+  if (!listaExibida || listaExibida.length === 0) return;
+  
+  const cards = document.querySelectorAll('.video-card-item');
+  const videoAlvo = listaExibida[0];
+  
+  for (let i = 0; i < listaVideos.length; i++) {
+    if (listaVideos[i] === videoAlvo) {
+      state.kbPlaylistIndex = i;
+      focarCartaoVideo(i);
+      if (cards[i]) cards[i].focus();
+      break;
+    }
+  }
+}
+
 export function inicializarTeclado() {
   document.addEventListener("keydown", (e) => {
+    // Verifica o estado atual da interface
     const loginOverlay = document.getElementById("login-overlay");
     const menuOverlay = document.getElementById("menu-overlay");
-    const adminModal = document.getElementById("admin-form-overlay") || document.getElementById("admin-modal");
+    const adminModal = document.getElementById("admin-form-overlay") || 
+                       document.getElementById("admin-modal");
     const appContainer = document.getElementById("app-container");
     
     const loginVisivel = loginOverlay && window.getComputedStyle(loginOverlay).display !== "none";
+    const menuVisivel = menuOverlay && window.getComputedStyle(menuOverlay).display !== "none";
+    const adminVisivel = adminModal && window.getComputedStyle(adminModal).display !== "none";
     const appVisivel = appContainer && window.getComputedStyle(appContainer).display !== "none";
-    
-    if (loginVisivel) return;
 
+    // 1. SE O LOGIN ESTIVER VISÍVEL
+    if (loginVisivel) {
+      if (e.key === "Enter") {
+        // Deixa o formulário de login submeter naturalmente ou gerencia aqui
+      }
+      return;
+    }
+
+    // 2. TELA "PALAVRAS" (YOUTUBE TV) - GRELHA DE VÍDEOS
     if (appVisivel) {
       const searchBox = document.getElementById("search-input");
       const termoBruto = searchBox ? searchBox.value : "";
@@ -22,12 +53,20 @@ export function inicializarTeclado() {
       const listaExibida = termos.length > 0
         ? listaVideos.filter(video => {
             const tit = video.title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-            return termos.every((t) => {
+            return termos.every((t, index) => {
               if (/^\d{1,2}$/.test(t)) {
+                if (index === termos.length - 1 && termos.length >= 3) {
+                  const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
+                  return regex.test(tit);
+                }
                 const regex = new RegExp(`\\b${t}\\b`);
                 return regex.test(tit);
               }
               if (/^\d{4}$/.test(t)) {
+                if (index === termos.length - 1 && termos.length >= 3) {
+                  const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
+                  return regex.test(tit);
+                }
                 const regex = new RegExp(`\\b${t}\\b`);
                 return regex.test(tit);
               }
@@ -36,6 +75,7 @@ export function inicializarTeclado() {
           })
         : listaVideos;
 
+      // Calcula dinamicamente a quantidade de colunas na grelha
       const gridContainer = document.getElementById("playlist");
       let colunas = 4;
       if (gridContainer) {
@@ -44,6 +84,7 @@ export function inicializarTeclado() {
         colunas = colTemplate ? colTemplate.split(" ").length : 4;
       }
 
+      // SE O FOCO ESTIVER NO CAMPO DE PESQUISA
       if (document.activeElement === searchBox) {
         if (e.key === "ArrowDown") {
           e.preventDefault();
@@ -51,29 +92,36 @@ export function inicializarTeclado() {
           if (btnRandom) {
             btnRandom.focus();
           } else {
-            state.kbPlaylistIndex = 0;
-            focarCartaoVideo(state.kbPlaylistIndex);
+            focarPrimeiroCartaoVisivel(listaExibida);
           }
         } else if (e.key === "ArrowUp") {
           e.preventDefault();
-          const btnAppBack = document.getElementById("btn-app-back");
+          const btnAppBack = document.getElementById("btn-app-back") || 
+                             document.getElementById("btn-back") || 
+                             document.getElementById("btn-voltar");
           if (btnAppBack) btnAppBack.focus();
         } else if (e.key === "ArrowLeft") {
           e.preventDefault();
-          const btnMenu = document.getElementById("btn-app-back");
-          if (btnMenu) btnMenu.focus();
+          const btnMenu = document.getElementById("btn-app-back") || 
+                          document.getElementById("btn-back") || 
+                          document.getElementById("btn-voltar") || 
+                          document.querySelector(".btn-voltar") || 
+                          document.querySelector("header button");
+          if (btnMenu) {
+            btnMenu.focus();
+          }
+        } else if (e.key === "ArrowRight") {
+          return; // Permite mover o cursor livremente pelo texto
         }
         return;
       }
 
+      // TRATAMENTO PARA O BOTÃO DE VÍDEOS ALEATÓRIOS (caso esteja focado)
       const btnRandom = document.getElementById("btn-random-videos");
       if (document.activeElement === btnRandom) {
         if (e.key === "ArrowDown") {
           e.preventDefault();
-          state.kbPlaylistIndex = 0;
-          focarCartaoVideo(state.kbPlaylistIndex);
-          const primeiroCartao = document.querySelector('.video-card-item');
-          if (primeiroCartao) primeiroCartao.focus();
+          focarPrimeiroCartaoVisivel(listaExibida);
         } else if (e.key === "ArrowUp") {
           e.preventDefault();
           if (searchBox) searchBox.focus();
@@ -84,7 +132,10 @@ export function inicializarTeclado() {
         return;
       }
 
-      const btnMenu = document.getElementById("btn-app-back");
+      // TRATAMENTO PARA O BOTÃO DE MENU / VOLTAR (caso esteja focado)
+      const btnMenu = document.getElementById("btn-app-back") || 
+                      document.getElementById("btn-back") || 
+                      document.getElementById("btn-voltar");
       if (document.activeElement === btnMenu) {
         if (e.key === "ArrowRight") {
           e.preventDefault();
@@ -94,8 +145,7 @@ export function inicializarTeclado() {
           if (btnRandom) {
             btnRandom.focus();
           } else {
-            state.kbPlaylistIndex = 0;
-            focarCartaoVideo(state.kbPlaylistIndex);
+            focarPrimeiroCartaoVisivel(listaExibida);
           }
         } else if (e.key === "Enter") {
           e.preventDefault();
@@ -104,6 +154,7 @@ export function inicializarTeclado() {
         return;
       }
 
+      // NAVEGAÇÃO POR SETAS NOS CARTÕES DE VÍDEO
       if (e.key === "ArrowRight") {
         e.preventDefault();
         if (listaExibida.length > 0) {
@@ -139,6 +190,15 @@ export function inicializarTeclado() {
         }
       } else if (e.key === "Enter") {
         e.preventDefault();
+        const elementoFocado = document.activeElement;
+        if (elementoFocado === btnMenu || (btnMenu && btnMenu.contains(elementoFocado))) {
+          btnMenu.click();
+          return;
+        }
+        if (elementoFocado === btnRandom) {
+          btnRandom.click();
+          return;
+        }
         if (listaExibida[state.kbPlaylistIndex]) {
           const videoAlvo = listaExibida[state.kbPlaylistIndex];
           const indexOriginal = listaVideos.findIndex(v => (v.youtubeId || v.youtubeld) === (videoAlvo.youtubeId || videoAlvo.youtubeld));
@@ -150,6 +210,7 @@ export function inicializarTeclado() {
       return;
     }
 
+    // 3. MENU PRINCIPAL OU MODAIS (Navegação vertical genérica por botões)
     const botoesAtivos = Array.from(document.querySelectorAll('button:not([style*="display: none"]), .btn-menu:not([style*="display: none"])'))
       .filter(btn => {
         const rect = btn.getBoundingClientRect();
@@ -171,8 +232,8 @@ export function inicializarTeclado() {
   });
 }
 
+// Exporta com ambos os nomes para evitar erros de incompatibilidade no app.js
 export const initKeyboard = inicializarTeclado;
-
 export function focarMenuPrincipal() {
   const menuOverlay = document.getElementById("menu-overlay");
   if (menuOverlay) {
@@ -180,7 +241,6 @@ export function focarMenuPrincipal() {
     if (primeiroBotao) primeiroBotao.focus();
   }
 }
-
 export function focarAdminMenu() {
   const adminMenuOverlay = document.getElementById("admin-menu-overlay");
   if (adminMenuOverlay) {
