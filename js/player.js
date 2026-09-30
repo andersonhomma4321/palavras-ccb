@@ -4,6 +4,25 @@ import { listaVideos } from '../data/videos.js';
 let modoAleatorioContinuoAtivo = false;
 let ytPlayerInstance = null;
 let youtubeApiPromise = null;
+let wakeLock = null;
+
+async function ativarBloqueioTela() {
+  try {
+    if ('wakeLock' in navigator) {
+      wakeLock = await navigator.requestWakeLock('screen');
+    }
+  } catch (err) {
+    console.log('Erro ao ativar Wake Lock:', err);
+  }
+}
+
+function libertarBloqueioTela() {
+  if (wakeLock !== null) {
+    wakeLock.release().then(() => {
+      wakeLock = null;
+    });
+  }
+}
 
 function carregarYouTubeAPI() {
   if (window.YT && window.YT.Player) {
@@ -125,8 +144,6 @@ export function focarCartaoVideo(index) {
   });
 }
 
-// ... (mantenha as funções anteriores de carregamento da API)
-
 export async function tocarVideo(index) {
   if (!listaVideos || listaVideos.length === 0) return;
   if (index < 0 || index >= listaVideos.length) return;
@@ -139,6 +156,9 @@ export async function tocarVideo(index) {
     console.error('Vídeo sem ID do YouTube:', video);
     return;
   }
+  
+  // Ativa o bloqueio para evitar que o monitor/ecrã apague durante a reprodução
+  ativarBloqueioTela();
   
   let playerOverlay = document.getElementById('fullscreen-player-overlay');
   if (!playerOverlay) {
@@ -205,7 +225,7 @@ export async function tocarVideo(index) {
   if (!playerContainer) return;
 
   if (ytPlayerInstance && typeof ytPlayerInstance.loadVideoById === 'function') {
-    // Carrega o vídeo explicitamente solicitando a melhor qualidade disponível ('highres' ou 'hd1080')
+    // Carrega o vídeo explicitamente solicitando a melhor qualidade disponível ('highres')
     ytPlayerInstance.loadVideoById({
       videoId: videoId,
       suggestedQuality: 'highres'
@@ -220,7 +240,7 @@ export async function tocarVideo(index) {
     playerVars: {
       autoplay: 1,
       enablejsapi: 1,
-      vq: 'highres', // Força a preferência por alta resolução inicial
+      vq: 'highres',
       hd: 1,
       playsinline: 0,
       rel: 0
@@ -231,7 +251,6 @@ export async function tocarVideo(index) {
         event.target.playVideo();
       },
       onStateChange: (event) => {
-        // Dispara ao iniciar o buffer/reprodução para garantir que a qualidade máxima seja aplicada
         if (event.data === window.YT.PlayerState.BUFFERING || event.data === window.YT.PlayerState.PLAYING) {
           if (typeof event.target.setPlaybackQuality === 'function') {
             event.target.setPlaybackQuality('highres');
@@ -244,16 +263,6 @@ export async function tocarVideo(index) {
       onError: onPlayerError
     }
   });
-}
-
-function onPlayerReady(event) {
-  event.target.playVideo();
-}
-
-function onPlayerStateChange(event) {
-  if (event.data === window.YT.PlayerState.ENDED) {
-    verificarFimDeVideoNoModoContinuo();
-  }
 }
 
 function onPlayerError(event) {
@@ -270,6 +279,10 @@ export function fecharPlayerFullscreen() {
   if (typeof state !== 'undefined') {
     state.modoAleatorioAtivo = false;
   }
+
+  // Liberta o bloqueio da tela para o monitor voltar a gerir o consumo de energia normalmente
+  libertarBloqueioTela();
+
   const playerOverlay = document.getElementById('fullscreen-player-overlay');
   if (playerOverlay) {
     playerOverlay.style.display = 'none';
@@ -286,7 +299,6 @@ export function fecharPlayerFullscreen() {
   const playlistElement = document.getElementById('playlist');
   if (playlistElement) {
     playlistElement.focus();
-    // Sincroniza a borda visual com o índice correto salvo no estado
     if (typeof state.kbPlaylistIndex === 'number') {
       focarCartaoVideo(state.kbPlaylistIndex);
     }
@@ -352,17 +364,9 @@ export function filtrarVideos() {
             .toLowerCase();
 
         const atendeTodos = termos.every((t, index) => {
-            /*
-               Trata números de 1 ou 2 dígitos (ex: Mês ou Dia).
-               Se houver um termo numérico anterior de 4 dígitos (Ano), 
-               garantimos que este número de 2 dígitos seja tratado como MÊS 
-               (logo após o ano, ex: '2026 09' não pega '2026 ... 09').
-            */
             if (/^\d{1,2}$/.test(t)) {
-                // Se o termo anterior na busca foi um ano de 4 dígitos, este número é o mês
                 const termoAnterior = index > 0 ? termos[index - 1] : null;
                 if (termoAnterior && /^\d{4}$/.test(termoAnterior)) {
-                    // Regex para garantir que o número venha logo após o ano (Ano Mês)
                     const regexAnoMes = new RegExp(`${termoAnterior}\\s+0?${parseInt(t, 10)}\\b`);
                     return regexAnoMes.test(titulo);
                 }
@@ -375,9 +379,6 @@ export function filtrarVideos() {
                 return regex.test(titulo);
             }
 
-            /*
-               Trata números de quatro dígitos (Ano).
-            */
             if (/^\d{4}$/.test(t)) {
                 if (index === termos.length - 1 && termos.length >= 3) {
                     const regex = new RegExp(`\\b${t}\\b(?!\\s*\\d{2})`);
@@ -387,9 +388,6 @@ export function filtrarVideos() {
                 return regex.test(titulo);
             }
 
-            /*
-               Para palavras normais, procura em qualquer parte do título.
-            */
             return titulo.includes(t);
         });
 
