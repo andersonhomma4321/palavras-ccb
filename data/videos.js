@@ -46,5 +46,6 @@ export const listaVideos = [
   { title: "2026 02 25   Palavra Vídeo – QUA 15 00   Lucas 14 15   IrLuiz", youtubeId: "fVer2Z_hKQo" },
   { title: "2026 02 22   Palavra Vídeo – DOM 10 00   I Pedro 1   IrNilson", youtubeId: "yPGb9Kxczjs" },
   { title: "2026 02 18   Palavra Vídeo – QUA 15 00   Romanos 12   IrLuiz", youtubeId: "_KJ0uq644eU" },
-  { title: "2026 02 15   Palavra Vídeo – DOM 10 00   Salmo 49   IrSalvador", youtubeId: "SAYPpVktURw" }
+  { title: "2026 02 15   Palavra Vídeo – DOM 10 00   Salmo 49   IrSalvador", youtubeId: "SAYPpVktURw" },
+  { title: "2026 02 11   Palavra Vídeo – QUA 15 00   Salmo 1   IrHélio", youtubeId: "Lywdm9Bxwy0" }
 ];
