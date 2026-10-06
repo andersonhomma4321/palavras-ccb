@@ -38,5 +38,17 @@ export const listaVideos = [
   { title: "2026 04 12   Palavra Vídeo – DOM 10 00   Tiago 4   IrSalvador", youtubeId: "9RUSq1caB4M" },
   { title: "2026 04 08   Palavra Vídeo – QUA 15 00   Romanos 5   IrLuiz", youtubeId: "VpG2GFM0zn0" },
   { title: "2026 03 29   Palavra Vídeo – DOM 10 00   Isaías 54   IrHélio", youtubeId: "RnIPxDoSQqk" },
-  { title: "2026 03 22   Palavra Vídeo – DOM 10 00   Hebreus 3   IrLuiz", youtubeId: "tnccPlupVbM" }
+  { title: "2026 03 22   Palavra Vídeo – DOM 10 00   Hebreus 3   IrLuiz", youtubeId: "tnccPlupVbM" },
+  { title: "2026 03 18   Palavra Vídeo – QUA 15 00   Marcos 11 IrLuiz", youtubeId: "yaTiEJZKQAc" },
+  { title: "2026 03 15   Palavra Vídeo – DOM 10 00   Mateus 7   IrSalvador", youtubeId: "H8lT_XSdERw" },
+  { title: "2026 03 11   Palavra Vídeo – QUA 15 00   João 17   IrSalvador", youtubeId: "9sP-aarbi6w" },
+  { title: "2026 03 08   Palavra Vídeo – DOM 10 00   II Pedro 1   IrSalvador", youtubeId: "WHPQtf8zioQ" },
+  { title: "2026 02 25   Palavra Vídeo – QUA 15 00   Lucas 14 15   IrLuiz", youtubeId: "fVer2Z_hKQo" },
+  { title: "2026 02 22   Palavra Vídeo – DOM 10 00   I Pedro 1   IrNilson", youtubeId: "yPGb9Kxczjs" },
+  { title: "2026 02 18   Palavra Vídeo – QUA 15 00   Romanos 12   IrLuiz", youtubeId: "_KJ0uq644eU" },
+  { title: "2026 02 15   Palavra Vídeo – DOM 10 00   Salmo 49   IrSalvador", youtubeId: "SAYPpVktURw" },
+  { title: "2026 02 11   Palavra Vídeo – QUA 15 00   Salmo 1   IrHélio", youtubeId: "Lywdm9Bxwy0" },
+  { title: "2026 02 08   Palavra Vídeo – DOM 10 00   Hebreus 10 19   IrSalvador", youtubeId: "iQrbXshEZlk" },
+  { title: "2026 02 04   Palavra Vídeo – QUA 15 00   II Reis 6   IrJoão", youtubeId: "d3VsZYspCrM" },
+  { title: "2026 02 01   Palavra Vídeo – DOM 10 00   João 16   IrSalvador", youtubeId: "SYjNq2r408w" }
 ];
