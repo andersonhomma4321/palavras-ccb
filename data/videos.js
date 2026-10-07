@@ -54,5 +54,6 @@ export const listaVideos = [
   { title: "2026 01 28   Palavra Vídeo – QUA 15 00   Mateus 28   IrLuiz", youtubeId: "yqXvfMhuupY" },
   { title: "2026 01 25   Palavra Vídeo – DOM 10 00   João 6   IrSalvador", youtubeId: "FJQC3C1l8ZI" },
   { title: "2026 01 21   Palavra Vídeo – QUA 15 00   Filipenses 2   IrLuiz", youtubeId: "nyJ1mtuEbL4" },
-  { title: "2026 01 18   Palavra Vídeo – DOM 10 00   Lucas 10   IrSalvador", youtubeId: "_3kfQlYqAfE" }
+  { title: "2026 01 18   Palavra Vídeo – DOM 10 00   Lucas 10   IrSalvador", youtubeId: "_3kfQlYqAfE" },
+  { title: "2026 01 14   Palavra Vídeo – QUA 15 00   II Coríntios 4   IrLuiz", youtubeId: "Fn3izQ_ovDU" }
 ];
