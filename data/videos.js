@@ -58,5 +58,6 @@ export const listaVideos = [
   { title: "2026 01 14   Palavra Vídeo – QUA 15 00   II Coríntios 4   IrLuiz", youtubeId: "Fn3izQ_ovDU" },
   { title: "2026 01 04   Palavra Vídeo – DOM 10 00   Esdras 6   IrSalvador", youtubeId: "LuBFypoCumw" },
   { title: "2025 12 31   Palavra Vídeo – QUA 15 00   Efésios 4   IrNilson", youtubeId: "vK-8pgDv9Eo" },
-  { title: "2025 12 28   Palavra Vídeo – DOM 10 00   Efésios 3 14   IrSalvador", youtubeId: "4DNlkZ1bZYY" }
+  { title: "2025 12 28   Palavra Vídeo – DOM 10 00   Efésios 3 14   IrSalvador", youtubeId: "4DNlkZ1bZYY" },
+  { title: "2025 12 24   Palavra Vídeo – QUA 15 00   Romanos 12   Ir", youtubeId: "837AHUpUwLU" }
 ];
