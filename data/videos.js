@@ -128,5 +128,6 @@ export const listaVideos = [
   { title: "2025 01 26   Palavra Vídeo   DOM 10 00   II Samuel 23   IrSalvador", youtubeId: "pkn0ypgdMi4" },
   { title: "2025 01 15   Palavra Vídeo   QUA 15 00    Salmo 15   IrLuiz", youtubeId: "FLlOd7rwfU8" },
   { title: "2025 01 05   Palavra Vídeo   DOM 10 00   I Coríntios 2   IrLuiz", youtubeId: "vTm10NTXGNA" },
-  { title: "2026 09 30   Palavra Vídeo –  QUA 19 30   Efésios 2   IrLuiz", youtubeId: "qaAFGNBegA0" }
+  { title: "2026 09 30   Palavra Vídeo –  QUA 19 30   Efésios 2   IrLuiz", youtubeId: "qaAFGNBegA0" },
+  { title: "2026 09 23   Palavra Vídeo –  QUA 19 30   Lucas 15   IrHélio", youtubeId: "kD1Hnf4qrTM" }
 ];
