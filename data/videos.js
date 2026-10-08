@@ -114,5 +114,6 @@ export const listaVideos = [
   { title: "2025 05 21   Palavra Vídeo   QUA 15 00   I Samuel 16   IrHélio", youtubeId: "zEhBGal6CP8" },
   { title: "2025 05 18   Palavra Vídeo   DOM 10 00   II Pedro 1   IrSalvador", youtubeId: "s760Cfwkxmw" },
   { title: "2025 05 14   Palavra Vídeo   QUA 15 00   João 14   IrLuiz", youtubeId: "JlHxBtfUQA0" },
-  { title: "2025 05 04   Palavra Vídeo   DOM 10 00   Hebreus 10   IrEliel", youtubeId: "yjQKpRqonWc" }
+  { title: "2025 05 04   Palavra Vídeo   DOM 10 00   Hebreus 10   IrEliel", youtubeId: "yjQKpRqonWc" },
+  { title: "2025 04 30   Palavra Vídeo   QUA 15 00   Lucas 7 18   IrLuiz", youtubeId: "OE1iwH3upQU" }
 ];
