@@ -102,5 +102,6 @@ export const listaVideos = [
   { title: "2025 07 20   Palavra Vídeo – DOM 10 00   II Coríntios 7   IrEliel", youtubeId: "ffrCu7c5S4g" },
   { title: "2025 07 16   Palavra Vídeo – QUA 15 00   Colossenses 2   IrLuiz", youtubeId: "jtRmreUYkSQ" },
   { title: "2025 07 09   Palavra Vídeo – QUA 15 00   Miquéias 7   IrHélio", youtubeId: "26bNEsdFnwQ" },
-  { title: "2025 07 06   Palavra Vídeo – DOM 10 00   Provérbios 3   IrSalvador", youtubeId: "Z76ZLSvhsjY" }
+  { title: "2025 07 06   Palavra Vídeo – DOM 10 00   Provérbios 3   IrSalvador", youtubeId: "Z76ZLSvhsjY" },
+  { title: "2025 07 02   Palavra Vídeo – QUA 15 00    Efésios 1   IrLuiz", youtubeId: "vxy496MqCro" }
 ];
