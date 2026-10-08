@@ -133,5 +133,6 @@ export const listaVideos = [
   { title: "2026 09 20   Palavra Vídeo –  DOM   10 00   Romanos 11   IrSalvador", youtubeId: "PR-xNw2GBEU" },
   { title: "2026 09 16   Palavra Vídeo –  QUA 19 30   II Coríntios 4   IrLuiz", youtubeId: "qMCQQ9VwKiU" },
   { title: "2026 09 13   Palavra Vídeo – DOM 10 00   Mateus 9 18   IrMaurício", youtubeId: "uX-u2Kj_9Zw" },
-  { title: "2026 09 09   Palavra Vídeo – QUA 19 30   I João 3   IrLuiz", youtubeId: "GHMuvIkEXms" }
+  { title: "2026 09 09   Palavra Vídeo – QUA 19 30   I João 3   IrLuiz", youtubeId: "GHMuvIkEXms" },
+  { title: "2026 09 02   Palavra Vídeo – QUA 19 30   Tiago 5 7   IrNilson", youtubeId: "7k_l7JQV4PI" }
 ];
