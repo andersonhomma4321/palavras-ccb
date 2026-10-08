@@ -89,5 +89,6 @@ export const listaVideos = [
   { title: "2025 08 31   Palavra Vídeo   DOM   14 00   Mateus 13   IrSalvador", youtubeId: "T3Iic0j5fsQ" },
   { title: "2025 08 31   Palavra Vídeo – DOM 10 00   Atos 13   IrEliel", youtubeId: "mg1Cjys6pKQ" },
   { title: "2025 08 27   Palavra Vídeo – QUA 15 00   Salmos 133   Ir", youtubeId: "BXCCy29xORA" },
-  { title: "2025 08 24   Palavra Vídeo – DOM 10 00   Hebreus 12   IrSalvador", youtubeId: "h2w9RM5Vp7Y" }
+  { title: "2025 08 24   Palavra Vídeo – DOM 10 00   Hebreus 12   IrSalvador", youtubeId: "h2w9RM5Vp7Y" },
+  { title: "2025 08 20   Palavra Vídeo – QUA 15 00   Lucas 12 22   IrLuiz", youtubeId: "_PfXEBEs7S0" }
 ];
