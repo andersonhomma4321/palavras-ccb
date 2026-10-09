@@ -176,5 +176,6 @@ export const listaVideos = [
   { title: "2025 07 27   Palavra Vídeo – DOM 10 00   Mateus 4   IrSalvador", youtubeId: "k2Qab3oHtu4" },
   { title: "2025 07 23   Palavra Vídeo – QUA 15 00   I Coríntios 10 IrHélio", youtubeId: "XN7JUMZYhB0" },
   { title: "2025 07 20   Palavra Vídeo – DOM 10 00   II Coríntios 7   IrEliel", youtubeId: "ffrCu7c5S4g" },
-  { title: "2025 07 16   Palavra Vídeo – QUA 15 00   Colossenses 2   IrLuiz", youtubeId: "jtRmreUYkSQ" }
+  { title: "2025 07 16   Palavra Vídeo – QUA 15 00   Colossenses 2   IrLuiz", youtubeId: "jtRmreUYkSQ" },
+  { title: "2025 07 09   Palavra Vídeo – QUA 15 00   Miquéias 7   IrHélio", youtubeId: "26bNEsdFnwQ" }
 ];
