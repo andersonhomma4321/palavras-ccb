@@ -180,5 +180,6 @@ export const listaVideos = [
   { title: "2025 07 09   Palavra Vídeo – QUA 15 00   Miquéias 7   IrHélio", youtubeId: "26bNEsdFnwQ" },
   { title: "2025 07 06   Palavra Vídeo – DOM 10 00   Provérbios 3   IrSalvador", youtubeId: "Z76ZLSvhsjY" },
   { title: "2025 07 02   Palavra Vídeo – QUA 15 00    Efésios 1   IrLuiz", youtubeId: "vxy496MqCro" },
-  { title: "2025 06 29   Palavra Vídeo   DOM 10 00   I Samuel 2   IrMaurício", youtubeId: "zDuKJ7_csx8" }
+  { title: "2025 06 29   Palavra Vídeo   DOM 10 00   I Samuel 2   IrMaurício", youtubeId: "zDuKJ7_csx8" },
+  { title: "2025 06 25   Palavra Vídeo   QUA 15 00    I Pedro 1   IrHélio", youtubeId: "85p_nA1bXYo" }
 ];
