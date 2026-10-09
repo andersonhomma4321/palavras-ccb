@@ -155,5 +155,6 @@ export const listaVideos = [
   { title: "2025 10 26   Palavra Vídeo – DOM 10 00   Romanos 6   IrLuiz", youtubeId: "yd5pv0__ZI4" },
   { title: "2025 10 22   Palavra Vídeo – QUA 15 00   Lucas 7   Ir", youtubeId: "jlvevV_G7JI" },
   { title: "2025 10 19   Palavra Vídeo – DOM 10 00   Lucas 16   IrSalvador", youtubeId: "cEZi2A0Anfw" },
-  { title: "2025 10 12   Palavra Vídeo – DOM 10 00   João 1   IrSalvador", youtubeId: "Bwbolv5z-H0" }
+  { title: "2025 10 12   Palavra Vídeo – DOM 10 00   João 1   IrSalvador", youtubeId: "Bwbolv5z-H0" },
+  { title: "2025 10 08   Palavra Vídeo – QUA 15 00   Hebreus 11   IrHélio", youtubeId: "CelC1k6tVfM" }
 ];
