@@ -185,5 +185,6 @@ export const listaVideos = [
   { title: "2025 06 18   Palavra Vídeo   QUA 15 00   Mateus 8   IrLuiz", youtubeId: "6Hvy5dzXFRE" },
   { title: "2025 06 15   Palavra Vídeo   DOM 10 00   Colossenses 3   IrNilson", youtubeId: "kjemRUkTsDs" },
   { title: "2025 06 04   Palavra Vídeo   QUA 15 00   João 9   IrLuiz", youtubeId: "1BfivVfp13U" },
-  { title: "2025 06 01   Palavra Vídeo   DOM 10 00   II Coríntios 4 16   IrSalvador", youtubeId: "ZlIL07rcduE" }
+  { title: "2025 06 01   Palavra Vídeo   DOM 10 00   II Coríntios 4 16   IrSalvador", youtubeId: "ZlIL07rcduE" },
+  { title: "2025 05 25   Palavra Vídeo   DOM 10 00   Romanos 12   IrNilson", youtubeId: "bXnojqHaD9o" }
 ];
