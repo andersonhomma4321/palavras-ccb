@@ -203,5 +203,6 @@ export const listaVideos = [
   { title: "2025 02 12   Palavra Vídeo   QUA 15 00   Salmo 19   IrDavi", youtubeId: "o4ELofTdETw" },
   { title: "2025 01 26   Palavra Vídeo   DOM 10 00   II Samuel 23   IrSalvador", youtubeId: "pkn0ypgdMi4" },
   { title: "2025 01 15   Palavra Vídeo   QUA 15 00    Salmo 15   IrLuiz", youtubeId: "FLlOd7rwfU8" },
-  { title: "2025 01 05   Palavra Vídeo   DOM 10 00   I Coríntios 2   IrLuiz", youtubeId: "vTm10NTXGNA" }
+  { title: "2025 01 05   Palavra Vídeo   DOM 10 00   I Coríntios 2   IrLuiz", youtubeId: "vTm10NTXGNA" },
+  { title: "2025 01 01   Palavra Vídeo   QUA 15 00    Romanos 8 18   IrLuiz", youtubeId: "-JlTK0a8F60" }
 ];
