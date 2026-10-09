@@ -193,5 +193,6 @@ export const listaVideos = [
   { title: "2025 05 04   Palavra Vídeo   DOM 10 00   Hebreus 10   IrEliel", youtubeId: "yjQKpRqonWc" },
   { title: "2025 04 30   Palavra Vídeo   QUA 15 00   Lucas 7 18   IrLuiz", youtubeId: "OE1iwH3upQU" },
   { title: "2025 04 27   Palavra Vídeo   DOM 10 00   II Reis 22   IrSalvador", youtubeId: "3DjZIZXLTWk" },
-  { title: "2025 04 09   Palavra Vídeo   QUA 15 00   Salmo 1   IrHélio", youtubeId: "wX4nPH3jx_c" }
+  { title: "2025 04 09   Palavra Vídeo   QUA 15 00   Salmo 1   IrHélio", youtubeId: "wX4nPH3jx_c" },
+  { title: "2025 04 02   Palavra Vídeo   QUA 15 00   Coríntios 13   IrLuiz", youtubeId: "jImc9SBtczE" }
 ];
